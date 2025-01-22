@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Robinson</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <!--Bootstrap Icons-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+  </head>
+
+  <body id="body">
+    <section id="home" class="home">
+      <div class="grid">
+        <div class="about_me">
+          <h1 class="header"><span class="hi">Hi,</span> I'm Robinson</h1>
+          <p class="header_text">
+            I'm a student that loves everything computers. I love to learn, and
+            try new things. My life goal is to do as many unique things as
+            possible, and to be happy.
+          </p>
+        </div>
+        <ul class="menu" id="menu">
+          <li class="first">
+            <i class="bi bi-file-earmark-binary-fill">&nbsp;&nbsp;&nbsp;</i
+            >Projects
+          </li>
+          <li><i class="bi bi-pen-fill">&nbsp;&nbsp;&nbsp;</i>Hobbies</li>
+          <li><i class="bi bi-github">&nbsp;&nbsp;&nbsp;</i>Links</li>
+        </ul>
+      </div>
+    </section>
+    <section id="projects" class="projects">
+      <div class="header_container" id="header_container">
+        <div class="" id="typewriter_animation"></div>
+        <div class="typewriter_style display_none" id="project_header">
+          <h1 class="header typewriter_title" id="project_title">Projects</h1>
+        </div>
+      </div>
+        <div class="slide_show_grid">
+          <div class="description">
+            <h1 class="project_title">Chrultrabook Tools<br></h1>
+            <p class="project_paragraph">
+              A tool that adds back lost functionality and adds new features to
+              all chromebooks when they install an alternate operating system.
+              Initially, it was created in
+              <span class="electron">Electron,</span> but due to its large
+              bundle size the application was remade in
+              <span class="tauri">Tauri</span>. Some added features include
+              diagnostics, fan controls, and Activity Light controls.
+            </p>
+          </div>
+          <div class="video">
+            <!--add video of app, and finish slideshow-->
+            <video autoplay loop class="chrultrabook_tools">
+              <source src="../assets/chrultrabook_tools.mp4">
+            </video>
+          </div>
+          <div class="photo"></div>
+        </div>
+    </section>
+    <section id="hobbies" class="display_none">
+      <!--Add Hobbies-->
+    </section>
+    <section id="links" class="display_none">
+      <!--Add links and have background change color as the user hovers over it-->
+    </section>
+
+    <script src="script.js"></script>
+    <script></script>
+    <!--bug on chrome where transition fires everytime a form element is loaded-->
+  </body>
+</html>

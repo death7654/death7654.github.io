@@ -1,0 +1,202 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap");
+
+:root {
+  --text: #fff;
+  --clr-primary-a0: #bf0603;
+  --clr-primary-a10: #cb3920;
+  --clr-primary-a20: #d6563a;
+  --clr-primary-a30: #e07054;
+  --clr-primary-a40: #e9886e;
+  --clr-primary-a50: #f0a08a;
+  --clr-surface-a0: #121212;
+  --clr-surface-a10: #282828;
+  --clr-surface-a20: #3f3f3f;
+  --clr-surface-a30: #575757;
+  --clr-surface-a40: #717171;
+  --clr-surface-a50: #8b8b8b;
+  --clr-surface-tonal-a0: #231612;
+  --clr-surface-tonal-a10: #382b28;
+  --clr-surface-tonal-a20: #4e423f;
+  --clr-surface-tonal-a30: #655a57;
+  --clr-surface-tonal-a40: #7d7371;
+  --clr-surface-tonal-a50: #968e8b;
+  --shadow-color: 0deg 0% 45%;
+  --shadow: -1px 1px 1.8px hsl(var(--shadow-color) / 0.26),
+  -3.7px 3.7px 6.7px -0.4px hsl(var(--shadow-color) / 0.33),
+  -7.1px 7.2px 12.9px -0.7px hsl(var(--shadow-color) / 0.4),
+  -13.5px 13.5px 24.3px -1.1px hsl(var(--shadow-color) / 0.47),
+  -25px 25px 45.1px -1.5px hsl(var(--shadow-color) / 0.54);
+}
+
+body {
+  font-family: "Ubuntu", serif;
+  margin: 0;
+  height: 100vh;
+  overflow-x: hidden;
+}
+.container {
+  position: relative;
+  height: 100%;
+}
+.home {
+  color: var(--text);
+  min-height: 900px;
+  background-color: var(--clr-surface-a0);
+}
+
+.grid {
+  display: grid;
+  grid-template-areas: "about_me menu";
+  grid-template-columns: 2fr 1fr;
+  column-gap: 10px;
+  margin-left: 25px;
+  margin-right: 25px;
+  width: 100%;
+}
+.grid.menu {
+  grid-area: "menu";
+}
+.grid.about_me {
+  text-align: center;
+  grid-area: "about_me";
+}
+.menu {
+  margin: 0;
+  padding: 0;
+  padding-top: 5px;
+  margin-right: 100px;
+  margin-top: 50px;
+  background-color: var(--clr-surface-a10);
+  border-radius: 30px;
+  position: relative;
+  top: 20px;
+  list-style: none;
+  text-align: left;
+}
+.menu ul {
+  line-height: 10px;
+}
+.menu li {
+  color: white;
+  padding: 20px;
+  margin-top: 15px;
+  font-size: 20px;
+  text-align: left;
+  border-radius: 10px;
+}
+.menu li:hover {
+  background-color: var(--clr-surface-a20);
+  transition: 0.5s;
+  letter-spacing: 0.04em;
+}
+.first {
+  margin-top: 10px !important;
+}
+.about_me {
+  padding-right: 20px;
+}
+.hi {
+  color: red;
+  transition: 1s;
+}
+.header {
+  font-size: 60px;
+}
+.header_text {
+  font-size: 30px;
+}
+.projects {
+  min-height: 1000px;
+  background-color: #fff;
+  color: #000;
+}
+.header_container {
+  position: relative;
+  left: calc(50% - 166px);
+  display: inline-block;
+}
+.typewriter_animation
+{
+  position: relative;
+  top: 70px;
+  left: 5px;
+  height: 70px;
+  width: 100%;
+  background-color: #fff;
+  border-left: 2px solid rgb(0, 0, 0);
+  animation: typing 2.5s steps(8, end) forwards,
+    cursor 0.6s step-end infinite alternate;
+  z-index: 1;
+}
+.typewriter_style h1 {
+  z-index: 0;
+  position: relative;
+  left: 5px;
+  width: 100%;
+  font-family: monospace;
+  white-space: nowrap;
+  margin: 0 auto;
+  letter-spacing: 0.14em;
+}
+
+@keyframes typing {
+  100%
+  {
+    left: 100%;
+  }
+}
+
+@keyframes cursor {
+  50% {
+    border-color: transparent;
+  }
+}
+.project_title
+{
+  font-size: 30px;
+}
+.project_paragraph
+{
+  font-size: 20px;
+  line-height: 2;
+}
+.electron {
+  color: #006dfc;
+}
+.tauri {
+  color: #ff7700;
+}
+
+.slide_show_grid
+{
+  display: grid;
+  grid-template-areas: "description video";
+  grid-template-columns: 2fr 1fr;
+  margin: 20px;
+
+}
+.description
+{
+  grid-area: "description";
+  margin: 20px;
+  padding: 20px;
+}
+.video
+{
+  grid-area: "video";
+}
+.chrultrabook_tools
+{
+  display: block;
+  background-color: transparent;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: var(--shadow);
+  border-radius: 20px;
+}
+
+.display_none {
+  display: none !important;
+  transition: linear 1s;
+}
