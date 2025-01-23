@@ -49,6 +49,7 @@ function remove_instagram()
   body.classList.remove("instagram")
   projects.classList.remove("instagram")
 }
+
 function github()
 {
   link_section.classList.add("github")
