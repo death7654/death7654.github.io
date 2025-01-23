@@ -28,11 +28,24 @@
   -25px 25px 45.1px -1.5px hsl(var(--shadow-color) / 0.54);
 }
 
+a 
+{
+  all: unset;
+}
+a:hover
+{
+  text-decoration: underline;
+}
+
 body {
   font-family: "Ubuntu", serif;
   margin: 0;
   height: 100vh;
   overflow-x: hidden;
+}
+body::-webkit-scrollbar
+{
+  display: none;
 }
 .container {
   position: relative;
@@ -64,14 +77,15 @@ body {
   margin: 0;
   padding: 0;
   padding-top: 5px;
-  margin-right: 100px;
+  margin-right: 80px;
   margin-top: 50px;
   background-color: var(--clr-surface-a10);
   border-radius: 30px;
   position: relative;
-  top: 20px;
+  top: 80px;
   list-style: none;
   text-align: left;
+  height: 170px;
 }
 .menu ul {
   line-height: 10px;
@@ -106,7 +120,7 @@ body {
   font-size: 30px;
 }
 .projects {
-  min-height: 1000px;
+  min-height: 2100px;
   background-color: #fff;
   color: #000;
 }
@@ -195,6 +209,112 @@ body {
   box-shadow: var(--shadow);
   border-radius: 20px;
 }
+.project_gap_top
+{
+  position: relative;
+  grid-template-columns: 2fr 1.1fr !important; 
+  top: 300px;
+}
+.project_gap_top_2
+{
+  position: relative;
+  grid-template-columns: 2fr 3fr !important; 
+  top: 500px;
+}
+.driver_installer
+{
+  position: relative;
+  top: -40px;
+}
+.links
+{
+  min-height: 1000px;
+  margin-top: 100px;
+}
+.gap_above
+{
+  position: relative;
+}
+.link_container
+{
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  column-gap: 60px;
+  height: 100px;
+  margin: 100px;
+  margin-left: 325px;
+  margin-right: 325px;
+}
+.links_title
+{
+  font-size: 40px;
+  position: relative;
+  left: 43%;
+}
+.link
+{
+  box-shadow: var(--shadow);
+  background-color: #cfcfcf;
+  border-radius: 20px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 40px;
+  transition: 1s;
+}
+.link:hover
+{
+  background-color: #fff;
+  box-shadow: none;
+  transition: .25s;
+ 
+}
+.link i
+{
+  position: relative;
+  top: calc(50%/2)
+}
+.instagram
+{
+  background-color: #de618a !important;
+}
+.github
+{
+  background-color: #4f5a65 !important;
+}
+.github_text
+{
+  color: #fff;
+}
+.github_icon
+{
+  color: white !important;
+  background-color: #2b3137 !important;
+}
+.instagram_icon
+{
+  color: #fff !important;
+  background-color: #E1306C !important;
+}
+.facebook_icon
+{
+  color: #fff !important;
+  background-color: #1877F2 !important;
+}
+.linkedin_icon
+{
+  color: #fff !important;
+  background-color: #0077B5 !important;
+}
+.facebook
+{
+  background-color: #4d95f4 !important;
+}
+.linkedin
+{
+  background-color: #458db4 !important;
+}
+
 
 .display_none {
   display: none !important;
