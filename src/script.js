@@ -39,6 +39,19 @@ link_scroll.addEventListener("click", () => {
   window.scrollTo(0,3050);
 } )
 
+
+function github() {
+  link_section.classList.add("github");
+  body.classList.add("github");
+  projects.classList.add("github");
+  link_title.classList.add("white_text");
+}
+function remove_github() {
+  link_section.classList.remove("github");
+  body.classList.remove("github");
+  projects.classList.remove("github");
+  link_title.classList.remove("white_text");
+}
 function instagram() {
   link_section.classList.add("instagram");
   body.classList.add("instagram");
@@ -48,19 +61,6 @@ function remove_instagram() {
   link_section.classList.remove("instagram");
   body.classList.remove("instagram");
   projects.classList.remove("instagram");
-}
-
-function github() {
-  link_section.classList.add("github");
-  body.classList.add("github");
-  projects.classList.add("github");
-  link_title.classList.add("github_text");
-}
-function remove_github() {
-  link_section.classList.remove("github");
-  body.classList.remove("github");
-  projects.classList.remove("github");
-  link_title.classList.remove("github_text");
 }
 function facebook() {
   link_section.classList.add("facebook");
