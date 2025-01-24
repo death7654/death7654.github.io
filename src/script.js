@@ -14,7 +14,7 @@ const link_scroll = document.getElementById("link_scroll")
 window.addEventListener("scroll", () => {
   const y = (window.scrollY || window.pageYOffset);
   //console.log(y)
-  if (y > 330) {
+  if (y > 2250) {
     project_header.classList.remove("display_none");
     animation.classList.add("typewriter_animation");
   }
