@@ -28,6 +28,7 @@ body {
   margin: 0;
   height: 100vh;
   overflow-x: hidden;
+  background-color: rgba(186,255,201,1);
 }
 body::-webkit-scrollbar {
   display: none;
@@ -53,7 +54,7 @@ body::-webkit-scrollbar {
 }
 .border_radius_20
 {
-  border-radius: 20;
+  border-radius: 20px;
 }
 .text_align_left
 {
@@ -65,8 +66,17 @@ body::-webkit-scrollbar {
 }
 
 .home {
-  min-height: 900px;
-  background-color: var(--clr-surface-a0);
+  min-height: 2750px;
+ background: linear-gradient(0deg, 
+    rgba(255,179,186,1) 0%, 
+    rgba(245,150,165,1) 10%, 
+    rgba(230,120,140,1) 20%, 
+    rgba(200,100,120,1) 30%, 
+    rgba(150,75,90,1) 40%, 
+    rgba(100,50,60,1) 50%, 
+    rgba(40,30,35,1) 65%, 
+    rgb(20,20,20) 85%, 
+    rgb(0, 0, 0) 100%);
 }
 
 .grid {
@@ -84,20 +94,21 @@ body::-webkit-scrollbar {
   grid-area: "about_me";
 }
 .menu {
-  padding: 5px, 0, 0;
-  margin: 50px, 80px, 0, 0;
+  margin: 0;
+  padding: 0;
+  margin-top: 55px;
   background-color: var(--clr-surface-a10);
   border-radius: 30px;
   top: 80px;
   list-style: none;
-  height: 170px;
+  height: 160px;
 }
 .menu ul {
-  line-height: 10px;
+  line-height: 20px;
 }
 .menu li {
   padding: 20px;
-  margin-top: 15px;
+  margin: 10px;
   font-size: 20px;
 }
 .menu li:hover {
@@ -121,9 +132,12 @@ body::-webkit-scrollbar {
 .header_text {
   font-size: 30px;
 }
+.project_background
+{
+  background: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(186,255,201,1) 0%, rgba(255,179,186,1) 100%, rgba(255,255,255,1) 100%);
+}
 .projects {
   min-height: 2100px;
-  background-color: var(--text);
   color: #000;
 }
 .header_container {
@@ -131,14 +145,14 @@ body::-webkit-scrollbar {
   display: inline-block;
 }
 .typewriter_animation {
-  top: 70px;
-  left: 5px;
+  top: 0px;
   height: 70px;
-  background-color: var(--text);
+  background-color: #ffb3ba;
   border-left: 2px solid rgb(0, 0, 0);
   animation: typing 2.5s steps(8, end) forwards,
     cursor 0.6s step-end infinite alternate;
   z-index: 1;
+  float: right;
 }
 .typewriter_style h1 {
   z-index: 0;
@@ -146,7 +160,7 @@ body::-webkit-scrollbar {
   font-family: monospace;
   white-space: nowrap;
   margin: 0;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
 }
 
 .project_title {
@@ -189,7 +203,7 @@ body::-webkit-scrollbar {
 }
 .links {
   min-height: 600px;
-  margin-top: 100px;
+  background-color: rgba(186,255,201,1);
 }
 .link_container {
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -203,7 +217,6 @@ body::-webkit-scrollbar {
 }
 .link {
   box-shadow: var(--shadow);
-  background-color: #cfcfcf;
   text-align: center;
   vertical-align: middle;
   font-size: 40px;
@@ -249,7 +262,7 @@ body::-webkit-scrollbar {
 
 @keyframes typing {
   100% {
-    left: 100%;
+    width: 0%;
   }
 }
 
