@@ -10,7 +10,6 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
     <link href="style.css" rel="stylesheet" type="text/css" />
-
   </head>
 
   <body id="body">
@@ -24,83 +23,159 @@
             possible, and to be happy.
           </p>
         </div>
-        <ul class="menu" id="menu">
+        <ul class="menu p_relative" id="menu">
           <li class="first" id="projects_scroll">
             <i class="bi bi-file-earmark-binary-fill">&nbsp;&nbsp;&nbsp;</i
             >Projects
           </li>
-          <li><i class="bi bi-github">&nbsp;&nbsp;&nbsp;</i>Links</li>
+          <li id="link_scroll"><i class="bi bi-github">&nbsp;&nbsp;&nbsp;</i>Links</li>
         </ul>
       </div>
     </section>
     <section id="projects" class="projects">
-      <div class="header_container" id="header_container">
-        <div class="" id="typewriter_animation"></div>
-        <div class="typewriter_style display_none" id="project_header">
+      <div class="header_container p_relative" id="header_container">
+        <div class="p_relative" id="typewriter_animation"></div>
+        <div
+          class="typewriter_style display_none p_relative" 
+          id="project_header"
+        >
           <h1 class="header typewriter_title" id="project_title">Projects</h1>
         </div>
       </div>
-        <div class="slide_show_grid">
-          <div class="description">
-            <h1 class="project_title"> <a href = "https://github.com/death7654/Chrultrabook-Tools" target="_blank">Chrultrabook Tools <svg class="octicon octicon-link v-align-middle" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" role="img" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg><br></a></h1>
-            <p class="project_paragraph">
-              A tool that adds back lost functionality and new features to
-              all chromebooks on Windows, Linux and macOS
-            </p>
-          </div>
-          <div class="video">
-            <video autoplay muted loop class="chrultrabook_tools">
-              <source src="../assets/chrultrabook_tools.mp4">
-            </video>
-          </div>
+      <div class="slide_show_grid">
+        <div class="description">
+          <h1 class="project_title">
+            <a
+              href="https://github.com/death7654/Chrultrabook-Tools"
+              target="_blank"
+              >Chrultrabook Tools
+              <svg
+                class="octicon octicon-link v-align-middle"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                role="img"
+                aria-hidden="true"
+              >
+                <path
+                  d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
+                ></path></svg><br/></a>
+          </h1>
+          <p class="project_paragraph">
+            A tool that adds back lost functionality and new features to all
+            chromebooks on Windows, Linux and macOS
+          </p>
         </div>
-        <div class="slide_show_grid project_gap_top">
-          <div class="description">
-            <video autoplay muted loop class="chrultrabook_tools driver_installer">
-              <source src="../assets/driver.mp4">
-            </video>
-          </div>
-          <div class="video">
-            <h1 class="project_title"><a href = "https://github.com/death7654/Chromebook-Driver-Installer" target="_blank">Chromebook Driver Installer <svg class="octicon octicon-link v-align-middle" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" role="img" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg><br></a><br></h1>
-            <p class="project_paragraph ">
-              A tool that automatically detects and installs missing drivers for chromebooks running Windows
-            </p>
-          </div>
+        <div class="video">
+          <video autoplay muted loop class="chrultrabook_tools">
+            <source src="../assets/chrultrabook_tools.mp4" />
+          </video>
         </div>
-        <div class="slide_show_grid project_gap_top_2">
-          <div class="description">
-            <h1 class="project_title"><a href = "https://github.com/death7654/CHIP8-Emulator-CPP" target="_blank">Chip8 Emulator <svg class="octicon octicon-link v-align-middle" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" role="img" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg><br></a><br></h1>
-            <p class="project_paragraph">
-              A program that replicates the Chip8 interpreter
-            </p>
-          </div>
-          <div class="video">
-            <video autoplay muted loop class="chrultrabook_tools chip_8">
-              <source src="../assets/chip8.mp4">
-            </video>
-          </div>
+      </div>
+      <div class="slide_show_grid project_gap_top p_relative">
+        <div class="description">
+          <video
+            autoplay
+            muted
+            loop
+            class="chrultrabook_tools driver_installer p_relative"
+          >
+            <source src="../assets/driver.mp4" />
+          </video>
         </div>
-        
+        <div class="video">
+          <h1 class="project_title">
+            <a
+              href="https://github.com/death7654/Chromebook-Driver-Installer"
+              target="_blank"
+              >Chromebook Driver Installer
+              <svg
+                class="octicon octicon-link v-align-middle"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                role="img"
+                aria-hidden="true"
+              >
+                <path
+                  d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
+                ></path></svg><br /></a
+            ><br />
+          </h1>
+          <p class="project_paragraph">
+            A tool that automatically detects and installs missing drivers for
+            chromebooks running Windows
+          </p>
+        </div>
+      </div>
+      <div class="slide_show_grid project_gap_top_2 p_relative">
+        <div class="description">
+          <h1 class="project_title">
+            <a
+              href="https://github.com/death7654/CHIP8-Emulator-CPP"
+              target="_blank"
+              >Chip8 Emulator
+              <svg
+                class="octicon octicon-link v-align-middle"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                role="img"
+                aria-hidden="true"
+              >
+                <path
+                  d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
+                ></path></svg><br /></a
+            ><br />
+          </h1>
+          <p class="project_paragraph">
+            A program that replicates the Chip8 interpreter
+          </p>
+        </div>
+        <div class="video">
+          <video autoplay muted loop class="chrultrabook_tools chip_8">
+            <source src="../assets/chip8.mp4" />
+          </video>
+        </div>
+      </div>
     </section>
     <section id="links" class="links">
-
-      <div class="links_title gap_above">
-        <h1 id="links_title">Links</h1>
+      <div class="links_title p_relative">
+        <h1 id="links_title p_relative">Links</h1>
       </div>
-      <div class="link_container">
-      <div class="link github_icon" onmouseover="github()" onmouseleave="remove_github()">
-        <i class="bi bi-github"></i>
-      </div>  
-      <div class="link instagram_icon" onmouseover="instagram()" onmouseleave="remove_instagram()">
-        <i class="bi bi-instagram"></i>
-      </div>  
-      <div class="link facebook_icon" onmouseover="facebook()" onmouseleave="remove_facebook()">
-        <i class="bi bi-meta"></i>
+      <div class="link_container p_relative">
+        <div
+          class="link github_icon"
+          onmouseover="github()"
+          onmouseleave="remove_github()"
+        >
+          <a href="https://github.com/death7654" target="_blank"><i class="bi bi-github p_relative"></i></a>
+        </div>
+        <div
+          class="link instagram_icon"
+          onmouseover="instagram()"
+          onmouseleave="remove_instagram()"
+        >
+         <a href="https://www.instagram.com/robinsongeorge301/" target="_blank"> <i class="bi bi-instagram p_relative"></i></a>
+        </div>
+        <div
+          class="link facebook_icon"
+          onmouseover="facebook()"
+          onmouseleave="remove_facebook()"
+        >
+          <i class="bi bi-meta p_relative"></i>
+        </div>
+        <div
+          class="link linkedin_icon"
+          onmouseover="linkedin()"
+          onmouseleave="remove_linkedin()"
+        >
+          <a href="https://www.linkedin.com/in/robinsonarysseril/" target="_blank"> <i class="bi bi-linkedin p_relative"></i></a>
+        </div>
       </div>
-      <div class="link linkedin_icon" onmouseover="linkedin()" onmouseleave="remove_linkedin()">
-        <i class="bi bi-linkedin"></i>
-      </div>  
-    </div>
     </section>
 
     <script src="script.js"></script>
