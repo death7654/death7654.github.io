@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/body/body.component.scss"],
+  "sourcesContent": [".body {\r\n  background-color: #fff;\r\n}\r\n\r\n.title {\r\n  font-size: 1.2rem;\r\n  color: #08c3d8;\r\n}\r\n.description {\r\n  font-size: 1.2rem;\r\n}\r\n.image_transform {\r\n  transform-style: preserve-3d;\r\n  backface-visibility: hidden;\r\n  transform: perspective(760px) rotateY(12deg);\r\n  box-shadow: 1 1 1 1 1;\r\n}\r\n\r\n.image_text_title {\r\n  font-size: 1.4rem;\r\n}\r\n\r\n.image_text_description {\r\n  font-size: 2rem;\r\n}\r\n\r\n.image_text_paragraph {\r\n  font-size: 1.3rem;\r\n}\r\n\r\n.market_title {\r\n  font-size: 3rem;\r\n}\r\n\r\n.pricing_tile {\r\n  height: fit-content;\r\n  line-height: 2rem;\r\n}\r\n\r\n.intended_user {\r\n  font-size: 1rem;\r\n  color: #029450;\r\n}\r\n\r\n.color_black {\r\n  color: #000;\r\n}\r\n\r\n.class {\r\n  font-size: 2rem;\r\n}\r\n\r\n.price {\r\n  font-size: 3rem;\r\n}\r\n\r\n.USD {\r\n  font-size: 2.4rem;\r\n}\r\n\r\n.month {\r\n  color: #7e7e7e;\r\n}\r\n"],
+  "mappings": ";AAAA,CAAA;AACE,oBAAA;;AAGF,CAAA;AACE,aAAA;AACA,SAAA;;AAEF,CAAA;AACE,aAAA;;AAEF,CAAA;AACE,mBAAA;AACA,uBAAA;AACA,aAAA,YAAA,OAAA,QAAA;AACA,cAAA,EAAA,EAAA,EAAA,EAAA;;AAGF,CAAA;AACE,aAAA;;AAGF,CAAA;AACE,aAAA;;AAGF,CAAA;AACE,aAAA;;AAGF,CAAA;AACE,aAAA;;AAGF,CAAA;AACE,UAAA;AACA,eAAA;;AAGF,CAAA;AACE,aAAA;AACA,SAAA;;AAGF,CAAA;AACE,SAAA;;AAGF,CAAA;AACE,aAAA;;AAGF,CAAA;AACE,aAAA;;AAGF,CAAA;AACE,aAAA;;AAGF,CAAA;AACE,SAAA;;",
+  "names": []
+}
