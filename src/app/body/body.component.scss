@@ -1,0 +1,63 @@
+.body {
+  background-color: #fff;
+}
+
+.title {
+  font-size: 1.2rem;
+  color: #08c3d8;
+}
+.description {
+  font-size: 1.2rem;
+}
+.image_transform {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transform: perspective(760px) rotateY(12deg);
+  box-shadow: 1 1 1 1 1;
+}
+
+.image_text_title {
+  font-size: 1.4rem;
+}
+
+.image_text_description {
+  font-size: 2rem;
+}
+
+.image_text_paragraph {
+  font-size: 1.3rem;
+}
+
+.market_title {
+  font-size: 3rem;
+}
+
+.pricing_tile {
+  height: fit-content;
+  line-height: 2rem;
+}
+
+.intended_user {
+  font-size: 1rem;
+  color: #029450;
+}
+
+.color_black {
+  color: #000;
+}
+
+.class {
+  font-size: 2rem;
+}
+
+.price {
+  font-size: 3rem;
+}
+
+.USD {
+  font-size: 2.4rem;
+}
+
+.month {
+  color: #7e7e7e;
+}

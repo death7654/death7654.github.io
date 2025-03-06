@@ -1,0 +1,32 @@
+<nav class="navbar fixed-top navbar-expand-lg pt-3 pb-3 navbar_transparent" id="navbar" data-bs-theme="dark"
+  style="backdrop-filter: blur(10px);">
+  <div class="container-fluid">
+    <a class="navbar-brand brand-pad fw-bold" href="../../index.html">
+      Wallet ++
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+      aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel"
+      style="height: 100vh;">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel"> Wallet++</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body opacity-100">
+        <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="javascript:void(0)" (click)="scrollToTop()">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="javascript:void(0)" (click)="scrollToDiscover()">Discover</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="javascript:void(0)" (click)="scrollToPricing()">Pricing</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
