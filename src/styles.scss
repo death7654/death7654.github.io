@@ -1,33 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-root {
-  /*$clr-dark-a0: #000000;
-$clr-light-a0: #ffffff;
-
-$clr-primary-a0: #6056a0;
-$clr-primary-a10: #7267ab;
-$clr-primary-a20: #8379b5;
-$clr-primary-a30: #958bc0;
-$clr-primary-a40: #a69dca;
-$clr-primary-a50: #b8b0d5;
-
-$clr-surface-a0: #121212;
-*/
-  --clr-surface-a10: #282828;
-  /*
-$clr-surface-a20: #3f3f3f;
-$clr-surface-a30: #575757;
-$clr-surface-a40: #717171;
-$clr-surface-a50: #8b8b8b;
-
-$clr-surface-tonal-a0: #1a191f;
-$clr-surface-tonal-a10: #2f2e34;
-$clr-surface-tonal-a20: #45444a;
-$clr-surface-tonal-a30: #5d5c61;
-$clr-surface-tonal-a40: #767579;
-$clr-surface-tonal-a50: #908f93;
-*/
-}
 // Custom.scss
 // Option B: Include parts of Bootstrap
 
@@ -66,7 +38,7 @@ $position-values: (
 @import "../node_modules/bootstrap/scss/type";
 @import "../node_modules/bootstrap/scss/images";
 @import "../node_modules/bootstrap/scss/containers";
-@import "../node_modules/bootstrap/scss/grid";
+//@import "../node_modules/bootstrap/scss/grid";
 @import "../node_modules/bootstrap/scss/helpers";
 
 // 7. Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
@@ -82,7 +54,7 @@ body {
   overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: poppins;
 }
 .container::-webkit-scrollbar {
   width: 0;

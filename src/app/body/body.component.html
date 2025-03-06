@@ -44,22 +44,26 @@
                 </div>
             </div>
         </div>
-        <div id="discover">
-            <div class="row pt-5">
-                <p class="market_title pt-5 fw-semibold">Supported Markets</p>
+        <hr>
+        <div id="discover" class="pt-5"> </div>
+        <div class="pt-3">
+            <div class="row">
+                <p class="market_title pt-5 fw-medium">Supported Markets</p>
+                <div class="pt-5"> </div>
                 @for(item of data; track item.name){
                 <div class="col">
-                    <app-tiles [name]="item.name" [image]="item.image" class="pt-3"></app-tiles>
+                    <app-tiles [name]="item.name" [image]="item.image" class="p-2"></app-tiles>
                 </div>
                 }
             </div>
         </div>
+        <hr>
         <div id="pricing">
             <div class="row pt-5 pb-5">
                 <div class="pt-5"></div>
-                <p class="market_title fw-semibold">Pricing</p>
+                <p class="market_title fw-medium">Pricing</p>
                 <div class="col pt-5">
-                    <div class="rounded-4 border border-dark-subtle border-2 text-start p-3 pricing_tile">
+                    <div class="rounded-4 border border-dark-subtle border-0 text-start p-3 pricing_tile">
                         <p class="intended_user">For New Users</p>
                         <p class="class fw-semibold ">Free</p>
                         <p class="intended_user color_black">Access to one business's data</p>
@@ -67,11 +71,11 @@
                         <p class="price fw-semibold">$0 <span class="USD fw-light">USD</span></p>
                         <p class="month">/month</p>
                         <div class="pt-5"> </div>
-                        <button type="button" class="btn btn-outline-dark">Create Account</button>
+                        <button type="button" class="btn btn-outline-dark button_size">Create Account</button>
                     </div>
                 </div>
                 <div class="col pt-5">
-                    <div class="rounded-4 border border-2 border-success text-start p-3 pricing_tile">
+                    <div class="rounded-4 border border-3 border-success text-start p-3 pricing_tile">
                         <p class="intended_user">For Everyone</p>
                         <p class="class fw-semibold">Pro</p>
                         <p class="intended_user color_black ">Access to all businesses</p>
@@ -79,11 +83,11 @@
                         <p class="price fw-semibold">$20 <span class="USD fw-light">USD</span></p>
                         <p class="month">/month</p>
                         <div class="pt-5"> </div>
-                        <button type="button" class="btn btn-success">Get Started</button>
+                        <button type="button" class="btn btn-success button_size">Get Started</button>
                     </div>
                 </div>
                 <div class="col pt-5">
-                    <div class="rounded-4 border border-dark-subtle border-2 text-start p-3 pricing_tile">
+                    <div class="rounded-4 border border-dark-subtle border-0 text-start p-3 pricing_tile">
                         <p class="intended_user">For Larger Organizations</p>
                         <p class="class fw-semibold">Enterprise</p>
                         <p class="intended_user color_black">Contact us for more information</p>
@@ -91,7 +95,7 @@
                         <p class="price fw-semibold">$100 <span class="USD fw-light">USD</span></p>
                         <p class="month">/month</p>
                         <div class="pt-5"> </div>
-                        <button type="button" class="btn btn-outline-dark">Contact Us</button>
+                        <button type="button" class="btn btn-outline-dark button_size">Contact Us</button>
                     </div>
                 </div>
             </div>

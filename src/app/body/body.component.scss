@@ -4,10 +4,12 @@
 
 .title {
   font-size: 1.2rem;
-  color: #08c3d8;
+  letter-spacing: .1rem;
+  color: #132fab;
 }
 .description {
   font-size: 1.2rem;
+  line-height: 2.3rem;
 }
 .image_transform {
   transform-style: preserve-3d;
@@ -22,14 +24,18 @@
 
 .image_text_description {
   font-size: 2rem;
+  letter-spacing: .2rem;
 }
 
 .image_text_paragraph {
   font-size: 1.3rem;
+  line-height: 2.3rem;
+
 }
 
 .market_title {
-  font-size: 3rem;
+  font-size: 3.5rem;
+  letter-spacing: .2rem;
 }
 
 .pricing_tile {
@@ -52,6 +58,7 @@
 
 .price {
   font-size: 3rem;
+  letter-spacing: .2rem;
 }
 
 .USD {
@@ -60,4 +67,8 @@
 
 .month {
   color: #7e7e7e;
+}
+.button_size
+{
+  font-size: 1.2rem;
 }
