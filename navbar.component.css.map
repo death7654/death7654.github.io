@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/navbar/navbar.component.scss"],
-  "sourcesContent": [".navbar_transparent {\r\n  background-color: transparent;\r\n  color: white;\r\n  transition: 0.5s;\r\n}\r\n.navbar_black {\r\n  transition: 0.5s;\r\n  background-color: rgba(0, 0, 0, 0.758);\r\n  box-shadow: 0, 3px, 10px, rgba(0, 0, 0, 0.15);\r\n}\r\n\r\n.brand-pad {\r\n  padding-left: 2%;\r\n}\r\n"],
-  "mappings": ";AAAA,CAAA;AACE,oBAAA;AACA,SAAA;AACA,cAAA;;AAEF,CAAA;AACE,cAAA;AACA,oBAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;AACA;IAAA,CAAA;IAAA,GAAA;IAAA,IAAA;IAAA,KAAA,CAAA,EAAA,CAAA,EAAA,CAAA,EAAA;;AAGF,CAAA;AACE,gBAAA;;",
-  "names": []
-}
