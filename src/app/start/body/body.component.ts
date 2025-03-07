@@ -122,11 +122,6 @@ export class BodyComponent {
       image: '../../assets/icons/mcdonald.svg',
     },
     {
-      name: 'Burger King',
-      market_name: 'BKC',
-      image: '../../assets/icons/burgerking.svg',
-    },
-    {
       name: 'Nintendo',
       market_name: 'NTDOY',
       image: '../../assets/icons/nintendo.svg',

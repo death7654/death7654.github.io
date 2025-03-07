@@ -8,9 +8,9 @@ import { ApplicationConfig } from '@angular/core';
 
 export const routes: Routes = [
     { path: 'start', component: StartComponent },
-    { path: '', component: StartComponent },//default
     { path: 'markets', component: SupportedMarketsComponent },
     { path: 'pricing', component: PricingComponent },
+    { path: '', redirectTo: '/start', pathMatch: 'full' },
 
 ];
 

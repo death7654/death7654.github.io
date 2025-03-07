@@ -17,7 +17,8 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/website",
+            "outputPath": "dist/stock_market",
+            "baseHref": "/stock_market/",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -63,7 +64,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "optimization": false,
+              "optimization": true,
               "extractLicenses": false,
               "sourceMap": true
             }
