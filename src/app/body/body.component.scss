@@ -1,5 +1,6 @@
 .body {
   background-color: #fff;
+  width: 100%;
 }
 
 .title {
@@ -72,3 +73,35 @@
 {
   font-size: 1.2rem;
 }
+.prevent_shrinking
+{
+  width: 33.3%;
+}
+.container_width
+{
+  width: 100vw;
+}
+
+@media (max-width: 768px) {
+  .prevent_shrinking
+{
+  width: 100%;
+}
+.image_transform {
+  transform: none;
+}
+
+}
+
+/* Mobile Phones */
+@media (max-width: 480px) {
+  .prevent_shrinking
+  {
+    width: 100%
+  }
+  .image_transform {
+    transform: none;
+  }
+
+}
+

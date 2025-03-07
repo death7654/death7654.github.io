@@ -1,7 +1,7 @@
-<nav class="navbar fixed-top navbar-expand-lg pt-3 pb-3 navbar_transparent" id="navbar" data-bs-theme="dark"
+<nav class="navbar fixed-top navbar-expand-lg pt-3 pb-3 navbar_transparent w-100" id="navbar" data-bs-theme="dark"
   style="backdrop-filter: blur(3px);">
   <div class="container-fluid">
-    <a class="navbar-brand ps-2 fw-bold" href="../../index.html">
+    <a class="navbar-brand ps-2 fw-bold" href="../../index.html" style="filter: opacity(1);">
       Wallet++
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
@@ -9,7 +9,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel"
-      style="height: 100vh;">
+      style="height: 300vh; filter: opacity(0.9);">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasNavbarLabel"> Wallet++</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -17,13 +17,13 @@
       <div class="offcanvas-body opacity-100">
         <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="javascript:void(0)" (click)="scrollToTop()">Home</a>
+            <a class="nav-link active" aria-current="page" href="javascript:void(0)" (click)="scrollToTop()" style="filter: opacity(1);">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)" (click)="scrollToDiscover()">Discover</a>
+            <a class="nav-link" href="javascript:void(0)" (click)="scrollToDiscover()" style="filter: opacity(1);">Discover</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)" (click)="scrollToPricing()">Pricing</a>
+            <a class="nav-link" href="javascript:void(0)" (click)="scrollToPricing()" style="filter: opacity(1);">Pricing</a>
           </li>
         </ul>
       </div>

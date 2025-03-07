@@ -2,17 +2,16 @@
 .home_page {
   color: #fff;
   min-height: 100vh;
-  width: 100vw;
+  background-image: url('../../assets/4k-New-York-City-Twilight-4K-Wallpaper.png');
+  background-repeat: no-repeat;
+  background-size: auto;
 }
 
 .background-img {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
   object-fit: cover;
-  z-index: -1;
 }
 
 .name {
