@@ -32,56 +32,18 @@
   font-size: 1.3rem;
   line-height: 2.3rem;
 }
+.button_font_size
+{
+  font-size: 1.3rem;
+}
 
 .market_title {
   font-size: 3.5rem;
-  letter-spacing: 0.2rem;
 }
-
-.pricing_tile {
-  height: fit-content;
-  line-height: 2rem;
+.custom_height
+{
 }
-
-.intended_user {
-  font-size: 1rem;
-  color: #029450;
-}
-
-.color_black {
-  color: #000;
-}
-
-.class {
-  font-size: 2rem;
-}
-
-.price {
-  font-size: 3rem;
-  letter-spacing: 0.2rem;
-}
-
-.USD {
-  font-size: 2.4rem;
-}
-
-.month {
-  color: #7e7e7e;
-}
-.button_size {
-  font-size: 1.2rem;
-}
-.prevent_shrinking {
-  width: 33.3%;
-}
-.container_width {
-  width: 100vw;
-}
-
 @media (max-width: 768px) {
-  .prevent_shrinking {
-    width: 100%;
-  }
   .image_transform {
     transform: none;
   }
@@ -89,9 +51,6 @@
 
 /* Mobile Phones */
 @media (max-width: 480px) {
-  .prevent_shrinking {
-    width: 100%;
-  }
   .image_transform {
     transform: none;
   }

@@ -1,14 +1,26 @@
-.navbar_transparent {
-  background-color: transparent;
-  color: white;
-  transition: 0.5s;
-}
-.navbar_black {
-  transition: 0.5s;
-  background-color: rgba(0, 0, 0, 0.95);
-  box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
-}
 
-.brand-pad {
-  padding-left: 2%;
-}
+.navbar_transparent {
+    background-color: transparent;
+    color: white;
+    transition: 0.5s;
+  }
+  .navbar_black {
+    transition: 0.5s;
+    background-color: rgba(0, 0, 0, 0.95);
+    box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
+  }
+  .navbar_black_no_trans {
+    background-color: rgba(0, 0, 0, 0.95);
+    box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
+  }
+  .navbar_transparent_no_trans
+  {
+    background-color: transparent;
+    color: white;
+  }
+  
+  .brand-pad {
+    padding-left: 2%;
+  }
+  
+  

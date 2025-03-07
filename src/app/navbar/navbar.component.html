@@ -1,4 +1,4 @@
-<nav class="navbar fixed-top navbar-expand-lg pt-3 pb-3 navbar_transparent w-100" id="navbar" data-bs-theme="dark"
+<nav class="navbar fixed-top navbar-expand-lg pt-3 pb-3 w-100" [class]="[class]" id="navbar" data-bs-theme="dark"
   style="backdrop-filter: blur(3px);">
   <div class="container-fluid">
     <a class="navbar-brand ps-2 fw-bold" href="../../index.html" style="filter: opacity(1);">
@@ -17,16 +17,16 @@
       <div class="offcanvas-body opacity-100">
         <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="javascript:void(0)" (click)="scrollToTop()"
+            <a routerLink="/start"  href="javascript:void(0)" class="nav-link active" aria-current="page" routerLinkActive="active"
               style="filter: opacity(1);">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)" (click)="scrollToDiscover()"
-              style="filter: opacity(1);">Discover</a>
+            <a class="nav-link" routerLink="/markets" href="javascript:void(0)"
+              style="filter: opacity(1);" >Discover</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0)" (click)="scrollToPricing()"
-              style="filter: opacity(1);">Pricing</a>
+            <a class="nav-link" routerLink="/pricing" href="javascript:void(0)"
+              style="filter: opacity(1);" >Pricing</a>
           </li>
         </ul>
       </div>

@@ -1,17 +1,18 @@
-import { Component, HostListener, Renderer2 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { start } from 'repl';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, HostListener, Input, Renderer2 } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss',
+  styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
-  activeLink = 'home';
+  @Input() class:string = '';
 
+  
   constructor(private renderer: Renderer2) {}
+
 
   @HostListener('window:scroll', [])
   onScroll(): void {
@@ -28,27 +29,7 @@ export class NavbarComponent {
       navbar?.classList.remove('navbar_black');
       navbar?.classList.add('navbar_transparent');
     }
+
   }
 
-  setActive(link: string) {
-    this.activeLink = link;
-  }
-
-  scrollToTop() {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }
-
-  scrollToPricing() {
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-  scrollToDiscover() {
-    const discoverSection = document.getElementById('discover');
-    if (discoverSection) {
-      discoverSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
 }

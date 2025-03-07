@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TilesComponent } from './tiles/tiles.component';
+import { TilesComponent } from '../../tiles/tiles.component';
 
 @Component({
   selector: 'app-body',
@@ -25,7 +25,6 @@ export class BodyComponent {
         'Continuous learning and adaptation refine strategies, maximizing returns while managing risk efficiently',
     },
   ];
-
   data = [
     {
       name: 'Google',
