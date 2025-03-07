@@ -5,7 +5,7 @@
 
 .title {
   font-size: 1.2rem;
-  letter-spacing: .1rem;
+  letter-spacing: 0.1rem;
   color: #132fab;
 }
 .description {
@@ -25,18 +25,17 @@
 
 .image_text_description {
   font-size: 2rem;
-  letter-spacing: .2rem;
+  letter-spacing: 0.2rem;
 }
 
 .image_text_paragraph {
   font-size: 1.3rem;
   line-height: 2.3rem;
-
 }
 
 .market_title {
   font-size: 3.5rem;
-  letter-spacing: .2rem;
+  letter-spacing: 0.2rem;
 }
 
 .pricing_tile {
@@ -59,7 +58,7 @@
 
 .price {
   font-size: 3rem;
-  letter-spacing: .2rem;
+  letter-spacing: 0.2rem;
 }
 
 .USD {
@@ -69,39 +68,31 @@
 .month {
   color: #7e7e7e;
 }
-.button_size
-{
+.button_size {
   font-size: 1.2rem;
 }
-.prevent_shrinking
-{
+.prevent_shrinking {
   width: 33.3%;
 }
-.container_width
-{
+.container_width {
   width: 100vw;
 }
 
 @media (max-width: 768px) {
-  .prevent_shrinking
-{
-  width: 100%;
-}
-.image_transform {
-  transform: none;
-}
-
-}
-
-/* Mobile Phones */
-@media (max-width: 480px) {
-  .prevent_shrinking
-  {
-    width: 100%
+  .prevent_shrinking {
+    width: 100%;
   }
   .image_transform {
     transform: none;
   }
-
 }
 
+/* Mobile Phones */
+@media (max-width: 480px) {
+  .prevent_shrinking {
+    width: 100%;
+  }
+  .image_transform {
+    transform: none;
+  }
+}
