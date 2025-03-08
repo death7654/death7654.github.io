@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { TilesComponent } from "../tiles/tiles.component";
 import { NavbarComponent } from "../navbar/navbar.component";
 
 @Component({
   selector: 'app-supported-markets',
-  imports: [TilesComponent, NavbarComponent],
+  imports: [NavbarComponent],
   templateUrl: './supported-markets.component.html',
   styleUrl: './supported-markets.component.scss'
 })

@@ -11,6 +11,7 @@ export const routes: Routes = [
     { path: 'markets', component: SupportedMarketsComponent },
     { path: 'pricing', component: PricingComponent },
     { path: '', redirectTo: '/start', pathMatch: 'full' },
+    { path: '**', redirectTo: '/start', pathMatch: "full"}
 
 ];
 

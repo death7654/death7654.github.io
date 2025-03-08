@@ -38,9 +38,9 @@
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.scss"
             ],
-            "scripts": [  
+            "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-          ],
+            ],
             "server": "src/main.server.ts",
             "prerender": true,
             "ssr": {
@@ -64,7 +64,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "optimization": true,
+              "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
             }
@@ -120,8 +120,22 @@
             }
           },
           "defaultConfiguration": "production"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }
