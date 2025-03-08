@@ -10,8 +10,13 @@
     box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
   }
   .navbar_black_no_trans {
-    background-color: rgba(0, 0, 0, 0.95);
+    background-color: rgba(216, 216, 216, 0.95);
+    color: black;
     box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
+  }
+  .navbar_black_no_trans a
+  {
+    color: black;
   }
   .navbar_transparent_no_trans
   {

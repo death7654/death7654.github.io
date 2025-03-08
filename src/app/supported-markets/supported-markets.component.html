@@ -1,19 +1,39 @@
 <app-navbar [class]="'navbar_black_no_trans'"></app-navbar>
-<div class="container pt-5 mx-auto">
+<div class="container pt-5 mx-auto markets">
     <div class="row">
         <div class="text-center">
             <p class="pt-5 market_title">Market Data</p>
         </div>
     </div>
     <div class="row">
-        <div class="col-md">
-            <ul class="list-group">
-                <li class="list-group-item">An item</li>
-                <li class="list-group-item">A second item</li>
-                <li class="list-group-item">A third item</li>
-                <li class="list-group-item">A fourth item</li>
-                <li class="list-group-item">And a fifth one</li>
-              </ul>
+        <div class="col-md-3">
+            <div class="container">
+                <div class="container_contain overflow-y-scroll overflow-x-hidden ">
+                    <div class="row p-3 pe-0 me-0">
+                        @for(item of data; track item.name){
+                        <div class="col w-100 h-100 d-inline-block pt-2 mx-auto">
+                            <button type="button" class="btn btn-outline-dark rounded-3 market_tile mx-auto"
+                                (click)="parse_data(item.market_name)">
+                                <div class="container-fluid mx-auto">
+                                    <div class="row justify-content-start text-start align-items-center mx-auto">
+                                        <div class="col-md-3">
+                                            <img [src]='item.image' class="img-fluid mx-auto" [alt]="item.market_name">
+                                        </div>
+                                        <div class="col-md-9">
+                                            {{item.name}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 h-15">
+            <canvas class="chart-background border border-dark-subtle border-1 p-4 rounded-3 w-100" baseChart [data]="lineChartData" [options]="lineChartOptions"
+                [type]="'line'"></canvas>
         </div>
     </div>
 </div>

@@ -1,14 +1,27 @@
-import { Component } from '@angular/core';
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { Component, ViewChild } from '@angular/core';
 import { NavbarComponent } from "../navbar/navbar.component";
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { ChartConfiguration } from "chart.js/auto";
+import { BaseChartDirective } from 'ng2-charts';
+import { HttpClient } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
-@Component({
+
+
+@Component({ 
   selector: 'app-supported-markets',
-  imports: [NavbarComponent],
+  providers: [provideCharts(withDefaultRegisterables())],
+  imports: [NavbarComponent, BaseChartDirective, CommonModule, HttpClientModule],
   templateUrl: './supported-markets.component.html',
   styleUrl: './supported-markets.component.scss'
 })
 export class SupportedMarketsComponent {
 
+  constructor(private http: HttpClient) {}
+
+  https_data: any;
   data = [
     {
       name: 'Google',
@@ -116,5 +129,80 @@ export class SupportedMarketsComponent {
       image: '../../assets/icons/nintendo.svg',
     },
   ];
+
+  chartdata: number[] = [];
+
+  
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+
+  apply_data()
+  {
+    this.lineChartData.datasets[0].data = this.https_data
+    this.chart?.update();
+  }
+  parse_data(stock: string) {
+    const filePath = `assets/jsons/${stock}.json`;
+    this.http.get(filePath).subscribe(
+      response => {
+        this.https_data = response;
+        this.apply_data();
+        console.log(this.https_data);
+      },
+      error => {
+        console.error("Error loading JSON:", error);
+      }
+    );
+  }
+  
+  public lineChartData: ChartConfiguration["data"] = {
+    datasets: [
+      {
+        data: [],
+        label: "Market Price",
+        backgroundColor: "rgba(232,72,85,0.1)",
+        borderColor: "#FF6694",
+        pointBackgroundColor: "#000",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "rgba(148,159,177,0.8)",
+        fill: "origin",
+        pointHitRadius: 25,
+        tension: 0.3,
+      },
+    ],
+    labels: [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10"
+    ],
+  };
+
+  public lineChartOptions: ChartConfiguration["options"] = {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      y: {
+        position: "left",
+        grid: {
+          color: "#797979",
+        },
+      },
+      x: {
+        grid: {
+          color: "#797979",
+        },
+      },
+    },
+    plugins: {
+      legend: { display: false },
+    },
+  };
 }
 
