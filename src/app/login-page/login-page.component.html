@@ -1,17 +1,17 @@
-<div class="background">
-  <div class="header d-flex align-items-center">
+<div class="background"></div>
+  <div class="header d-flex align-items-center no_blur position-absolute top-0">
     <img src="../../assets/wallet_2.svg" alt="logo" class="logo ms-3 me-0" />
     <p class="login_logo_title m-auto ms-0">Wallet++</p>
   </div>
-  <div class="position-absolute top-50 start-50 translate-middle">
+  <div class="position-absolute top-50 start-50 translate-middle padding_top">
     <p class="welcome fw-bold mx-auto text-center">Welcome Back</p>
     <div class="container-fluid w-100 mx-auto text-center">
       <p class="request fw-light mx-auto w-100">Please log in</p>
     </div>
     <div
-      class="container-fluid w-75 h-100 justify-content-center border border-1 border-dark rounded-4 login_island"
+      class="container-fluid w-100 h-100 justify-content-center rounded-2"
     >
-      <div class="p-2 pt-4 text-center mx-auto w-100">
+      <div class="p-2 pt-4 w-75 text-center mx-auto">
         <input
           type="text"
           class="form-control border-dark pt-2 pb-2 bg-transparent w-100 mx-auto"
@@ -20,7 +20,7 @@
           placeholder="Email"
         />
       </div>
-      <div class="p-2 text-center mx-auto w-100">
+      <div class="p-2 text-center w-75 mx-auto">
         <input
           type="text"
           class="form-control border-dark pt-2 pb-2 bg-transparent w-100 mx-auto"
@@ -32,7 +32,7 @@
       <div class="p-2 pb-3 mx-auto w-100 text-center">
         <button
           type="button"
-          class="btn btn-outline-primary mx-auto px-4"
+          class="btn btn-outline-success mx-auto w-75"
           data-bs-toggle="popover"
           data-bs-title="Not Implemented"
           data-bs-content="This is just a prototype :D"
@@ -40,6 +40,76 @@
           Login
         </button>
       </div>
+      <div class="mx-auto text-center">
+      <p class="fw-light unable_to_log"><u>Can't Log In?</u></p>
+      </div>
+      <div>
+      <div class="button_container mx-auto w-75 text-center p-2 pt-3">
+        <button
+          class="btn btn-outline-dark mx-auto w-100 rounded-2 text-start align-middle"
+          type="button"
+        >
+          <div class="container-fluid justify-content-center align-items-center p-0">
+            <div class="row p-1">
+              <div class="container-fluid">
+                <div
+                  class="row justify-content-start text-start ps-0 align-items-center mx-auto"
+                >
+                  <div class="col-md-2">
+                    <i class="bi bi-google font_size p-0"></i>
+                  </div>
+                  <div class="col-md-8">Continue With Google</div>
+                  <div class="col-md-1 text-end"><i class="bi bi-chevron-right me-0 ms-4"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </button>
+      </div>
+      <div class="button_container mx-auto w-75 text-center p-2">
+        <button
+          class="btn btn-outline-dark mx-auto w-100 rounded-2 text-start align-middle"
+          type="button"
+        >
+          <div class="container-fluid justify-content-center align-items-center p-0">
+            <div class="row p-1">
+              <div class="container-fluid">
+                <div
+                  class="row justify-content-start text-start ps-0 align-items-center mx-auto"
+                >
+                  <div class="col-md-2">
+                    <i class="bi bi-apple p-0 m-0 font_size"></i>
+
+                  </div>
+                  <div class="col-md-8">Continue With Apple</div>
+                  <div class="col-md-1 text-end"><i class="bi bi-chevron-right me-0 ms-4"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </button>
+      </div>
+      <div class="button_container mx-auto w-75 text-center p-2">
+        <button
+          class="btn btn-outline-dark mx-auto w-100 rounded-2 text-start align-middle"
+          type="button"
+        >
+          <div class="container-fluid justify-content-center align-items-center p-0">
+            <div class="row p-1">
+              <div class="container-fluid">
+                <div
+                  class="row justify-content-start text-start ps-0 align-items-center mx-auto"
+                >
+                  <div class="col-md-2">
+                    <i class="bi bi-github font_size"></i>
+                  </div>
+                  <div class="col-md-8">Continue With Github</div>
+                  <div class="col-md-1 text-end"><i class="bi bi-chevron-right me-0 ms-4"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
-</div>
