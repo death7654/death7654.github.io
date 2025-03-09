@@ -1,29 +1,23 @@
-.welcome
-{
-    font-size: 4rem;
+.welcome {
+  font-size: 4rem;
 }
-.request
-{
-    font-size: 1rem;
+.request {
+  font-size: 1rem;
 }
-.login_island
-{
-    background-color: #c5c5c5d6;
+.login_island {
+  background-color: #c5c5c5d6;
 }
-.background
-{
-    background-image: url(../../assets/login_background.jpeg);
-    background-repeat: no-repeat;
-    background-size: auto;
-    height: 100vh;
+.background {
+  background-image: url(../../assets/login_background.jpeg);
+  background-repeat: no-repeat;
+  background-size: auto;
+  height: 100vh;
 }
-.logo
-{
-    height: 4rem;
-    width: 4rem;
+.logo {
+  height: 4rem;
+  width: 4rem;
 }
-.login_logo_title
-{
-    font-size: 1.4rem;
-    transform: translateX(-10%);
+.login_logo_title {
+  font-size: 1.4rem;
+  transform: translateX(-10%);
 }

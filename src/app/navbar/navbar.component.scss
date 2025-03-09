@@ -1,71 +1,57 @@
-
 .navbar_transparent {
-    background-color: transparent;
-    color: white;
-    transition: 0.5s;
-  }
-  .navbar_black {
-    transition: 0.5s;
-    background-color: rgba(0, 0, 0, 0.95);
-    box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
-  }
-  .navbar_black ul li a
-  {
-    color: #fff
-  }
-  .navbar_transparent #branding
-  {
-    color: #fff;
-  }
-  .navbar_transparent #nav_item
-  {
-    color: #fff;
-  }
-  .navbar_black #branding
-  {
-    color: #fff;
-  }
-  .navbar_transparent button span
-  {
-    filter: brightness(100);
-  }
-  .navbar_black button span
-  {
-    filter: brightness(100);
-  }
+  background-color: transparent;
+  color: white;
+  transition: 0.5s;
+}
+.navbar_black {
+  transition: 0.5s;
+  background-color: rgba(0, 0, 0, 0.95);
+  box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
+}
+.navbar_black ul li a {
+  color: #fff;
+}
+.navbar_transparent #branding {
+  color: #fff;
+}
+.navbar_transparent #nav_item {
+  color: #fff;
+}
+.navbar_black #branding {
+  color: #fff;
+}
+.navbar_transparent button span {
+  filter: brightness(100);
+}
+.navbar_black button span {
+  filter: brightness(100);
+}
 
-  .navbar_black_no_trans {
-    background-color: rgba(216, 216, 216, 0.95);
-    color: black;
-    box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
-  }
-  .navbar_black_no_trans a
-  {
-    color: black;
-  }
-  .navbar_transparent_no_trans
-  {
-    background-color: transparent;
-    color: white;
-  }
-  
-  .brand-pad {
-    padding-left: 2%;
-  }
+.navbar_black_no_trans {
+  background-color: rgba(216, 216, 216, 0.95);
+  color: black;
+  box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
+}
+.navbar_black_no_trans a {
+  color: black;
+}
+.navbar_transparent_no_trans {
+  background-color: transparent;
+  color: white;
+}
 
-  @media (max-width: 768px) {
-    .navbar_transparent a
-    {
-      color: #000;
-    }
-    .navbar_transparent #nav_item
-  {
+.brand-pad {
+  padding-left: 2%;
+}
+
+@media (max-width: 768px) {
+  .navbar_transparent a {
     color: #000;
   }
-    .navbar_black ul li a
-    {
-      color: #000
-    }
+  .navbar_transparent #nav_item {
+    color: #000;
   }
-  
-  
+  .navbar_black ul li a {
+    color: #000;
+  }
+}

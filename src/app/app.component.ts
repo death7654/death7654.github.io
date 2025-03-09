@@ -1,4 +1,4 @@
-import { RouterOutlet, } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { Component } from '@angular/core';
 
 @Component({
@@ -9,5 +9,4 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'website';
-
-  }
+}
