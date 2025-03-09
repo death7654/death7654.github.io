@@ -1,7 +1,7 @@
-<nav class="navbar fixed-top navbar-expand-lg pt-3 pb-3 w-100" [class]="[class]" id="navbar" data-bs-theme="dark"
+<nav class="navbar fixed-top navbar-expand-lg pt-3 pb-3 w-100" [class]="[class]" id="navbar" data-bs-theme="light"
   style="backdrop-filter: blur(3px);">
   <div class="container-fluid">
-    <a class="navbar-brand ps-2 fw-bold" href="../../index.html" style="filter: opacity(1);">
+    <a class="navbar-brand ps-2 fw-bold" href="../../index.html" style="filter: opacity(1);" id="branding">
       Wallet++
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
@@ -18,24 +18,24 @@
         <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
           <li class="nav-item">
             <a routerLink="/start"  href="javascript:void(0)" class="nav-link active" aria-current="page" routerLinkActive="active"
-              style="filter: opacity(1);">Home</a>
+              style="filter: opacity(1); " id="nav_item">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="/markets" href="javascript:void(0)"
-              style="filter: opacity(1);" >Discover</a>
+              style="filter: opacity(1);" id="nav_item" >Discover</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="/pricing" href="javascript:void(0)"
-              style="filter: opacity(1);" >Pricing</a>
+              style="filter: opacity(1);" id="nav_item" >Pricing</a>
           </li>
         </ul>
         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
           <li class="nav-item me-2">
             <a class="nav-link fw-bolder" href="javascript:void(0)"
-            style="filter: opacity(1);" >Contact Sales</a>          </li>
+            style="filter: opacity(1);" id="nav_item" >Contact Sales</a>          </li>
           <li class="nav-item">
             <a class="nav-link fw-bolder" routerLink="/login" href="javascript:void(0)"
-            style="filter: opacity(1);" >Login/Register</a>          </li>
+            style="filter: opacity(1);" id="nav_item" >Login/Register</a>          </li>
         </ul>
       </div>
     </div>

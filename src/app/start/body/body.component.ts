@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { TilesComponent } from '../../tiles/tiles.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-body',
-  imports: [TilesComponent],
+  imports: [TilesComponent, RouterLink],
   templateUrl: './body.component.html',
   styleUrl: './body.component.scss',
 })
