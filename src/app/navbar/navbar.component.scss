@@ -28,9 +28,18 @@
 }
 
 .navbar_black_no_trans {
-  background-color: rgba(216, 216, 216, 0.95);
-  color: black;
-  box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15);
+  background-color: rgba(216, 216, 216, 0.95) !important;
+  color: black !important;
+  box-shadow: 0, 100px, 10px, rgba(0, 0, 0, 0.15) !important;
+}
+.navbar_black_no_trans ul li a {
+  color: #000;
+}
+.navbar_black_no_trans #branding {
+  color: #000;
+}
+.navbar_black_no_trans #nav_item {
+  color: #000;
 }
 .navbar_black_no_trans a {
   color: black;
