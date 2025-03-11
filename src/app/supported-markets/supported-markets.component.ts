@@ -154,8 +154,8 @@ export class SupportedMarketsComponent {
       {
         data: [],
         label: 'Market Price',
-        backgroundColor: 'rgba(232,72,85,0.1)',
-        borderColor: '#FF6694',
+        backgroundColor: 'rgba(83, 224, 123, 0.2)',
+        borderColor: 'rgb(83, 224, 123)',
         pointBackgroundColor: '#000',
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
