@@ -1,0 +1,13 @@
+{
+  "routes": {
+    "/": {},
+    "/admin": {},
+    "/suggestions": {},
+    "/suggestions/account": {},
+    "/suggestions/account/login": {},
+    "/suggestions/account/profile": {},
+    "/suggestions/all": {},
+    "/suggestions/create-account": {},
+    "/suggestions/new": {}
+  }
+}
