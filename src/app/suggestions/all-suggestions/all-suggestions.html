@@ -1,0 +1,220 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">All Suggestions</h3>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-sm-6 col-md-3 mb-2">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search title/description..."
+        [(ngModel)]="searchQuery"
+        (input)="filter()"
+      />
+    </div>
+
+    <div class="col-sm-6 col-md-3 mb-2">
+      <select class="form-select" [(ngModel)]="selectedCategory" (change)="filter()">
+        <option value="All">All Categories</option>
+        <option *ngFor="let cat of allCategories" [value]="cat">
+          {{ cat }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-sm-6 col-md-3 mb-2">
+      <select class="form-select" [(ngModel)]="selectedTag" (change)="filter()">
+        <option value="All">Filter by Tag</option>
+        <option *ngFor="let tag of getAllTags()" [value]="tag">#{{ tag }}</option>
+      </select>
+    </div>
+
+    <div class="col-sm-6 col-md-3 mb-2">
+      <select class="form-select" [(ngModel)]="sortOrder" (change)="filter()">
+        <option value="votes">Highest Votes</option>
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="solved">Solved</option>
+        <option value="unsolved">Unsolved</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="filteredSuggestions.length === 0" class="text-center text-muted mt-4">
+    No suggestions found matching the current criteria.
+  </div>
+
+  <div
+    class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"
+    style="max-height: 70vh; overflow-y: auto"
+  >
+    <div *ngFor="let s of filteredSuggestions" class="col">
+      <div class="card shadow-sm border-0 h-100" (click)="openSuggestion(s)">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title fw-bold">{{ s.title }}</h5>
+
+            <span
+              class="badge text-light text-uppercase"
+              [ngClass]="{
+                'bg-success': s.status === 'Solved',
+                'bg-warning': s.status === 'Pending',
+                'bg-info': s.status === 'In Progress',
+                'bg-danger': s.status === 'Closed',
+                'bg-primary': s.status === 'Planned',
+                'bg-secondary': s.status === 'Not Planned'
+              }"
+              style="font-size: 0.7rem"
+            >
+              {{ s.status }}
+            </span>
+          </div>
+
+          <span class="badge bg-secondary-subtle text-dark mb-2">{{ s.category }}</span>
+
+          <p>
+            {{ s.summary.length > 200 ? (s.summary | slice : 0 : 200) + '...' : s.summary }}
+          </p>
+
+          <div class="mt-3">
+            <span *ngFor="let tag of s.tags" class="badge bg-secondary me-1 text-light"
+              >#{{ tag }}</span
+            >
+          </div>
+        </div>
+
+        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+          <div class="text-muted small">Submitted: {{ formatDate(s.created_at) }}</div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button
+              class="btn btn-sm"
+              [ngClass]="{ 'btn-success': hasUpvoted(s), 'btn-outline-success': !hasUpvoted(s), 'disabled': !isLoggedIn }"
+              [disabled]="!isLoggedIn"
+              (click)="upvote(s, $event)"
+            >
+              👍 {{ s.upvotes }}
+            </button>
+            <button
+              class="btn btn-sm"
+              [ngClass]="{ 'btn-danger': hasDownvoted(s), 'btn-outline-danger': !hasDownvoted(s), 'disabled': !isLoggedIn }"
+              [disabled]="!isLoggedIn"
+              (click)="downvote(s, $event)"
+            >
+              👎 {{ s.downvotes }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="suggestionModal"
+    tabindex="-1"
+    aria-labelledby="suggestionModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header bg-dark text-white rounded-top-4">
+          <h5 class="modal-title" id="suggestionModalLabel">{{ selectedSuggestion?.title }}</h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+            <span class="badge bg-secondary">{{ selectedSuggestion?.category }}</span>
+
+            <span *ngFor="let tag of selectedSuggestion?.tags" class="badge bg-secondary"
+              >#{{ tag }}</span
+            >
+
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-danger': selectedSuggestion?.priority === 'High',
+                'bg-warning text-dark': selectedSuggestion?.priority === 'Medium',
+                'bg-success': selectedSuggestion?.priority === 'Low'
+              }"
+            >
+              {{ selectedSuggestion?.priority }}
+            </span>
+          </div>
+
+          <div class="mb-3 text-muted small">
+            Last Updated: {{ selectedSuggestion?.updated_at | date : 'medium' }}
+          </div>
+          <h6 class="fw-semibold">AI Summary:</h6>
+          <p>{{selectedSuggestion?.summary}}</p>
+
+
+          <h6 class="fw-semibold">Description:</h6>
+          <markdown
+            [data]="selectedSuggestion?.description || 'No description provided.'"
+          ></markdown>
+
+          <div class="mt-4">
+            <h6 class="fw-semibold">Discussion: ({{ selectedSuggestion?.comment_count || 0 }} comments)</h6>
+
+            <div
+              *ngIf="selectedSuggestion && selectedSuggestion.comments.length > 0"
+              class="list-group mb-3"
+            >
+              <div *ngFor="let comment of selectedSuggestion.comments" class="list-group-item d-flex flex-column">
+                <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                  <div class="fw-bold">
+                    <span 
+                      class="me-2" 
+                      [ngClass]="{'text-success': comment.user_id === user_id, 'text-primary': comment.user_id !== user_id}" 
+                      title="User ID"
+                    >
+                      {{ comment.user_id | slice:0:8 }}...
+                    </span>
+                    <span *ngIf="comment.user_id === user_id" class="badge bg-success-subtle text-success border border-success-subtle">You</span>
+                  </div>
+
+                  <small class="text-muted" title="Comment Time">
+                    {{ comment.timestamp | date: 'short' }}
+                  </small>
+                </div>
+                
+                <p class="mb-0 text-break">{{ comment.text }}</p>
+              </div>
+              </div>
+
+            <div *ngIf="!selectedSuggestion?.comments?.length" class="text-muted mb-3">
+              No discussion yet.
+            </div>
+
+            <div *ngIf="isLoggedIn" class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Add a comment (Press Enter or click Post)..."
+                [(ngModel)]="newComment"
+                (keydown.enter)="addComment()"
+              />
+              <button class="btn btn-primary" type="button" (click)="addComment()">Post</button>
+            </div>
+            
+            <div *ngIf="!isLoggedIn" class="alert alert-warning small mt-3">
+                You must be **logged in** to post comments.
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

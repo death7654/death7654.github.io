@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card shadow-sm p-4 p-md-5" style="max-width: 400px;">
+    <h3 class="fw-bold text-center mb-4">Student Login</h3>
+
+    <div *ngIf="errorMessage()" class="alert alert-danger text-center small">
+      {{ errorMessage() }}
+    </div>
+
+    <div *ngIf="submissionStatus()"
+         class="alert text-center small"
+         [ngClass]="{
+           'alert-success': submissionStatus() === 'success',
+           'alert-danger': submissionStatus() === 'failed'
+         }">
+      <span *ngIf="submissionStatus() === 'success'">Login Successful! Redirecting...</span>
+      <span *ngIf="submissionStatus() === 'failed'">Login Failed. Please check your Student ID and password.</span>
+    </div>
+
+    <form (ngSubmit)="login()">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">PRN Number</label>
+        <input
+          type="text"
+          class="form-control"
+          [ngModel]="prn()"
+          (ngModelChange)="prn.set($event)"
+          name="prn"
+          placeholder="Enter PRN Number"
+          required
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          name="password"
+          placeholder="Enter Password"
+          required
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 fw-semibold" [disabled]="isLoading()">
+        <span *ngIf="isLoading()" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ isLoading() ? 'Logging In...' : 'Login' }}
+      </button>
+    </form>
+
+    <div class="text-center mt-3">
+      <a routerLink="../create-account" class="btn btn-outline-secondary btn-sm" [class.disabled]="isLoading()">
+    Create New Account
+</a>
+    </div>
+  </div>
+</div>

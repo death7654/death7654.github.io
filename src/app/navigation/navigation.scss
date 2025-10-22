@@ -1,0 +1,15 @@
+.navbar .nav-link {
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.navbar .nav-link:hover {
+  color: #0056b3 !important; /* A slightly darker blue on hover */
+}
+
+/* Active link state for Angular's routerLinkActive */
+.navbar .nav-link.active {
+  color: #0d6efd !important; /* Bootstrap primary blue */
+  border-bottom: 3px solid #0d6efd;
+}
