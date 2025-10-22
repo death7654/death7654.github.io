@@ -1,59 +1,67 @@
-# OpenVoiceOpenBox
+# OpenVoiceBox
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.6.
+OpenVoiceBox is a Free and Open Source Suggestion Box System designed for organizations and projects to collect, review, and manage community feedback.  
+It features AI-assisted summarization, markdown-based submissions, and a full moderation dashboard.
 
-## Development server
+---
 
-To start a local development server, run:
+## Overview
 
-```bash
-ng serve
-```
+OpenVoiceBox provides an accessible and transparent way for users to submit suggestions while giving administrators complete control over moderation and management.  
+It integrates Firebase for authentication and data storage, and uses AI to automatically summarize suggestions for faster review.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Features
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### User Features
+- Post suggestions using a markdown editor with formatting support.
+- View AI-generated summaries of their suggestions.
+- Comment on other users’ posts.
+- Create and manage a user profile.
+- Sign up and log in securely via Firebase Authentication.
 
-```bash
-ng generate component component-name
-```
+### Admin Features
+- Access an admin dashboard for full control.
+- Edit or delete user suggestions.
+- Delete inappropriate comments.
+- Ban users who violate rules or guidelines.
+- View AI summaries to streamline moderation.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## Technology Stack
 
-## Building
+| Category | Technology |
+|-----------|-------------|
+| Frontend Framework | Angular |
+| Styling | Bootstrap |
+| Backend | Firebase (Firestore and Auth) |
+| AI Integration | AI Summarization API |
+| Hosting | GitHub Pages |
+| Language | TypeScript |
 
-To build the project run:
+---
 
-```bash
-ng build
-```
+## AI Summarization
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Each suggestion is processed through an AI model that generates concise summaries.  
+This allows moderators to review large numbers of suggestions efficiently without manually reading each one in full.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Markdown Support
 
-```bash
-ng test
-```
+OpenVoiceBox supports full markdown syntax in user submissions.  
+Users can structure their text, highlight ideas, and include lists for clarity.
 
-## Running end-to-end tests
+Example:
 
-For end-to-end (e2e) testing, run:
+```markdown
+# Suggestion: Improve Dashboard Design
 
-```bash
-ng e2e
-```
+**Feature Request:** Introduce a cleaner, responsive dashboard layout.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Enhance readability on mobile devices
+- Add light/dark theme toggle
+- Use more accessible color contrast
