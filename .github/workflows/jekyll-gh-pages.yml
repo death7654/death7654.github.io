@@ -35,6 +35,12 @@ jobs:
         with:
           source: ./
           destination: ./_site
+      
+      # NEW STEP: Copy index.html to 404.html
+      - name: Copy index.html to 404.html
+        # Jekyll builds the site into the ./_site directory, so we copy the files there.
+        run: cp ./_site/index.html ./_site/404.html
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
