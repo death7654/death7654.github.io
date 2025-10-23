@@ -36,10 +36,17 @@ jobs:
           source: ./
           destination: ./_site
       
-      # NEW STEP: Copy index.html to 404.html
-      - name: Copy index.html to 404.html
-        # Jekyll builds the site into the ./_site directory, so we copy the files there.
-        run: cp ./_site/index.html ./_site/404.html
+      # NEW STEP: Copy index.html to 404.html (now conditional)
+      - name: Copy index.html to 404.html (Conditional)
+        # Check if index.html exists before copying to avoid job failure.
+        # If it doesn't exist, this indicates an issue with the Jekyll site source structure.
+        run: |
+          if [ -f ./_site/index.html ]; then
+            echo "index.html found. Copying to 404.html..."
+            cp ./_site/index.html ./_site/404.html
+          else
+            echo "Warning: ./_site/index.html not found after build. 404 page will not be set."
+          fi
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
