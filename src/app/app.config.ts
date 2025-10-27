@@ -13,7 +13,7 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 // FIX: Add AngularFire imports
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-import { environment } from '../environments/environment.prod';
+import { environment } from '../enviroments/enviroments.prod';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 
 export const appConfig: ApplicationConfig = {

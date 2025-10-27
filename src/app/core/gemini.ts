@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GoogleGenAI } from '@google/genai';
 import { from, Observable, map } from 'rxjs';
-import { environment } from '../../environments/environment.prod';
+import { environment } from '../../enviroments/enviroments.prod';
 
 @Injectable({
   providedIn: 'root',
