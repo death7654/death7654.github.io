@@ -934,7 +934,7 @@
       </div>
     </div>
 
-    <!-- Chip8 Emulator -->
+    <!-- GameBoy Emulator Rust -->
     <div class="featured-project tilt3d reveal">
       <div class="fp-media" id="fp-media-2">
         <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
@@ -942,16 +942,37 @@
       </div>
       <div class="fp-content">
         <p class="fp-number">03 / FEATURED</p>
-        <h3 class="fp-title">CHIP-8 Emulator</h3>
-        <p class="fp-desc">A full software emulator replicating the CHIP-8 interpreter — including CPU, memory, display, and input systems — written in C++.</p>
+        <h3 class="fp-title">Game Boy Emulator</h3>
+        <p class="fp-desc">A cycle-accurate Game Boy emulator built in Rust — emulating the LR35902 CPU, PPU, memory bus, and cartridge ROM banking from scratch.</p>
         <div class="fp-tags">
-          <span class="fp-tag cyan">C++</span>
+          <span class="fp-tag cyan">Rust</span>
           <span class="fp-tag violet">Emulation</span>
           <span class="fp-tag pink">Low-Level</span>
         </div>
-        <a href="https://github.com/death7654/CHIP8-Emulator-CPP" target="_blank" class="fp-link">
+        <a href="https://github.com/death7654/Gameboy-Emulator-Rust" target="_blank" class="fp-link">
           View on GitHub <i class="bi bi-arrow-right"></i>
         </a>
+      </div>
+    </div>
+
+    <!-- Space Invaders Emulator -->
+    <div class="featured-project reverse tilt3d reveal">
+      <div class="fp-content">
+        <p class="fp-number">04 / FEATURED</p>
+        <h3 class="fp-title">Space Invaders Emulator</h3>
+        <p class="fp-desc">A faithful emulation of the classic 1978 arcade game, implementing the Intel 8080 CPU, hardware interrupts, shift registers, and original sound logic.</p>
+        <div class="fp-tags">
+          <span class="fp-tag cyan">C++</span>
+          <span class="fp-tag violet">Intel 8080</span>
+          <span class="fp-tag pink">Emulation</span>
+        </div>
+        <a href="https://github.com/death7654/Intel-8080-Emulator" target="_blank" class="fp-link">
+          View on GitHub <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      <div class="fp-media" id="fp-media-3">
+        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
+        <div class="fp-media-overlay" style="background: linear-gradient(to left, transparent 60%, var(--card-bg))"></div>
       </div>
     </div>
   </div>
@@ -1403,6 +1424,30 @@ const GH_USER = 'death7654';
 let allRepos = [];
 let langs    = new Set(['all']);
 
+/* Warn when opened as a local file — fetch() is blocked by the browser
+   under file:// due to CORS / same-origin rules. The site must be served
+   over HTTP(S) (e.g. GitHub Pages, a local server) to load GitHub data. */
+if (location.protocol === 'file:') {
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    position:fixed;bottom:0;left:0;right:0;z-index:9999;
+    background:#1a0a00;border-top:1px solid #f59e0b;
+    padding:0.75rem 1.5rem;display:flex;align-items:center;gap:0.75rem;
+    font-family:'Space Mono',monospace;font-size:0.75rem;color:#fbbf24;
+  `;
+  banner.innerHTML = `
+    <i class="bi bi-exclamation-triangle-fill" style="font-size:1rem;flex-shrink:0;"></i>
+    <span><strong>Local file detected.</strong> GitHub data won't load when opened as a file://
+    — browser security blocks external API calls. Upload to GitHub Pages or use a local server
+    (<code style="background:rgba(255,255,255,0.1);padding:1px 6px;border-radius:4px;">npx serve .</code>)
+    to see live repo data and images.</span>
+    <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#fbbf24;font-size:1.1rem;cursor:pointer;padding:0 4px;">×</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+
+
 async function fetchAllPages(baseUrl) {
   let results = [];
   let page = 1;
@@ -1505,26 +1550,40 @@ async function fetchGitHub() {
 
 /* ─── FEATURED PROJECT IMAGES FROM GITHUB API ────────────── */
 const featuredProjects = [
-  { repo: 'Chrultrabook-Tools',         mediaId: 'fp-media-0' },
+  { repo: 'Chrultrabook-Tools',          mediaId: 'fp-media-0' },
   { repo: 'Chromebook-Driver-Installer', mediaId: 'fp-media-1' },
-  { repo: 'CHIP8-Emulator-CPP',          mediaId: 'fp-media-2' },
+  { repo: 'Gameboy-Emulator-Rust',       mediaId: 'fp-media-2' },
+  { repo: 'Intel-8080-Emulator',         mediaId: 'fp-media-3' },
 ];
 
 async function loadFeaturedImages() {
   for (const fp of featuredProjects) {
     try {
+      const mediaEl = document.getElementById(fp.mediaId);
+      if (!mediaEl) continue;
+
+      // First get the repo's actual default branch
+      let branch = 'main';
+      try {
+        const repoRes = await fetch(
+          `https://api.github.com/repos/${GH_USER}/${fp.repo}`,
+          { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+        );
+        if (repoRes.ok) {
+          const repoData = await repoRes.json();
+          branch = repoData.default_branch || 'main';
+        }
+      } catch {}
+
       const res = await fetch(
         `https://api.github.com/repos/${GH_USER}/${fp.repo}/readme`,
         { headers: { 'Accept': 'application/vnd.github.v3+json' } }
       );
-      const mediaEl = document.getElementById(fp.mediaId);
-      if (!mediaEl) continue;
 
       let images = [];
       if (res.ok) {
         const data = await res.json();
         const text = atob(data.content.replace(/\n/g, ''));
-        const branch = data.encoding || 'main';
         const raw = extractImages(text, GH_USER, fp.repo, branch);
         // Verify images actually load
         const verified = await Promise.all(raw.slice(0, 6).map(url => new Promise(r => {
@@ -1539,7 +1598,6 @@ async function loadFeaturedImages() {
 
       // Fallback: use GitHub social preview (og:image via API)
       if (images.length === 0) {
-        // Use the repo's first screenshot from Open Graph or a placeholder banner
         images = [`https://opengraph.githubassets.com/1/${GH_USER}/${fp.repo}`];
       }
 
@@ -1653,8 +1711,9 @@ function extractImages(readmeText, owner, repo, branch) {
 
 async function fetchReadmeImages(owner, repo, branch, cardId) {
   const key = `${owner}/${repo}`;
+  const ogFallback = `https://opengraph.githubassets.com/1/${key}`;
   if (readmeCache[key] !== undefined) {
-    applyImagesToCard(cardId, readmeCache[key]);
+    applyImagesToCard(cardId, readmeCache[key], ogFallback);
     return;
   }
   try {
@@ -1662,11 +1721,11 @@ async function fetchReadmeImages(owner, repo, branch, cardId) {
       `https://api.github.com/repos/${key}/readme`,
       { headers: { 'Accept': 'application/vnd.github.v3+json' } }
     );
-    if (!res.ok) { readmeCache[key] = []; applyImagesToCard(cardId, []); return; }
+    if (!res.ok) { readmeCache[key] = []; applyImagesToCard(cardId, [], ogFallback); return; }
     const data = await res.json();
     // README content is base64-encoded
     const text = atob(data.content.replace(/\n/g, ''));
-    const imgs = extractImages(text, owner, repo, branch || data.encoding || 'main');
+    const imgs = extractImages(text, owner, repo, branch || 'main');
     // Verify images load (filter out broken ones) — check first 4
     const verified = await Promise.all(
       imgs.slice(0, 6).map(url => new Promise(res => {
@@ -1679,23 +1738,40 @@ async function fetchReadmeImages(owner, repo, branch, cardId) {
     );
     const valid = verified.filter(Boolean);
     readmeCache[key] = valid;
-    applyImagesToCard(cardId, valid);
+    applyImagesToCard(cardId, valid, ogFallback);
   } catch {
     readmeCache[key] = [];
-    applyImagesToCard(cardId, []);
+    applyImagesToCard(cardId, [], ogFallback);
   }
 }
 
-function applyImagesToCard(cardId, images) {
+function applyImagesToCard(cardId, images, ogFallback) {
   const mediaEl = document.getElementById(`media-${cardId}`);
   if (!mediaEl) return;
 
+  // Always have the OG fallback ready
+  const ogSrc = ogFallback || '';
+
+  // If no README images, use the GitHub social preview (OG / Discord banner)
   if (!images || images.length === 0) {
-    // Show placeholder
-    mediaEl.innerHTML = `
-      <div class="project-card-img-placeholder">
-        <i class="bi bi-code-slash"></i>
-      </div>`;
+    if (ogSrc) {
+      mediaEl.innerHTML = `
+        <div style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg3);">
+          <img src="${ogSrc}" alt="Preview"
+               style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.6s ease;"
+               onmouseover="this.style.transform='scale(1.06)'"
+               onmouseout="this.style.transform='scale(1)'"
+               onerror="this.style.opacity='0.15'"/>
+        </div>`;
+    } else {
+      mediaEl.innerHTML = `
+        <div style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg3);">
+          <img src="https://opengraph.githubassets.com/1/${cardId.split('-')[0]}"
+               alt="Preview"
+               style="width:100%;height:100%;object-fit:cover;display:block;"
+               onerror="this.style.opacity='0.15'"/>
+        </div>`;
+    }
     return;
   }
 
@@ -1706,7 +1782,7 @@ function applyImagesToCard(cardId, images) {
              style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.6s ease;"
              onmouseover="this.style.transform='scale(1.06)'"
              onmouseout="this.style.transform='scale(1)'"
-             onerror="this.parentElement.parentElement.innerHTML='<div class=project-card-img-placeholder><i class=bi.bi-code-slash></i></div>'"/>
+             onerror="this.src='${ogSrc || ''}';this.onerror=function(){this.style.opacity='0.15';}"/>
       </div>`;
     return;
   }
@@ -1835,7 +1911,7 @@ function renderRepos(repos) {
 
     // If already cached, apply immediately
     if (readmeCache[key] !== undefined) {
-      applyImagesToCard(cardId, readmeCache[key]);
+      applyImagesToCard(cardId, readmeCache[key], `https://opengraph.githubassets.com/1/${key}`);
     } else {
       // Register for lazy README fetch
       readmeObserver.observe(card);
