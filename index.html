@@ -519,6 +519,7 @@
     .fp-tag.cyan  { color: var(--accent);  border-color: rgba(0,229,255,0.3);  background: rgba(0,229,255,0.06); }
     .fp-tag.violet{ color: #a78bfa;        border-color: rgba(124,58,237,0.3); background: rgba(124,58,237,0.06); }
     .fp-tag.pink  { color: #fb7185;        border-color: rgba(255,61,107,0.3); background: rgba(255,61,107,0.06); }
+    .fp-tag.amber { color: #fbbf24;        border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.06); }
     .fp-link {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 0.85rem; font-weight: 700;
@@ -808,6 +809,7 @@
         <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
         <li class="nav-item"><a class="nav-link" href="#github-repos">GitHub</a></li>
         <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+        <li class="nav-item"><a class="nav-link" href="#education">Education</a></li>
         <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
         <li class="nav-item"><a class="nav-link" href="#links">Links</a></li>
       </ul>
@@ -902,10 +904,8 @@
         <p class="fp-number">01 / FEATURED</p>
         <h3 class="fp-title">Chrultrabook Tools</h3>
         <p class="fp-desc">Restores lost functionality and adds powerful new features to all Chromebooks running Windows, Linux and macOS. Cross-platform and actively maintained.</p>
-        <div class="fp-tags">
-          <span class="fp-tag cyan">Cross-Platform</span>
-          <span class="fp-tag violet">C++</span>
-          <span class="fp-tag pink">Open Source</span>
+        <div class="fp-tags" id="fp-tags-0">
+          <span class="fp-tag cyan">Loading languages…</span>
         </div>
         <a href="https://github.com/death7654/Chrultrabook-Tools" target="_blank" class="fp-link">
           View on GitHub <i class="bi bi-arrow-right"></i>
@@ -918,11 +918,9 @@
       <div class="fp-content">
         <p class="fp-number">02 / FEATURED</p>
         <h3 class="fp-title">Chromebook Driver Installer</h3>
-        <p class="fp-desc">Intelligently detects hardware and automatically installs missing drivers for Chromebooks running Windows — no manual searching required.</p>
-        <div class="fp-tags">
-          <span class="fp-tag cyan">Windows</span>
-          <span class="fp-tag violet">Automation</span>
-          <span class="fp-tag pink">Drivers</span>
+        <p class="fp-desc">Automated driver installation system for Chromebook users with over 5,000 downloads — a Rust CLI tool paired with a structured hardware database cataloging 200+ Chromebook models with chipset info and driver mappings.</p>
+        <div class="fp-tags" id="fp-tags-1">
+          <span class="fp-tag cyan">Loading languages…</span>
         </div>
         <a href="https://github.com/death7654/Chromebook-Driver-Installer" target="_blank" class="fp-link">
           View on GitHub <i class="bi bi-arrow-right"></i>
@@ -934,45 +932,60 @@
       </div>
     </div>
 
-    <!-- GameBoy Emulator Rust -->
+    <!-- ESP32 Bare Metal Kernel -->
     <div class="featured-project tilt3d reveal">
-      <div class="fp-media" id="fp-media-2">
+      <div class="fp-media" id="fp-media-4">
         <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
         <div class="fp-media-overlay"></div>
       </div>
       <div class="fp-content">
         <p class="fp-number">03 / FEATURED</p>
-        <h3 class="fp-title">Game Boy Emulator</h3>
-        <p class="fp-desc">A cycle-accurate Game Boy emulator built in Rust — emulating the LR35902 CPU, PPU, memory bus, and cartridge ROM banking from scratch.</p>
-        <div class="fp-tags">
-          <span class="fp-tag cyan">Rust</span>
-          <span class="fp-tag violet">Emulation</span>
-          <span class="fp-tag pink">Low-Level</span>
+        <h3 class="fp-title">Bare Metal ESP32 Kernel</h3>
+        <p class="fp-desc">A two-stage bootloader and kernel for the ESP32, built from the TRM up — custom Xtensa assembly trampoline, register-level SPI/SD driver, FAT32 filesystem, GPIO/UART HALs, and an interactive kernel shell with a domain-specific script interpreter.</p>
+        <div class="fp-tags" id="fp-tags-4">
+          <span class="fp-tag cyan">Loading languages…</span>
         </div>
-        <a href="https://github.com/death7654/Gameboy-Emulator-Rust" target="_blank" class="fp-link">
+        <a href="https://github.com/death7654/ESP32-Bare-Metal-Kernel" target="_blank" class="fp-link">
           View on GitHub <i class="bi bi-arrow-right"></i>
         </a>
       </div>
     </div>
 
-    <!-- Space Invaders Emulator -->
+    <!-- GameBoy Emulator Rust -->
     <div class="featured-project reverse tilt3d reveal">
       <div class="fp-content">
         <p class="fp-number">04 / FEATURED</p>
-        <h3 class="fp-title">Space Invaders Emulator</h3>
+        <h3 class="fp-title">Game Boy Emulator</h3>
+        <p class="fp-desc">A cycle-accurate Game Boy emulator built in Rust — emulating the LR35902 CPU, PPU, memory bus, MBC1/MBC3 cartridge mappers, scanline rendering, tile caching, sprite compositing, and OAM DMA timing from scratch.</p>
+        <div class="fp-tags" id="fp-tags-2">
+          <span class="fp-tag cyan">Loading languages…</span>
+        </div>
+        <a href="https://github.com/death7654/Gameboy-Emulator-Rust" target="_blank" class="fp-link">
+          View on GitHub <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      <div class="fp-media" id="fp-media-2">
+        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
+        <div class="fp-media-overlay" style="background: linear-gradient(to left, transparent 60%, var(--card-bg))"></div>
+      </div>
+    </div>
+
+    <!-- Space Invaders Emulator -->
+    <div class="featured-project tilt3d reveal">
+      <div class="fp-media" id="fp-media-3">
+        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
+        <div class="fp-media-overlay"></div>
+      </div>
+      <div class="fp-content">
+        <p class="fp-number">05 / FEATURED</p>
+        <h3 class="fp-title">Space Invaders / Intel 8080</h3>
         <p class="fp-desc">A faithful emulation of the classic 1978 arcade game, implementing the Intel 8080 CPU, hardware interrupts, shift registers, and original sound logic.</p>
-        <div class="fp-tags">
-          <span class="fp-tag cyan">C++</span>
-          <span class="fp-tag violet">Intel 8080</span>
-          <span class="fp-tag pink">Emulation</span>
+        <div class="fp-tags" id="fp-tags-3">
+          <span class="fp-tag cyan">Loading languages…</span>
         </div>
         <a href="https://github.com/death7654/Intel-8080-Emulator" target="_blank" class="fp-link">
           View on GitHub <i class="bi bi-arrow-right"></i>
         </a>
-      </div>
-      <div class="fp-media" id="fp-media-3">
-        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
-        <div class="fp-media-overlay" style="background: linear-gradient(to left, transparent 60%, var(--card-bg))"></div>
       </div>
     </div>
   </div>
@@ -1011,6 +1024,37 @@
     </div>
     <div id="skills-grid">
       <!-- populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ─── EDUCATION ─────────────────────────────────────────────── -->
+<section id="education" style="background: var(--bg);">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">// academia</p>
+      <h2 class="section-title">Education</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="reveal" style="max-width: 760px;">
+      <div style="display:grid; grid-template-columns: 120px 1fr; gap: 0 2rem; position:relative; padding-bottom: 2.5rem;">
+        <div style="text-align:right; padding-top: 0.25rem;">
+          <span style="font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--muted); line-height:1.5;">Sep 2024<br>— May 2028</span>
+        </div>
+        <div style="position:relative; padding-left:1.5rem; border-left: 1px solid var(--card-border);">
+          <span style="position:absolute; left:-5px; top:6px; width:9px; height:9px; background:var(--accent2); border-radius:50%; box-shadow: 0 0 10px rgba(124,58,237,0.5); display:block;"></span>
+          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:1.5rem; transition: var(--transition);"
+               onmouseover="this.style.borderColor='rgba(124,58,237,0.4)'; this.style.boxShadow='0 0 20px rgba(124,58,237,0.12)'"
+               onmouseout="this.style.borderColor=''; this.style.boxShadow=''">
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+              <h4 style="font-size:1.05rem; font-weight:700; margin:0;">B.Tech in Artificial Intelligence and Data Science</h4>
+              <span style="font-size:0.72rem; background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); border-radius:100px; padding:3px 12px; color:var(--accent2); font-family:'Space Mono',monospace;">CGPA: 9.32 / 10</span>
+            </div>
+            <p style="font-size:0.85rem; color:var(--accent2); margin-bottom:0.75rem; font-family:'Space Mono',monospace; font-weight:600;">Vimal Jyothi Engineering College — Chemperi, Kerala</p>
+            <p style="font-size:0.88rem; color:var(--muted); margin:0;">Minor in Electronics and Communications</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1382,7 +1426,6 @@ const skillCategories = [
     pills: [
       { icon: 'bi-git',             name: 'Git' },
       { icon: 'bi-terminal-fill',   name: 'Make' },
-      { icon: 'bi-github',          name: 'GitHub' },
     ]
   },
 ];
@@ -1412,6 +1455,7 @@ const langColors = {
   'Rust': '#dea584', 'Go': '#00ADD8', 'C#': '#178600',
   'HTML': '#e34c26', 'CSS': '#563d7c', 'Shell': '#89e051',
   'PowerShell': '#012456', 'Makefile': '#427819',
+  'Zig': '#ec915c', 'Assembly': '#6E4C13',
 };
 function langClass(lang) {
   if (!lang) return 'lang-default';
@@ -1550,30 +1594,51 @@ async function fetchGitHub() {
 
 /* ─── FEATURED PROJECT IMAGES FROM GITHUB API ────────────── */
 const featuredProjects = [
-  { repo: 'Chrultrabook-Tools',          mediaId: 'fp-media-0' },
-  { repo: 'Chromebook-Driver-Installer', mediaId: 'fp-media-1' },
-  { repo: 'Gameboy-Emulator-Rust',       mediaId: 'fp-media-2' },
-  { repo: 'Intel-8080-Emulator',         mediaId: 'fp-media-3' },
+  { repo: 'Chrultrabook-Tools',          mediaId: 'fp-media-0', tagsId: 'fp-tags-0' },
+  { repo: 'Chromebook-Driver-Installer', mediaId: 'fp-media-1', tagsId: 'fp-tags-1' },
+  { repo: 'ESP32-Bare-Metal-Kernel',     mediaId: 'fp-media-4', tagsId: 'fp-tags-4' },
+  { repo: 'Gameboy-Emulator-Rust',       mediaId: 'fp-media-2', tagsId: 'fp-tags-2' },
+  { repo: 'Intel-8080-Emulator',         mediaId: 'fp-media-3', tagsId: 'fp-tags-3' },
 ];
+
+/* Tag color cycle for language pills */
+const tagColors = ['cyan', 'violet', 'pink', 'amber'];
+
+function renderLangTags(langs, tagsEl) {
+  if (!tagsEl) return;
+  const entries = Object.keys(langs); // sorted by bytes descending from GitHub
+  if (!entries.length) { tagsEl.innerHTML = ''; return; }
+  tagsEl.innerHTML = entries.map((lang, i) =>
+    `<span class="fp-tag ${tagColors[i % tagColors.length]}">${lang}</span>`
+  ).join('');
+}
 
 async function loadFeaturedImages() {
   for (const fp of featuredProjects) {
     try {
       const mediaEl = document.getElementById(fp.mediaId);
-      if (!mediaEl) continue;
+      const tagsEl  = document.getElementById(fp.tagsId);
 
-      // First get the repo's actual default branch
+      // Fetch repo info (branch) + languages in parallel
+      const [repoRes, langRes] = await Promise.all([
+        fetch(`https://api.github.com/repos/${GH_USER}/${fp.repo}`,
+              { headers: { 'Accept': 'application/vnd.github.v3+json' } }),
+        fetch(`https://api.github.com/repos/${GH_USER}/${fp.repo}/languages`,
+              { headers: { 'Accept': 'application/vnd.github.v3+json' } })
+      ]);
+
       let branch = 'main';
-      try {
-        const repoRes = await fetch(
-          `https://api.github.com/repos/${GH_USER}/${fp.repo}`,
-          { headers: { 'Accept': 'application/vnd.github.v3+json' } }
-        );
-        if (repoRes.ok) {
-          const repoData = await repoRes.json();
-          branch = repoData.default_branch || 'main';
-        }
-      } catch {}
+      if (repoRes.ok) {
+        const repoData = await repoRes.json();
+        branch = repoData.default_branch || 'main';
+      }
+
+      if (langRes.ok && tagsEl) {
+        const langs = await langRes.json();
+        renderLangTags(langs, tagsEl);
+      }
+
+      if (!mediaEl) continue;
 
       const res = await fetch(
         `https://api.github.com/repos/${GH_USER}/${fp.repo}/readme`,
@@ -1585,7 +1650,6 @@ async function loadFeaturedImages() {
         const data = await res.json();
         const text = atob(data.content.replace(/\n/g, ''));
         const raw = extractImages(text, GH_USER, fp.repo, branch);
-        // Verify images actually load
         const verified = await Promise.all(raw.slice(0, 6).map(url => new Promise(r => {
           const img = new Image();
           img.onload  = () => r(url);
@@ -1596,7 +1660,6 @@ async function loadFeaturedImages() {
         images = verified.filter(Boolean);
       }
 
-      // Fallback: use GitHub social preview (og:image via API)
       if (images.length === 0) {
         images = [`https://opengraph.githubassets.com/1/${GH_USER}/${fp.repo}`];
       }
@@ -1604,7 +1667,9 @@ async function loadFeaturedImages() {
       applyFeaturedImage(mediaEl, images);
     } catch {
       const mediaEl = document.getElementById(fp.mediaId);
+      const tagsEl  = document.getElementById(fp.tagsId);
       if (mediaEl) applyFeaturedImage(mediaEl, [`https://opengraph.githubassets.com/1/${GH_USER}/${fp.repo}`]);
+      if (tagsEl)  tagsEl.innerHTML = '';
     }
   }
 }
@@ -1841,6 +1906,69 @@ const readmeObserver = new IntersectionObserver(entries => {
   });
 }, { rootMargin: '200px' });
 
+/* ─── LANGUAGE CACHE & LAZY FETCHER ──────────────────────── */
+const langCache = {}; // key: "owner/repo" → { Lang: bytes, ... }
+const langQueue = [];
+let langRunning = 0;
+const LANG_CONCURRENCY = 3;
+
+function runLangQueue() {
+  while (langRunning < LANG_CONCURRENCY && langQueue.length) {
+    const fn = langQueue.shift();
+    langRunning++;
+    fn().finally(() => { langRunning--; runLangQueue(); });
+  }
+}
+
+async function fetchRepoLangs(owner, repo, cardId) {
+  const key = `${owner}/${repo}`;
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${key}/languages`,
+      { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+    );
+    if (!res.ok) throw new Error('lang fetch failed');
+    const langs = await res.json();
+    langCache[key] = langs;
+    applyLangsToCard(cardId, langs);
+  } catch {
+    langCache[key] = {};
+  }
+}
+
+function applyLangsToCard(cardId, langs) {
+  const el = document.getElementById(`langs-${cardId}`);
+  if (!el) return;
+  const names = Object.keys(langs);
+  if (!names.length) { el.innerHTML = ''; return; }
+  el.innerHTML = names.map(lang => {
+    const color = langColors[lang] || '#858585';
+    return `<span class="project-lang-badge">
+      <span class="project-lang-dot" style="background:${color}"></span>
+      ${lang}
+    </span>`;
+  }).join('');
+}
+
+const langObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const owner  = el.dataset.owner;
+    const repo   = el.dataset.repo;
+    const cid    = el.dataset.cardid;
+    if (!owner) return;
+    langObserver.unobserve(el);
+    const key = `${owner}/${repo}`;
+    if (langCache[key] !== undefined) {
+      applyLangsToCard(cid, langCache[key]);
+    } else {
+      langQueue.push(() => fetchRepoLangs(owner, repo, cid));
+      runLangQueue();
+    }
+  });
+}, { rootMargin: '300px' });
+
 /* ─── RENDER REPOS ────────────────────────────────────────── */
 function renderRepos(repos) {
   const grid = document.getElementById('repos-grid');
@@ -1850,11 +1978,10 @@ function renderRepos(repos) {
   }
 
   grid.innerHTML = repos.map((r, i) => {
-    const langColor = langColors[r.language] || '#858585';
-    const updated   = new Date(r.updated_at).toLocaleDateString('en-US', {year:'numeric',month:'short'});
-    const desc = r.description || 'No description provided.';
-    const cardId = `${r.name}-${i}`.replace(/[^a-z0-9-]/gi, '-');
-    const branch = r.default_branch || 'main';
+    const updated = new Date(r.updated_at).toLocaleDateString('en-US', {year:'numeric',month:'short'});
+    const desc    = r.description || 'No description provided.';
+    const cardId  = `${r.name}-${i}`.replace(/[^a-z0-9-]/gi, '-');
+    const branch  = r.default_branch || 'main';
 
     // Check cache immediately (from previous filter)
     const cached = readmeCache[`${GH_USER}/${r.name}`];
@@ -1881,23 +2008,26 @@ function renderRepos(repos) {
           </h4>
           <p class="project-card-desc flex-grow-1">${desc.length > 110 ? desc.slice(0,110)+'…' : desc}</p>
           <div class="project-meta">
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-              ${r.language ? `
-                <span class="project-lang-badge">
-                  <span class="project-lang-dot" style="background:${langColor}"></span>
-                  ${r.language}
-                </span>` : ''}
-              <span class="project-stars">
-                <i class="bi bi-star-fill" style="color:#f59e0b;font-size:0.7rem;"></i> ${r.stargazers_count}
+            <div class="d-flex align-items-center gap-2 flex-wrap" id="langs-${cardId}">
+              <span class="project-lang-badge" style="opacity:0.4;">
+                <span class="project-lang-dot" style="background:#858585"></span>
+                loading…
               </span>
-              ${r.forks_count > 0 ? `<span class="project-stars"><i class="bi bi-share" style="font-size:0.7rem;"></i> ${r.forks_count}</span>` : ''}
             </div>
             <a href="${r.html_url}" target="_blank" class="github-link-btn">
               <i class="bi bi-github"></i> View
             </a>
           </div>
-          <div style="font-size:0.7rem;color:var(--muted);margin-top:0.75rem;font-family:'Space Mono',monospace">
-            Updated ${updated}
+          <div class="d-flex align-items-center justify-content-between mt-2 flex-wrap gap-2">
+            <div class="d-flex gap-2">
+              <span class="project-stars">
+                <i class="bi bi-star-fill" style="color:#f59e0b;font-size:0.7rem;"></i> ${r.stargazers_count}
+              </span>
+              ${r.forks_count > 0 ? `<span class="project-stars"><i class="bi bi-share" style="font-size:0.7rem;"></i> ${r.forks_count}</span>` : ''}
+            </div>
+            <div style="font-size:0.7rem;color:var(--muted);font-family:'Space Mono',monospace">
+              Updated ${updated}
+            </div>
           </div>
         </div>
       </div>
@@ -1909,12 +2039,18 @@ function renderRepos(repos) {
     const cardId = card.dataset.cardid;
     const key = `${card.dataset.owner}/${card.dataset.repo}`;
 
-    // If already cached, apply immediately
+    // README images
     if (readmeCache[key] !== undefined) {
       applyImagesToCard(cardId, readmeCache[key], `https://opengraph.githubassets.com/1/${key}`);
     } else {
-      // Register for lazy README fetch
       readmeObserver.observe(card);
+    }
+
+    // Languages — lazy load
+    if (langCache[key] !== undefined) {
+      applyLangsToCard(cardId, langCache[key]);
+    } else {
+      langObserver.observe(card);
     }
 
     // 3D tilt
