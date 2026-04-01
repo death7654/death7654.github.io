@@ -1,1485 +1,2276 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Robinson — Portfolio</title>
-
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
-
-  <style>
-    /* ─── DESIGN TOKENS ─────────────────────────────────────────── */
-    :root {
-      --bg:       #080c12;
-      --bg2:      #0d1420;
-      --bg3:      #111927;
-      --accent:   #00e5ff;
-      --accent2:  #7c3aed;
-      --accent3:  #ff3d6b;
-      --text:     #e8eaf0;
-      --muted:    #6b7a99;
-      --card-bg:  rgba(255,255,255,0.04);
-      --card-border: rgba(0,229,255,0.12);
-      --glow:     0 0 30px rgba(0,229,255,0.25);
-      --glow-sm:  0 0 12px rgba(0,229,255,0.2);
-      --radius:   16px;
-      --transition: 0.4s cubic-bezier(0.23,1,0.32,1);
-    }
-
-    /* ─── RESET & BASE ──────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      cursor: none;
-    }
-    body::-webkit-scrollbar { width: 4px; }
-    body::-webkit-scrollbar-track { background: var(--bg); }
-    body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
-    a { color: inherit; text-decoration: none; }
-    a:hover { color: var(--accent); }
-
-    /* ─── CUSTOM CURSOR ─────────────────────────────────────────── */
-    #cursor {
-      width: 12px; height: 12px;
-      background: var(--accent);
-      border-radius: 50%;
-      position: fixed; top: 0; left: 0;
-      pointer-events: none; z-index: 9999;
-      transform: translate(-50%,-50%);
-      transition: width 0.2s, height 0.2s, background 0.2s;
-      mix-blend-mode: difference;
-    }
-    #cursor-ring {
-      width: 36px; height: 36px;
-      border: 1.5px solid var(--accent);
-      border-radius: 50%;
-      position: fixed; top: 0; left: 0;
-      pointer-events: none; z-index: 9998;
-      transform: translate(-50%,-50%);
-      transition: transform 0.12s ease, width 0.3s, height 0.3s, opacity 0.3s;
-      opacity: 0.5;
-    }
-    body:hover #cursor { opacity: 1; }
-
-    /* ─── NOISE OVERLAY ─────────────────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.025;
-      pointer-events: none; z-index: 0;
-    }
-
-    /* ─── NAVBAR ────────────────────────────────────────────────── */
-    .navbar {
-      background: rgba(8,12,18,0.85) !important;
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--card-border);
-      padding: 1rem 2rem;
-      position: fixed; width: 100%; top: 0; z-index: 1000;
-    }
-    .navbar-brand {
-      font-family: 'Space Mono', monospace;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--accent) !important;
-      letter-spacing: 0.05em;
-    }
-    .nav-link {
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted) !important;
-      position: relative;
-      padding: 0.5rem 1rem !important;
-      transition: color 0.3s;
-    }
-    .nav-link::after {
-      content: '';
-      position: absolute; bottom: 0; left: 1rem;
-      width: 0; height: 1.5px;
-      background: var(--accent);
-      transition: width var(--transition);
-    }
-    .nav-link:hover { color: var(--accent) !important; }
-    .nav-link:hover::after { width: calc(100% - 2rem); }
-
-    /* ─── HERO ──────────────────────────────────────────────────── */
-    #hero {
-      min-height: 100vh;
-      display: flex; align-items: center;
-      position: relative;
-      overflow: hidden;
-      background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(0,229,255,0.06) 0%, transparent 60%),
-                  radial-gradient(ellipse 60% 50% at 20% 80%, rgba(124,58,237,0.07) 0%, transparent 60%),
-                  var(--bg);
-    }
-    #hero-canvas {
-      position: absolute; inset: 0;
-      pointer-events: none; z-index: 0;
-    }
-    .hero-content { position: relative; z-index: 2; padding-top: 80px; }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(0,229,255,0.08);
-      border: 1px solid rgba(0,229,255,0.2);
-      border-radius: 100px;
-      padding: 6px 16px;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      margin-bottom: 2rem;
-      animation: fadeSlideUp 0.8s ease both;
-    }
-    .hero-badge::before {
-      content: '';
-      width: 7px; height: 7px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-
-    .hero-name {
-      font-size: clamp(3.5rem, 10vw, 7.5rem);
-      font-weight: 900;
-      line-height: 0.95;
-      letter-spacing: -0.03em;
-      color: var(--text);
-      animation: fadeSlideUp 0.8s 0.1s ease both;
-    }
-    .hero-name .accent-word {
-      color: transparent;
-      -webkit-text-stroke: 1.5px var(--accent);
-      position: relative;
-    }
-    .hero-subtitle {
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
-      color: var(--muted);
-      font-weight: 300;
-      max-width: 520px;
-      line-height: 1.7;
-      margin-top: 1.5rem;
-      animation: fadeSlideUp 0.8s 0.2s ease both;
-    }
-    .hero-actions {
-      margin-top: 2.5rem;
-      display: flex; gap: 1rem; flex-wrap: wrap;
-      animation: fadeSlideUp 0.8s 0.3s ease both;
-    }
-    .btn-primary-custom {
-      background: var(--accent);
-      color: #000;
-      font-weight: 700;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      border: none;
-      border-radius: 100px;
-      padding: 0.85rem 2rem;
-      cursor: none;
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition);
-    }
-    .btn-primary-custom::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: rgba(255,255,255,0.2);
-      transform: translateX(-100%);
-      transition: transform 0.4s ease;
-    }
-    .btn-primary-custom:hover::before { transform: translateX(0); }
-    .btn-primary-custom:hover { box-shadow: var(--glow); transform: translateY(-2px); color: #000; }
-
-    .btn-outline-custom {
-      background: transparent;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 100px;
-      padding: 0.85rem 2rem;
-      cursor: none;
-      transition: var(--transition);
-    }
-    .btn-outline-custom:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateY(-2px);
-    }
-
-    /* floating 3D shapes */
-    .hero-3d-group {
-      position: absolute; right: 5%; top: 50%;
-      transform: translateY(-50%);
-      width: 420px; height: 420px;
-      perspective: 800px;
-      animation: fadeSlideUp 1s 0.4s ease both;
-      pointer-events: none;
-    }
-    .hero-3d-inner {
-      width: 100%; height: 100%;
-      transform-style: preserve-3d;
-      animation: float3d 8s ease-in-out infinite;
-    }
-    @keyframes float3d {
-      0%,100% { transform: rotateX(10deg) rotateY(-15deg) rotateZ(2deg); }
-      33%      { transform: rotateX(-5deg) rotateY(10deg) rotateZ(-3deg); }
-      66%      { transform: rotateX(8deg) rotateY(5deg) rotateZ(4deg); }
-    }
-    .cube-face {
-      position: absolute;
-      width: 180px; height: 180px;
-      border: 1px solid rgba(0,229,255,0.25);
-      background: rgba(0,229,255,0.03);
-      backdrop-filter: blur(4px);
-      border-radius: 16px;
-    }
-    .cube-face.f1 { transform: translateZ(90px); top:120px; left:120px; }
-    .cube-face.f2 { transform: translateZ(-90px); top:120px; left:120px; background: rgba(124,58,237,0.04); border-color: rgba(124,58,237,0.25); }
-    .cube-face.f3 { transform: rotateY(90deg) translateZ(90px); top:120px; left:120px; }
-    .cube-face.f4 { transform: rotateY(-90deg) translateZ(90px); top:120px; left:120px; }
-    .cube-face.f5 { transform: rotateX(90deg) translateZ(90px); top:120px; left:120px; }
-    .cube-face.f6 { transform: rotateX(-90deg) translateZ(90px); top:120px; left:120px; background: rgba(255,61,107,0.03); border-color: rgba(255,61,107,0.2);}
-
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      pointer-events: none;
-    }
-    .orb-1 { width:300px;height:300px; background:rgba(0,229,255,0.08); top:-50px; left:-100px; }
-    .orb-2 { width:200px;height:200px; background:rgba(124,58,237,0.1); bottom:50px; right:50px; }
-    .orb-3 { width:150px;height:150px; background:rgba(255,61,107,0.07); top:200px; right:0; }
-
-    .scroll-indicator {
-      position: absolute; bottom: 2rem; left: 50%;
-      transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      color: var(--muted); font-size: 0.7rem;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      animation: fadeSlideUp 1s 0.6s ease both;
-    }
-    .scroll-line {
-      width: 1px; height: 60px;
-      background: linear-gradient(to bottom, var(--accent), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-    @keyframes scrollPulse { 0%,100%{opacity:0.3;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.2)} }
-
-    /* ─── SECTION STYLES ────────────────────────────────────────── */
-    section { padding: 6rem 0; position: relative; z-index: 1; }
-    .section-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.75rem;
-    }
-    .section-title {
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      line-height: 1.05;
-    }
-    .section-divider {
-      width: 60px; height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius: 2px;
-      margin: 1.5rem 0 2rem;
-    }
-
-    @keyframes fadeSlideUp {
-      from { opacity:0; transform: translateY(30px); }
-      to   { opacity:1; transform: translateY(0); }
-    }
-
-    /* ─── STATS STRIP ───────────────────────────────────────────── */
-    .stats-strip {
-      background: var(--bg2);
-      border-top: 1px solid var(--card-border);
-      border-bottom: 1px solid var(--card-border);
-      padding: 2rem 0;
-    }
-    .stat-item {
-      text-align: center;
-      padding: 1rem;
-      border-right: 1px solid var(--card-border);
-    }
-    .stat-item:last-child { border-right: none; }
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: var(--accent);
-      font-family: 'Space Mono', monospace;
-      display: block;
-    }
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    /* ─── FEATURED PROJECTS ─────────────────────────────────────── */
-    #projects { background: var(--bg2); }
-
-    .project-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      overflow: hidden;
-      transition: var(--transition);
-      cursor: none;
-      position: relative;
-      transform-style: preserve-3d;
-      perspective: 1000px;
-    }
-    .project-card::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(0,229,255,0.05) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity var(--transition);
-      border-radius: 24px;
-      z-index: 0;
-    }
-    .project-card:hover {
-      border-color: rgba(0,229,255,0.4);
-      transform: translateY(-8px) rotateX(2deg);
-      box-shadow: var(--glow), 0 30px 80px rgba(0,0,0,0.5);
-    }
-    .project-card:hover::before { opacity: 1; }
-
-    .project-card-video {
-      width: 100%; aspect-ratio: 16/9;
-      object-fit: cover;
-      background: var(--bg3);
-      display: block;
-    }
-    .project-card-img-placeholder {
-      width: 100%; aspect-ratio: 16/9;
-      background: linear-gradient(135deg, var(--bg3) 0%, rgba(0,229,255,0.05) 100%);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem; color: rgba(0,229,255,0.2);
-    }
-    .project-card-body {
-      padding: 1.5rem;
-      position: relative; z-index: 1;
-    }
-    .project-card-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .project-card-title a { transition: color 0.2s; }
-    .project-card-title a:hover { color: var(--accent); }
-    .project-card-desc {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.65;
-      margin-bottom: 1rem;
-    }
-    .project-lang-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(0,229,255,0.08);
-      border: 1px solid rgba(0,229,255,0.15);
-      border-radius: 100px;
-      padding: 3px 10px;
-      font-size: 0.72rem;
-      font-family: 'Space Mono', monospace;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-    }
-    .project-lang-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-    }
-    .project-stars {
-      font-size: 0.8rem;
-      color: var(--muted);
-      display: flex; align-items: center; gap: 4px;
-    }
-    .project-meta {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 0.5rem;
-    }
-    .github-link-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 100px;
-      padding: 4px 12px;
-      transition: var(--transition);
-    }
-    .github-link-btn:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    /* loading spinner */
-    .gh-loading {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 4rem;
-      color: var(--muted); gap: 1rem;
-    }
-    .gh-spinner {
-      width: 40px; height: 40px;
-      border: 2px solid rgba(0,229,255,0.15);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ─── FEATURED (BIG) PROJECTS ───────────────────────────────── */
-    .featured-project {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 28px;
-      overflow: hidden;
-      margin-bottom: 2rem;
-      transition: var(--transition);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    .featured-project:hover {
-      border-color: rgba(0,229,255,0.35);
-      box-shadow: var(--glow), 0 40px 100px rgba(0,0,0,0.4);
-      transform: translateY(-4px);
-    }
-    .featured-project.reverse { grid-template-columns: 1fr 1fr; }
-    .featured-project.reverse .fp-media { order: 2; }
-    .featured-project.reverse .fp-content { order: 1; }
-    .fp-media {
-      position: relative;
-      overflow: hidden;
-      min-height: 360px;
-    }
-    .fp-media video, .fp-media img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform 0.8s ease;
-    }
-    .featured-project:hover .fp-media video,
-    .featured-project:hover .fp-media img { transform: scale(1.04); }
-    .fp-media-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to right, transparent 60%, var(--card-bg));
-      pointer-events: none;
-    }
-    .fp-content {
-      padding: 3rem;
-      display: flex; flex-direction: column; justify-content: center;
-    }
-    .fp-number {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--accent);
-      letter-spacing: 0.2em;
-      margin-bottom: 0.75rem;
-    }
-    .fp-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      line-height: 1.1;
-    }
-    .fp-desc {
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-    }
-    .fp-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .fp-tag {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      padding: 4px 12px;
-      border-radius: 100px;
-      border: 1px solid;
-    }
-    .fp-tag.cyan  { color: var(--accent);  border-color: rgba(0,229,255,0.3);  background: rgba(0,229,255,0.06); }
-    .fp-tag.violet{ color: #a78bfa;        border-color: rgba(124,58,237,0.3); background: rgba(124,58,237,0.06); }
-    .fp-tag.pink  { color: #fb7185;        border-color: rgba(255,61,107,0.3); background: rgba(255,61,107,0.06); }
-    .fp-tag.amber { color: #fbbf24;        border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.06); }
-    .fp-link {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 0.85rem; font-weight: 700;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--accent);
-      transition: gap 0.3s;
-    }
-    .fp-link:hover { gap: 14px; color: var(--accent); }
-
-    /* ─── SKILLS ────────────────────────────────────────────────── */
-    #skills { background: var(--bg); }
-
-    .skill-category {
-      margin-bottom: 2.5rem;
-    }
-    .skill-category-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .skill-category-label::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .skill-pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-    }
-    .skill-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 100px;
-      padding: 0.45rem 1rem;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text);
-      transition: var(--transition);
-      cursor: none;
-      white-space: nowrap;
-    }
-    .skill-pill i {
-      font-size: 1rem;
-      color: var(--accent);
-      transition: color 0.3s;
-    }
-    .skill-pill:hover {
-      border-color: var(--accent);
-      background: rgba(0,229,255,0.06);
-      transform: translateY(-3px);
-      box-shadow: var(--glow-sm);
-    }
-    .skill-pill.violet i { color: #a78bfa; }
-    .skill-pill.violet:hover { border-color: #a78bfa; background: rgba(124,58,237,0.06); box-shadow: 0 0 12px rgba(124,58,237,0.2); }
-    .skill-pill.pink i { color: #fb7185; }
-    .skill-pill.pink:hover { border-color: #fb7185; background: rgba(255,61,107,0.06); box-shadow: 0 0 12px rgba(255,61,107,0.2); }
-    .skill-pill.amber i { color: #fbbf24; }
-    .skill-pill.amber:hover { border-color: #fbbf24; background: rgba(251,191,36,0.06); box-shadow: 0 0 12px rgba(251,191,36,0.2); }
-
-    /* Keep old .skill-card for any legacy references */
-    .skill-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      text-align: center;
-      transition: var(--transition);
-      cursor: none;
-    }
-    .skill-card:hover {
-      border-color: rgba(0,229,255,0.4);
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: var(--glow-sm);
-    }
-    .skill-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; color: var(--accent); }
-    .skill-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
-
-    /* ─── LINKS ─────────────────────────────────────────────────── */
-    #links { background: var(--bg2); }
-    .link-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 2rem 1.5rem;
-      text-align: center;
-      transition: var(--transition);
-      cursor: none;
-      display: flex; flex-direction: column;
-      align-items: center; gap: 1rem;
-    }
-    .link-card:hover {
-      transform: translateY(-8px) scale(1.03);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    }
-    .link-card.github:hover  { border-color: #e8e8e8; box-shadow: 0 20px 60px rgba(255,255,255,0.08); }
-    .link-card.instagram:hover { border-color: #e1306c; box-shadow: 0 20px 60px rgba(225,48,108,0.2); }
-    .link-card.linkedin:hover  { border-color: #0077b5; box-shadow: 0 20px 60px rgba(0,119,181,0.2); }
-    .link-card.meta:hover      { border-color: #1877f2; box-shadow: 0 20px 60px rgba(24,119,242,0.2); }
-
-    .link-card-icon {
-      font-size: 2.5rem;
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      border: 1px solid var(--card-border);
-      transition: var(--transition);
-    }
-    .link-card.github  .link-card-icon { color: #fff; }
-    .link-card.instagram .link-card-icon { color: #e1306c; }
-    .link-card.linkedin  .link-card-icon { color: #0077b5; }
-    .link-card.meta      .link-card-icon { color: #1877f2; }
-
-    .link-card:hover .link-card-icon { background: rgba(255,255,255,0.05); border-color: currentColor; }
-    .link-card-name { font-weight: 700; font-size: 1rem; }
-    .link-card-handle { font-size: 0.8rem; color: var(--muted); font-family: 'Space Mono', monospace; }
-
-    /* ─── FOOTER ────────────────────────────────────────────────── */
-    footer {
-      background: var(--bg);
-      border-top: 1px solid var(--card-border);
-      padding: 2rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-family: 'Space Mono', monospace;
-    }
-    footer span { color: var(--accent); }
-
-    /* ─── SCROLL-REVEAL ─────────────────────────────────────────── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
-
-    /* ─── 3D TILT ────────────────────────────────────────────────── */
-    .tilt3d { transform-style: preserve-3d; }
-
-    /* ─── RESPONSIVE ────────────────────────────────────────────── */
-    @media (max-width: 991px) {
-      .featured-project, .featured-project.reverse { grid-template-columns: 1fr; }
-      .featured-project.reverse .fp-media { order: 0; }
-      .featured-project.reverse .fp-content { order: 1; }
-      .fp-media { min-height: 240px; }
-      .fp-media-overlay { background: linear-gradient(to bottom, transparent 50%, var(--card-bg)); }
-      .hero-3d-group { display: none; }
-    }
-    @media (max-width: 576px) {
-      .hero-name { font-size: 3rem; }
-      .fp-content { padding: 1.5rem; }
-    }
-
-    /* ─── SHIMMER LOADER ────────────────────────────────────── */
-    .img-shimmer {
-      width: 100%; aspect-ratio: 16/9;
-      background: linear-gradient(90deg,
-        var(--bg3) 25%,
-        rgba(0,229,255,0.05) 50%,
-        var(--bg3) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.6s infinite;
-    }
-    @keyframes shimmer {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    /* ─── CAROUSEL OVERRIDES ─────────────────────────────────── */
-    .carousel-indicators [data-bs-target] {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.3);
-      border: none;
-      margin: 0 3px;
-    }
-    .carousel-indicators .active {
-      background: var(--accent) !important;
-      transform: scale(1.3);
-    }
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon { display: none; }
-
-    .carousel-image-count {
-      position: absolute;
-      top: 10px; right: 10px;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 100px;
-      padding: 3px 10px;
-      font-size: 0.72rem;
-      font-family: 'Space Mono', monospace;
-      color: #fff;
-      display: flex; align-items: center; gap: 5px;
-    }
-
-    /* ─── FORK BADGE ─────────────────────────────────────────── */
-    .fork-badge {
-      font-size: 0.62rem;
-      padding: 2px 8px;
-      border-radius: 100px;
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--muted);
-      font-weight: 400;
-    }
-
-    /* readme-loading placeholder keeps aspect ratio */
-    .readme-loading {
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* ─── FEATURED PROJECT MEDIA LOADING ─────────────────────── */
-    .fp-gh-loading {
-      width: 100%; height: 100%;
-      min-height: 360px;
-      display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, var(--bg3) 0%, rgba(0,229,255,0.04) 100%);
-    }
-    .fp-media .fp-gh-img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.6s ease;
-    }
-    .fp-media:hover .fp-gh-img { transform: scale(1.04); }
-
-    /* ─── CURSOR BACKGROUND CANVAS ────────────────────────────── */
-    #cursor-bg-canvas {
-      position: fixed; inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.55;
-    }
-    .lang-cpp         { background: #f34b7d; }
-    .lang-python      { background: #3572A5; }
-    .lang-javascript  { background: #f1e05a; }
-    .lang-typescript  { background: #2b7489; }
-    .lang-rust        { background: #dea584; }
-    .lang-go          { background: #00ADD8; }
-    .lang-csharp      { background: #178600; }
-    .lang-html        { background: #e34c26; }
-    .lang-css         { background: #563d7c; }
-    .lang-default     { background: #858585; }
-  </style>
-</head>
-<body>
-
-<!-- Cursor Background Canvas -->
-<canvas id="cursor-bg-canvas"></canvas>
-
-<!-- Custom Cursor -->
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
-
-<!-- ─── NAVBAR ──────────────────────────────────────────────────── -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="#hero">ROB<span style="color:var(--accent3)">.</span></a>
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-      <i class="bi bi-list" style="color:var(--text);font-size:1.5rem;"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="nav">
-      <ul class="navbar-nav ms-auto gap-1">
-        <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
-        <li class="nav-item"><a class="nav-link" href="#github-repos">GitHub</a></li>
-        <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
-        <li class="nav-item"><a class="nav-link" href="#education">Education</a></li>
-        <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
-        <li class="nav-item"><a class="nav-link" href="#links">Links</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<!-- ─── HERO ──────────────────────────────────────────────────────── -->
-<section id="hero">
-  <canvas id="hero-canvas"></canvas>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <div class="container hero-content">
-    <div class="row">
-      <div class="col-lg-7">
-        <div class="hero-badge">Available for opportunities</div>
-        <h1 class="hero-name">
-          Hi, I'm<br>
-          <span class="accent-word">Robinson</span>
-        </h1>
-        <p class="hero-subtitle">
-          A student passionate about everything computers — building tools, writing emulators, and exploring new tech. My goal is to do as many unique things as possible.
-        </p>
-        <div class="hero-actions">
-          <a href="#projects" class="btn-primary-custom">View Projects <i class="bi bi-arrow-down ms-1"></i></a>
-          <a href="#links" class="btn-outline-custom">Get in Touch</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3D Cube -->
-  <div class="hero-3d-group">
-    <div class="hero-3d-inner">
-      <div class="cube-face f1"></div>
-      <div class="cube-face f2"></div>
-      <div class="cube-face f3"></div>
-      <div class="cube-face f4"></div>
-      <div class="cube-face f5"></div>
-      <div class="cube-face f6"></div>
-    </div>
-  </div>
-
-  <div class="scroll-indicator">
-    <div class="scroll-line"></div>
-    <span>scroll</span>
-  </div>
-</section>
-
-<!-- ─── STATS STRIP ──────────────────────────────────────────────── -->
-<div class="stats-strip">
-  <div class="container">
-    <div class="row" id="stats-row">
-      <div class="col-6 col-md-3 stat-item reveal">
-        <span class="stat-number" id="stat-repos">—</span>
-        <span class="stat-label">Public Repos</span>
-      </div>
-      <div class="col-6 col-md-3 stat-item reveal reveal-delay-1">
-        <span class="stat-number" id="stat-stars">—</span>
-        <span class="stat-label">GitHub Stars</span>
-      </div>
-      <div class="col-6 col-md-3 stat-item reveal reveal-delay-2">
-        <span class="stat-number" id="stat-langs">—</span>
-        <span class="stat-label">Languages Used</span>
-      </div>
-      <div class="col-6 col-md-3 stat-item reveal reveal-delay-3">
-        <span class="stat-number">∞</span>
-        <span class="stat-label">Things to Learn</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ─── FEATURED PROJECTS ────────────────────────────────────────── -->
-<section id="projects">
-  <div class="container">
-    <div class="reveal">
-      <p class="section-label">// hand-picked</p>
-      <h2 class="section-title">Featured<br>Projects</h2>
-      <div class="section-divider"></div>
-    </div>
-
-    <!-- Chrultrabook Tools -->
-    <div class="featured-project tilt3d reveal">
-      <div class="fp-media" id="fp-media-0">
-        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
-        <div class="fp-media-overlay"></div>
-      </div>
-      <div class="fp-content">
-        <p class="fp-number">01 / FEATURED</p>
-        <h3 class="fp-title">Chrultrabook Tools</h3>
-        <p class="fp-desc">Restores lost functionality and adds powerful new features to all Chromebooks running Windows, Linux and macOS. Cross-platform and actively maintained.</p>
-        <div class="fp-tags" id="fp-tags-0">
-          <span class="fp-tag cyan">Loading languages…</span>
-        </div>
-        <a href="https://github.com/death7654/Chrultrabook-Tools" target="_blank" class="fp-link">
-          View on GitHub <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- Driver Installer -->
-    <div class="featured-project reverse tilt3d reveal">
-      <div class="fp-content">
-        <p class="fp-number">02 / FEATURED</p>
-        <h3 class="fp-title">Chromebook Driver Installer</h3>
-        <p class="fp-desc">Automated driver installation system for Chromebook users with over 5,000 downloads — a Rust CLI tool paired with a structured hardware database cataloging 200+ Chromebook models with chipset info and driver mappings.</p>
-        <div class="fp-tags" id="fp-tags-1">
-          <span class="fp-tag cyan">Loading languages…</span>
-        </div>
-        <a href="https://github.com/death7654/Chromebook-Driver-Installer" target="_blank" class="fp-link">
-          View on GitHub <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-      <div class="fp-media" id="fp-media-1">
-        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
-        <div class="fp-media-overlay" style="background: linear-gradient(to left, transparent 60%, var(--card-bg))"></div>
-      </div>
-    </div>
-
-    <!-- ESP32 Bare Metal Kernel -->
-    <div class="featured-project tilt3d reveal">
-      <div class="fp-media" id="fp-media-4">
-        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
-        <div class="fp-media-overlay"></div>
-      </div>
-      <div class="fp-content">
-        <p class="fp-number">03 / FEATURED</p>
-        <h3 class="fp-title">Bare Metal ESP32 Kernel</h3>
-        <p class="fp-desc">A two-stage bootloader and kernel for the ESP32, built from the TRM up — custom Xtensa assembly trampoline, register-level SPI/SD driver, FAT32 filesystem, GPIO/UART HALs, and an interactive kernel shell with a domain-specific script interpreter.</p>
-        <div class="fp-tags" id="fp-tags-4">
-          <span class="fp-tag cyan">Loading languages…</span>
-        </div>
-        <a href="https://github.com/death7654/ESP32-Bare-Metal-Kernel" target="_blank" class="fp-link">
-          View on GitHub <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- GameBoy Emulator Rust -->
-    <div class="featured-project reverse tilt3d reveal">
-      <div class="fp-content">
-        <p class="fp-number">04 / FEATURED</p>
-        <h3 class="fp-title">Game Boy Emulator</h3>
-        <p class="fp-desc">A cycle-accurate Game Boy emulator built in Rust — emulating the LR35902 CPU, PPU, memory bus, MBC1/MBC3 cartridge mappers, scanline rendering, tile caching, sprite compositing, and OAM DMA timing from scratch.</p>
-        <div class="fp-tags" id="fp-tags-2">
-          <span class="fp-tag cyan">Loading languages…</span>
-        </div>
-        <a href="https://github.com/death7654/Gameboy-Emulator-Rust" target="_blank" class="fp-link">
-          View on GitHub <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-      <div class="fp-media" id="fp-media-2">
-        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
-        <div class="fp-media-overlay" style="background: linear-gradient(to left, transparent 60%, var(--card-bg))"></div>
-      </div>
-    </div>
-
-    <!-- Space Invaders Emulator -->
-    <div class="featured-project tilt3d reveal">
-      <div class="fp-media" id="fp-media-3">
-        <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
-        <div class="fp-media-overlay"></div>
-      </div>
-      <div class="fp-content">
-        <p class="fp-number">05 / FEATURED</p>
-        <h3 class="fp-title">Space Invaders / Intel 8080</h3>
-        <p class="fp-desc">A faithful emulation of the classic 1978 arcade game, implementing the Intel 8080 CPU, hardware interrupts, shift registers, and original sound logic.</p>
-        <div class="fp-tags" id="fp-tags-3">
-          <span class="fp-tag cyan">Loading languages…</span>
-        </div>
-        <a href="https://github.com/death7654/Intel-8080-Emulator" target="_blank" class="fp-link">
-          View on GitHub <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── GITHUB REPOS ──────────────────────────────────────────────── -->
-<section id="github-repos" style="background: var(--bg);">
-  <div class="container">
-    <div class="reveal">
-      <p class="section-label">// live from github api</p>
-      <h2 class="section-title">All Repositories</h2>
-      <div class="section-divider"></div>
-    </div>
-
-    <!-- Filter buttons -->
-    <div class="d-flex gap-2 flex-wrap mb-4 reveal" id="lang-filters">
-      <button class="btn-filter active" data-lang="all" onclick="filterRepos('all', this)">All</button>
-    </div>
-
-    <div id="repos-grid" class="row g-4">
-      <div class="gh-loading col-12">
-        <div class="gh-spinner"></div>
-        <span style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--muted)">Fetching from GitHub API...</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── SKILLS ───────────────────────────────────────────────────── -->
-<section id="skills">
-  <div class="container">
-    <div class="reveal">
-      <p class="section-label">// toolbox</p>
-      <h2 class="section-title">Skills &amp; Tech</h2>
-      <div class="section-divider"></div>
-    </div>
-    <div id="skills-grid">
-      <!-- populated by JS -->
-    </div>
-  </div>
-</section>
-
-<!-- ─── EDUCATION ─────────────────────────────────────────────── -->
-<section id="education" style="background: var(--bg);">
-  <div class="container">
-    <div class="reveal">
-      <p class="section-label">// academia</p>
-      <h2 class="section-title">Education</h2>
-      <div class="section-divider"></div>
-    </div>
-    <div class="reveal" style="max-width: 760px;">
-      <div style="display:grid; grid-template-columns: 120px 1fr; gap: 0 2rem; position:relative; padding-bottom: 2.5rem;">
-        <div style="text-align:right; padding-top: 0.25rem;">
-          <span style="font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--muted); line-height:1.5;">Sep 2024<br>— May 2028</span>
-        </div>
-        <div style="position:relative; padding-left:1.5rem; border-left: 1px solid var(--card-border);">
-          <span style="position:absolute; left:-5px; top:6px; width:9px; height:9px; background:var(--accent2); border-radius:50%; box-shadow: 0 0 10px rgba(124,58,237,0.5); display:block;"></span>
-          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:1.5rem; transition: var(--transition);"
-               onmouseover="this.style.borderColor='rgba(124,58,237,0.4)'; this.style.boxShadow='0 0 20px rgba(124,58,237,0.12)'"
-               onmouseout="this.style.borderColor=''; this.style.boxShadow=''">
-            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
-              <h4 style="font-size:1.05rem; font-weight:700; margin:0;">B.Tech in Artificial Intelligence and Data Science</h4>
-              <span style="font-size:0.72rem; background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); border-radius:100px; padding:3px 12px; color:var(--accent2); font-family:'Space Mono',monospace;">CGPA: 9.32 / 10</span>
-            </div>
-            <p style="font-size:0.85rem; color:var(--accent2); margin-bottom:0.75rem; font-family:'Space Mono',monospace; font-weight:600;">Vimal Jyothi Engineering College — Chemperi, Kerala</p>
-            <p style="font-size:0.88rem; color:var(--muted); margin:0;">Minor in Electronics and Communications</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── EXPERIENCE ────────────────────────────────────────────────── -->
-<section id="experience" style="background: var(--bg2);">
-  <div class="container">
-    <div class="reveal">
-      <p class="section-label">// work history</p>
-      <h2 class="section-title">Experience</h2>
-      <div class="section-divider"></div>
-    </div>
-    <div class="reveal" style="max-width: 760px;">
-      <div style="display:flex; flex-direction:column; gap: 0;">
-
-        <!-- Timeline item -->
-        <div style="display:grid; grid-template-columns: 120px 1fr; gap: 0 2rem; position:relative; padding-bottom: 2.5rem;">
-          <!-- Date col -->
-          <div style="text-align:right; padding-top: 0.25rem;">
-            <span style="font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--muted); line-height:1.5;">May 2023<br>— Present</span>
-          </div>
-          <!-- Line + dot -->
-          <div style="position:relative; padding-left:1.5rem; border-left: 1px solid var(--card-border);">
-            <span style="position:absolute; left:-5px; top:6px; width:9px; height:9px; background:var(--accent); border-radius:50%; box-shadow: 0 0 10px rgba(0,229,255,0.5); display:block;"></span>
-            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:1.5rem; transition: var(--transition);"
-                 onmouseover="this.style.borderColor='rgba(0,229,255,0.4)'; this.style.boxShadow='0 0 20px rgba(0,229,255,0.12)'"
-                 onmouseout="this.style.borderColor=''; this.style.boxShadow=''">
-              <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
-                <h4 style="font-size:1.05rem; font-weight:700; margin:0;">Open Source Contributor</h4>
-                <span style="font-size:0.72rem; background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.2); border-radius:100px; padding:3px 12px; color:var(--accent); font-family:'Space Mono',monospace;">Remote</span>
-              </div>
-              <p style="font-size:0.85rem; color:var(--accent); margin-bottom:0.75rem; font-family:'Space Mono',monospace; font-weight:600;">Chrultrabook Project</p>
-              <ul style="margin:0; padding-left:1.2rem; color:var(--muted); font-size:0.88rem; line-height:1.75;">
-                <li>Developed and maintained Chrultrabook Tools, a cross-platform system utility application serving users running alternate operating systems on Chromebook hardware.</li>
-                <li>Provided technical support and troubleshooting for community members transitioning Chromebooks to Linux, Windows, and other operating systems.</li>
-                <li>Collaborated with project maintainers to improve documentation, hardware compatibility databases, and user-facing tools.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── LINKS ────────────────────────────────────────────────────── -->
-<section id="links">
-  <div class="container">
-    <div class="reveal">
-      <p class="section-label">// find me online</p>
-      <h2 class="section-title">Connect</h2>
-      <div class="section-divider"></div>
-    </div>
-    <div class="row g-4 justify-content-center">
-      <div class="col-6 col-md-3 reveal">
-        <a href="https://github.com/death7654" target="_blank" class="link-card github d-block">
-          <div class="link-card-icon"><i class="bi bi-github"></i></div>
-          <div class="link-card-name">GitHub</div>
-          <div class="link-card-handle">@death7654</div>
-        </a>
-      </div>
-      <div class="col-6 col-md-3 reveal reveal-delay-1">
-        <a href="https://www.instagram.com/robinsongeorge301/" target="_blank" class="link-card instagram d-block">
-          <div class="link-card-icon"><i class="bi bi-instagram"></i></div>
-          <div class="link-card-name">Instagram</div>
-          <div class="link-card-handle">@robinsongeorge301</div>
-        </a>
-      </div>
-      <div class="col-6 col-md-3 reveal reveal-delay-2">
-        <a href="https://www.linkedin.com/in/robinsonarysseril/" target="_blank" class="link-card linkedin d-block">
-          <div class="link-card-icon"><i class="bi bi-linkedin"></i></div>
-          <div class="link-card-name">LinkedIn</div>
-          <div class="link-card-handle">Robinson Arysseril</div>
-        </a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ─── FOOTER ───────────────────────────────────────────────────── -->
-<footer>
-  <p>Built by <span>Robinson</span> · Powered by Bootstrap 5 + GitHub API</p>
-</footer>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<style>
-  .btn-filter {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    color: var(--muted);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    cursor: none;
-    transition: all 0.3s;
-    font-family: 'Space Mono', monospace;
-  }
-  .btn-filter.active, .btn-filter:hover {
-    background: var(--accent);
-    color: #000;
-    border-color: var(--accent);
-  }
-</style>
-
-<script>
-/* ─── CURSOR BACKGROUND CANVAS ───────────────────────────── */
-(function() {
-  const bgCanvas = document.getElementById('cursor-bg-canvas');
-  const bgCtx = bgCanvas.getContext('2d');
-  let BW, BH;
-
-  function resizeBg() {
-    BW = bgCanvas.width  = window.innerWidth;
-    BH = bgCanvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resizeBg);
-  resizeBg();
-
-  // Trail: store last N cursor positions
-  const TRAIL_LEN = 28;
-  const trail = [];
-
-  // Ripples triggered on click
-  const ripples = [];
-
-  document.addEventListener('mousemove', e => {
-    trail.push({ x: e.clientX, y: e.clientY, t: Date.now() });
-    if (trail.length > TRAIL_LEN) trail.shift();
-  });
-
-  document.addEventListener('click', e => {
-    ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: 0.6, born: Date.now() });
-  });
-
-  // Ambient floating orbs that drift toward cursor
-  const NUM_ORBS = 7;
-  const orbs = Array.from({ length: NUM_ORBS }, (_, i) => ({
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
-    r: 60 + Math.random() * 120,
-    vx: (Math.random() - 0.5) * 0.4,
-    vy: (Math.random() - 0.5) * 0.4,
-    hue: [180, 260, 340][i % 3], // cyan / violet / pink
-    alpha: 0.04 + Math.random() * 0.05,
-    speed: 0.005 + Math.random() * 0.008,
-  }));
-
-  let animMx = window.innerWidth / 2, animMy = window.innerHeight / 2;
-  document.addEventListener('mousemove', e => { animMx = e.clientX; animMy = e.clientY; });
-
-  function drawBg() {
-    bgCtx.clearRect(0, 0, BW, BH);
-
-    // Draw ambient orbs — drift slightly toward cursor
-    orbs.forEach(o => {
-      o.vx += (animMx - o.x) * o.speed * 0.002;
-      o.vy += (animMy - o.y) * o.speed * 0.002;
-      o.vx *= 0.98; o.vy *= 0.98;
-      o.x += o.vx; o.y += o.vy;
-      // Wrap
-      if (o.x < -o.r) o.x = BW + o.r;
-      if (o.x > BW + o.r) o.x = -o.r;
-      if (o.y < -o.r) o.y = BH + o.r;
-      if (o.y > BH + o.r) o.y = -o.r;
-
-      const g = bgCtx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-      g.addColorStop(0, `hsla(${o.hue},100%,60%,${o.alpha})`);
-      g.addColorStop(1, `hsla(${o.hue},100%,60%,0)`);
-      bgCtx.beginPath();
-      bgCtx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
-      bgCtx.fillStyle = g;
-      bgCtx.fill();
-    });
-
-    // Draw cursor glow
-    if (trail.length > 0) {
-      const last = trail[trail.length - 1];
-      const glow = bgCtx.createRadialGradient(last.x, last.y, 0, last.x, last.y, 140);
-      glow.addColorStop(0,   'rgba(0,229,255,0.12)');
-      glow.addColorStop(0.4, 'rgba(0,229,255,0.05)');
-      glow.addColorStop(1,   'rgba(0,229,255,0)');
-      bgCtx.beginPath();
-      bgCtx.arc(last.x, last.y, 140, 0, Math.PI * 2);
-      bgCtx.fillStyle = glow;
-      bgCtx.fill();
-    }
-
-    // Draw trailing comet tail
-    if (trail.length > 1) {
-      for (let i = 1; i < trail.length; i++) {
-        const t = i / trail.length;
-        const prev = trail[i - 1];
-        const curr = trail[i];
-        bgCtx.beginPath();
-        bgCtx.moveTo(prev.x, prev.y);
-        bgCtx.lineTo(curr.x, curr.y);
-        bgCtx.strokeStyle = `rgba(0,229,255,${t * 0.18})`;
-        bgCtx.lineWidth = t * 4;
-        bgCtx.lineCap = 'round';
-        bgCtx.stroke();
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Robinson — Portfolio</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+      :root {
+        --bg: #080c12;
+        --bg2: #0d1420;
+        --bg3: #111927;
+        --accent: #00e5ff;
+        --accent2: #7c3aed;
+        --accent3: #ff3d6b;
+        --text: #e8eaf0;
+        --muted: #6b7a99;
+        --card-bg: rgba(255, 255, 255, 0.04);
+        --card-border: rgba(0, 229, 255, 0.12);
+        --glow: 0 0 30px rgba(0, 229, 255, 0.25);
+        --glow-sm: 0 0 12px rgba(0, 229, 255, 0.2);
+        --radius: 16px;
+        --transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
       }
-    }
 
-    // Draw click ripples
-    const now = Date.now();
-    for (let i = ripples.length - 1; i >= 0; i--) {
-      const rp = ripples[i];
-      const age = now - rp.born;
-      rp.r += 6;
-      rp.alpha = Math.max(0, 0.6 - age / 600);
-      if (rp.alpha <= 0) { ripples.splice(i, 1); continue; }
-      bgCtx.beginPath();
-      bgCtx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-      bgCtx.strokeStyle = `rgba(0,229,255,${rp.alpha})`;
-      bgCtx.lineWidth = 1.5;
-      bgCtx.stroke();
-    }
+      /* ─── RESET & BASE ──────────────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Outfit", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+        cursor: none;
+      }
+      body::-webkit-scrollbar {
+        width: 4px;
+      }
+      body::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      body::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 2px;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:hover {
+        color: var(--accent);
+      }
 
-    requestAnimationFrame(drawBg);
-  }
-  drawBg();
-})();
+      /* ─── CUSTOM CURSOR ─────────────────────────────────────────── */
+      #cursor {
+        width: 12px;
+        height: 12px;
+        background: var(--accent);
+        border-radius: 50%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition:
+          width 0.2s,
+          height 0.2s,
+          background 0.2s;
+        mix-blend-mode: difference;
+      }
+      #cursor-ring {
+        width: 36px;
+        height: 36px;
+        border: 1.5px solid var(--accent);
+        border-radius: 50%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 9998;
+        transform: translate(-50%, -50%);
+        transition:
+          transform 0.12s ease,
+          width 0.3s,
+          height 0.3s,
+          opacity 0.3s;
+        opacity: 0.5;
+      }
+      body:hover #cursor {
+        opacity: 1;
+      }
 
-/* ─── CURSOR ─────────────────────────────────────────────── */
-const cursor = document.getElementById('cursor');
-const ring   = document.getElementById('cursor-ring');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-(function animCursor() {
-  rx += (mx - rx) * 0.15;
-  ry += (my - ry) * 0.15;
-  cursor.style.left = mx + 'px';
-  cursor.style.top  = my + 'px';
-  ring.style.left   = rx + 'px';
-  ring.style.top    = ry + 'px';
-  requestAnimationFrame(animCursor);
-})();
-document.querySelectorAll('a,button,.link-card,.project-card,.skill-card,.btn-filter').forEach(el => {
-  el.addEventListener('mouseenter', () => { cursor.style.width = '20px'; cursor.style.height = '20px'; ring.style.width = '50px'; ring.style.height = '50px'; ring.style.opacity = '0.3'; });
-  el.addEventListener('mouseleave', () => { cursor.style.width = '12px'; cursor.style.height = '12px'; ring.style.width = '36px'; ring.style.height = '36px'; ring.style.opacity = '0.5'; });
-});
+      /* ─── NOISE OVERLAY ─────────────────────────────────────────── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+        opacity: 0.025;
+        pointer-events: none;
+        z-index: 0;
+      }
 
-/* ─── HERO CANVAS PARTICLES ──────────────────────────────── */
-(function() {
-  const canvas = document.getElementById('hero-canvas');
-  const ctx = canvas.getContext('2d');
-  let W, H, particles;
-  function resize() {
-    W = canvas.width  = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
-  }
-  window.addEventListener('resize', () => { resize(); init(); });
-  resize();
-  function Particle() {
-    this.x = Math.random() * W;
-    this.y = Math.random() * H;
-    this.vx = (Math.random() - 0.5) * 0.3;
-    this.vy = (Math.random() - 0.5) * 0.3;
-    this.r  = Math.random() * 1.5 + 0.3;
-    this.alpha = Math.random() * 0.4 + 0.1;
-  }
-  function init() {
-    particles = Array.from({length: 80}, () => new Particle());
-  }
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    particles.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0,229,255,${p.alpha})`;
-      ctx.fill();
-    });
-    // lines between nearby particles
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const d  = Math.sqrt(dx*dx + dy*dy);
-        if (d < 120) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(0,229,255,${0.06 * (1 - d/120)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
+      /* ─── NAVBAR ────────────────────────────────────────────────── */
+      .navbar {
+        background: rgba(8, 12, 18, 0.85) !important;
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--card-border);
+        padding: 1rem 2rem;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+      }
+      .navbar-brand {
+        font-family: "Space Mono", monospace;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--accent) !important;
+        letter-spacing: 0.05em;
+      }
+      .nav-link {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted) !important;
+        position: relative;
+        padding: 0.5rem 1rem !important;
+        transition: color 0.3s;
+      }
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 1rem;
+        width: 0;
+        height: 1.5px;
+        background: var(--accent);
+        transition: width var(--transition);
+      }
+      .nav-link:hover {
+        color: var(--accent) !important;
+      }
+      .nav-link:hover::after {
+        width: calc(100% - 2rem);
+      }
+
+      /* ─── HERO ──────────────────────────────────────────────────── */
+      #hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(
+            ellipse 80% 60% at 60% 40%,
+            rgba(0, 229, 255, 0.06) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 60% 50% at 20% 80%,
+            rgba(124, 58, 237, 0.07) 0%,
+            transparent 60%
+          ),
+          var(--bg);
+      }
+      #hero-canvas {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        padding-top: 80px;
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0, 229, 255, 0.08);
+        border: 1px solid rgba(0, 229, 255, 0.2);
+        border-radius: 100px;
+        padding: 6px 16px;
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        margin-bottom: 2rem;
+        animation: fadeSlideUp 0.8s ease both;
+      }
+      .hero-badge::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        background: var(--accent);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.7);
         }
       }
-    }
-    requestAnimationFrame(draw);
-  }
-  init(); draw();
-})();
 
-/* ─── 3D TILT ON FEATURED CARDS ─────────────────────────── */
-document.querySelectorAll('.tilt3d').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width  - 0.5;
-    const y = (e.clientY - r.top)  / r.height - 0.5;
-    card.style.transform = `translateY(-4px) rotateX(${-y * 4}deg) rotateY(${x * 6}deg)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
-  });
-});
+      .hero-name {
+        font-size: clamp(3.5rem, 10vw, 7.5rem);
+        font-weight: 900;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        color: var(--text);
+        animation: fadeSlideUp 0.8s 0.1s ease both;
+      }
+      .hero-name .accent-word {
+        color: transparent;
+        -webkit-text-stroke: 1.5px var(--accent);
+        position: relative;
+      }
+      .hero-subtitle {
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+        color: var(--muted);
+        font-weight: 300;
+        max-width: 520px;
+        line-height: 1.7;
+        margin-top: 1.5rem;
+        animation: fadeSlideUp 0.8s 0.2s ease both;
+      }
+      .hero-actions {
+        margin-top: 2.5rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        animation: fadeSlideUp 0.8s 0.3s ease both;
+      }
+      .btn-primary-custom {
+        background: var(--accent);
+        color: #000;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 100px;
+        padding: 0.85rem 2rem;
+        cursor: none;
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+      }
+      .btn-primary-custom::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(-100%);
+        transition: transform 0.4s ease;
+      }
+      .btn-primary-custom:hover::before {
+        transform: translateX(0);
+      }
+      .btn-primary-custom:hover {
+        box-shadow: var(--glow);
+        transform: translateY(-2px);
+        color: #000;
+      }
 
-/* ─── SCROLL REVEAL ──────────────────────────────────────── */
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      .btn-outline-custom {
+        background: transparent;
+        color: var(--text);
+        font-weight: 600;
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 100px;
+        padding: 0.85rem 2rem;
+        cursor: none;
+        transition: var(--transition);
+      }
+      .btn-outline-custom:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-2px);
+      }
 
-/* ─── SKILLS DATA ────────────────────────────────────────── */
-const skillCategories = [
-  {
-    label: 'Systems & Embedded',
-    color: 'cyan',
-    pills: [
-      { icon: 'bi-braces',   name: 'C / C++' },
-      { icon: 'bi-shield-fill',    name: 'Rust' },
-      { icon: 'bi-lightning-fill', name: 'Zig' },
-      { icon: 'bi-cpu-fill',       name: 'Xtensa Assembly' },
-    ]
-  },
-  {
-    label: 'General Purpose',
-    color: 'violet',
-    pills: [
-      { icon: 'bi-code',            name: 'Python' },
-      { icon: 'bi-cup-hot-fill',    name: 'Java' },
-      { icon: 'bi-filetype-js',     name: 'JavaScript' },
-      { icon: 'bi-filetype-tsx',    name: 'TypeScript' },
-      { icon: 'bi-database-fill',   name: 'MySQL' },
-    ]
-  },
-  {
-    label: 'Web & UI',
-    color: 'pink',
-    pills: [
-      { icon: 'bi-window-sidebar',  name: 'Tauri' },
-      { icon: 'bi-hexagon-fill',    name: 'Angular' },
-      { icon: 'bi-grid-1x2-fill',   name: 'Bootstrap' },
-      { icon: 'bi-filetype-html',   name: 'HTML / CSS' },
-    ]
-  },
-  {
-    label: 'Data Science',
-    color: 'amber',
-    pills: [
-      { icon: 'bi-table',           name: 'Pandas' },
-      { icon: 'bi-calculator-fill', name: 'NumPy' },
-      { icon: 'bi-graph-up',        name: 'Matplotlib' },
-      { icon: 'bi-robot',           name: 'Scikit-Learn' },
-      { icon: 'bi-infinity',        name: 'SciPy' },
-    ]
-  },
-  {
-    label: 'Developer Tools',
-    color: 'cyan',
-    pills: [
-      { icon: 'bi-git',             name: 'Git' },
-      { icon: 'bi-terminal-fill',   name: 'Make' },
-    ]
-  },
-];
+      /* floating 3D shapes */
+      .hero-3d-group {
+        position: absolute;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 420px;
+        height: 420px;
+        perspective: 800px;
+        animation: fadeSlideUp 1s 0.4s ease both;
+        pointer-events: none;
+      }
+      .hero-3d-inner {
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        animation: float3d 8s ease-in-out infinite;
+      }
+      @keyframes float3d {
+        0%,
+        100% {
+          transform: rotateX(10deg) rotateY(-15deg) rotateZ(2deg);
+        }
+        33% {
+          transform: rotateX(-5deg) rotateY(10deg) rotateZ(-3deg);
+        }
+        66% {
+          transform: rotateX(8deg) rotateY(5deg) rotateZ(4deg);
+        }
+      }
+      .cube-face {
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border: 1px solid rgba(0, 229, 255, 0.25);
+        background: rgba(0, 229, 255, 0.03);
+        backdrop-filter: blur(4px);
+        border-radius: 16px;
+      }
+      .cube-face.f1 {
+        transform: translateZ(90px);
+        top: 120px;
+        left: 120px;
+      }
+      .cube-face.f2 {
+        transform: translateZ(-90px);
+        top: 120px;
+        left: 120px;
+        background: rgba(124, 58, 237, 0.04);
+        border-color: rgba(124, 58, 237, 0.25);
+      }
+      .cube-face.f3 {
+        transform: rotateY(90deg) translateZ(90px);
+        top: 120px;
+        left: 120px;
+      }
+      .cube-face.f4 {
+        transform: rotateY(-90deg) translateZ(90px);
+        top: 120px;
+        left: 120px;
+      }
+      .cube-face.f5 {
+        transform: rotateX(90deg) translateZ(90px);
+        top: 120px;
+        left: 120px;
+      }
+      .cube-face.f6 {
+        transform: rotateX(-90deg) translateZ(90px);
+        top: 120px;
+        left: 120px;
+        background: rgba(255, 61, 107, 0.03);
+        border-color: rgba(255, 61, 107, 0.2);
+      }
 
-const skillsGrid = document.getElementById('skills-grid');
-skillCategories.forEach((cat, ci) => {
-  const section = document.createElement('div');
-  section.className = 'skill-category reveal';
-  section.style.transitionDelay = `${ci * 0.1}s`;
+      .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        pointer-events: none;
+      }
+      .orb-1 {
+        width: 300px;
+        height: 300px;
+        background: rgba(0, 229, 255, 0.08);
+        top: -50px;
+        left: -100px;
+      }
+      .orb-2 {
+        width: 200px;
+        height: 200px;
+        background: rgba(124, 58, 237, 0.1);
+        bottom: 50px;
+        right: 50px;
+      }
+      .orb-3 {
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 61, 107, 0.07);
+        top: 200px;
+        right: 0;
+      }
 
-  const pillsHtml = cat.pills.map(p =>
-    `<span class="skill-pill ${cat.color}"><i class="bi ${p.icon}"></i>${p.name}</span>`
-  ).join('');
+      .scroll-indicator {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        animation: fadeSlideUp 1s 0.6s ease both;
+      }
+      .scroll-line {
+        width: 1px;
+        height: 60px;
+        background: linear-gradient(to bottom, var(--accent), transparent);
+        animation: scrollPulse 2s ease-in-out infinite;
+      }
+      @keyframes scrollPulse {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scaleY(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scaleY(1.2);
+        }
+      }
 
-  section.innerHTML = `
+      /* ─── SECTION STYLES ────────────────────────────────────────── */
+      section {
+        padding: 6rem 0;
+        position: relative;
+        z-index: 1;
+      }
+      .section-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+      }
+      .section-title {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+      .section-divider {
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        border-radius: 2px;
+        margin: 1.5rem 0 2rem;
+      }
+
+      @keyframes fadeSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ─── STATS STRIP ───────────────────────────────────────────── */
+      .stats-strip {
+        background: var(--bg2);
+        border-top: 1px solid var(--card-border);
+        border-bottom: 1px solid var(--card-border);
+        padding: 2rem 0;
+      }
+      .stat-item {
+        text-align: center;
+        padding: 1rem;
+        border-right: 1px solid var(--card-border);
+      }
+      .stat-item:last-child {
+        border-right: none;
+      }
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: var(--accent);
+        font-family: "Space Mono", monospace;
+        display: block;
+      }
+      .stat-label {
+        font-size: 0.8rem;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      /* ─── FEATURED PROJECTS ─────────────────────────────────────── */
+      #projects {
+        background: var(--bg2);
+      }
+
+      .project-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        overflow: hidden;
+        transition: var(--transition);
+        cursor: none;
+        position: relative;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+      }
+      .project-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 229, 255, 0.05) 0%,
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity var(--transition);
+        border-radius: 24px;
+        z-index: 0;
+      }
+      .project-card:hover {
+        border-color: rgba(0, 229, 255, 0.4);
+        transform: translateY(-8px) rotateX(2deg);
+        box-shadow:
+          var(--glow),
+          0 30px 80px rgba(0, 0, 0, 0.5);
+      }
+      .project-card:hover::before {
+        opacity: 1;
+      }
+
+      .project-card-video {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        background: var(--bg3);
+        display: block;
+      }
+      .project-card-img-placeholder {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: linear-gradient(
+          135deg,
+          var(--bg3) 0%,
+          rgba(0, 229, 255, 0.05) 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: rgba(0, 229, 255, 0.2);
+      }
+      .project-card-body {
+        padding: 1.5rem;
+        position: relative;
+        z-index: 1;
+      }
+      .project-card-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .project-card-title a {
+        transition: color 0.2s;
+      }
+      .project-card-title a:hover {
+        color: var(--accent);
+      }
+      .project-card-desc {
+        font-size: 0.88rem;
+        color: var(--muted);
+        line-height: 1.65;
+        margin-bottom: 1rem;
+      }
+      .project-lang-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0, 229, 255, 0.08);
+        border: 1px solid rgba(0, 229, 255, 0.15);
+        border-radius: 100px;
+        padding: 3px 10px;
+        font-size: 0.72rem;
+        font-family: "Space Mono", monospace;
+        color: var(--accent);
+        letter-spacing: 0.05em;
+      }
+      .project-lang-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .project-stars {
+        font-size: 0.8rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .project-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .github-link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        color: var(--muted);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 100px;
+        padding: 4px 12px;
+        transition: var(--transition);
+      }
+      .github-link-btn:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* loading spinner */
+      .gh-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem;
+        color: var(--muted);
+        gap: 1rem;
+      }
+      .gh-spinner {
+        width: 40px;
+        height: 40px;
+        border: 2px solid rgba(0, 229, 255, 0.15);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ─── FEATURED (BIG) PROJECTS ───────────────────────────────── */
+      .featured-project {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 28px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        transition: var(--transition);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .featured-project:hover {
+        border-color: rgba(0, 229, 255, 0.35);
+        box-shadow:
+          var(--glow),
+          0 40px 100px rgba(0, 0, 0, 0.4);
+        transform: translateY(-4px);
+      }
+      .featured-project.reverse {
+        grid-template-columns: 1fr 1fr;
+      }
+      .featured-project.reverse .fp-media {
+        order: 2;
+      }
+      .featured-project.reverse .fp-content {
+        order: 1;
+      }
+      .fp-media {
+        position: relative;
+        overflow: hidden;
+        min-height: 360px;
+      }
+      .fp-media video,
+      .fp-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s ease;
+      }
+      .featured-project:hover .fp-media video,
+      .featured-project:hover .fp-media img {
+        transform: scale(1.04);
+      }
+      .fp-media-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, transparent 60%, var(--card-bg));
+        pointer-events: none;
+      }
+      .fp-content {
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .fp-number {
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--accent);
+        letter-spacing: 0.2em;
+        margin-bottom: 0.75rem;
+      }
+      .fp-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        line-height: 1.1;
+      }
+      .fp-desc {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+      }
+      .fp-tags {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+      .fp-tag {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        padding: 4px 12px;
+        border-radius: 100px;
+        border: 1px solid;
+      }
+      .fp-tag.cyan {
+        color: var(--accent);
+        border-color: rgba(0, 229, 255, 0.3);
+        background: rgba(0, 229, 255, 0.06);
+      }
+      .fp-tag.violet {
+        color: #a78bfa;
+        border-color: rgba(124, 58, 237, 0.3);
+        background: rgba(124, 58, 237, 0.06);
+      }
+      .fp-tag.pink {
+        color: #fb7185;
+        border-color: rgba(255, 61, 107, 0.3);
+        background: rgba(255, 61, 107, 0.06);
+      }
+      .fp-tag.amber {
+        color: #fbbf24;
+        border-color: rgba(251, 191, 36, 0.3);
+        background: rgba(251, 191, 36, 0.06);
+      }
+      .fp-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        transition: gap 0.3s;
+      }
+      .fp-link:hover {
+        gap: 14px;
+        color: var(--accent);
+      }
+
+      /* ─── SKILLS ────────────────────────────────────────────────── */
+      #skills {
+        background: var(--bg);
+      }
+
+      .skill-category {
+        margin-bottom: 2.5rem;
+      }
+      .skill-category-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--card-border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .skill-category-label::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .skill-pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+      }
+      .skill-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 100px;
+        padding: 0.45rem 1rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text);
+        transition: var(--transition);
+        cursor: none;
+        white-space: nowrap;
+      }
+      .skill-pill i {
+        font-size: 1rem;
+        color: var(--accent);
+        transition: color 0.3s;
+      }
+      .skill-pill:hover {
+        border-color: var(--accent);
+        background: rgba(0, 229, 255, 0.06);
+        transform: translateY(-3px);
+        box-shadow: var(--glow-sm);
+      }
+      .skill-pill.violet i {
+        color: #a78bfa;
+      }
+      .skill-pill.violet:hover {
+        border-color: #a78bfa;
+        background: rgba(124, 58, 237, 0.06);
+        box-shadow: 0 0 12px rgba(124, 58, 237, 0.2);
+      }
+      .skill-pill.pink i {
+        color: #fb7185;
+      }
+      .skill-pill.pink:hover {
+        border-color: #fb7185;
+        background: rgba(255, 61, 107, 0.06);
+        box-shadow: 0 0 12px rgba(255, 61, 107, 0.2);
+      }
+      .skill-pill.amber i {
+        color: #fbbf24;
+      }
+      .skill-pill.amber:hover {
+        border-color: #fbbf24;
+        background: rgba(251, 191, 36, 0.06);
+        box-shadow: 0 0 12px rgba(251, 191, 36, 0.2);
+      }
+
+      /* Keep old .skill-card for any legacy references */
+      .skill-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: var(--transition);
+        cursor: none;
+      }
+      .skill-card:hover {
+        border-color: rgba(0, 229, 255, 0.4);
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: var(--glow-sm);
+      }
+      .skill-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        display: block;
+        color: var(--accent);
+      }
+      .skill-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      /* ─── LINKS ─────────────────────────────────────────────────── */
+      #links {
+        background: var(--bg2);
+      }
+      .link-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: var(--transition);
+        cursor: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+      .link-card:hover {
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      }
+      .link-card.github:hover {
+        border-color: #e8e8e8;
+        box-shadow: 0 20px 60px rgba(255, 255, 255, 0.08);
+      }
+      .link-card.instagram:hover {
+        border-color: #e1306c;
+        box-shadow: 0 20px 60px rgba(225, 48, 108, 0.2);
+      }
+      .link-card.linkedin:hover {
+        border-color: #0077b5;
+        box-shadow: 0 20px 60px rgba(0, 119, 181, 0.2);
+      }
+      .link-card.meta:hover {
+        border-color: #1877f2;
+        box-shadow: 0 20px 60px rgba(24, 119, 242, 0.2);
+      }
+
+      .link-card-icon {
+        font-size: 2.5rem;
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--card-border);
+        transition: var(--transition);
+      }
+      .link-card.github .link-card-icon {
+        color: #fff;
+      }
+      .link-card.instagram .link-card-icon {
+        color: #e1306c;
+      }
+      .link-card.linkedin .link-card-icon {
+        color: #0077b5;
+      }
+      .link-card.meta .link-card-icon {
+        color: #1877f2;
+      }
+
+      .link-card:hover .link-card-icon {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: currentColor;
+      }
+      .link-card-name {
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .link-card-handle {
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-family: "Space Mono", monospace;
+      }
+
+      /* ─── FOOTER ────────────────────────────────────────────────── */
+      footer {
+        background: var(--bg);
+        border-top: 1px solid var(--card-border);
+        padding: 2rem;
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--muted);
+        font-family: "Space Mono", monospace;
+      }
+      footer span {
+        color: var(--accent);
+      }
+
+      /* ─── SCROLL-REVEAL ─────────────────────────────────────────── */
+      .reveal {
+        opacity: 0;
+        transform: translateY(40px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .reveal-delay-1 {
+        transition-delay: 0.1s;
+      }
+      .reveal-delay-2 {
+        transition-delay: 0.2s;
+      }
+      .reveal-delay-3 {
+        transition-delay: 0.3s;
+      }
+      .reveal-delay-4 {
+        transition-delay: 0.4s;
+      }
+
+      /* ─── 3D TILT ────────────────────────────────────────────────── */
+      .tilt3d {
+        transform-style: preserve-3d;
+      }
+
+      /* ─── RESPONSIVE ────────────────────────────────────────────── */
+      @media (max-width: 991px) {
+        .featured-project,
+        .featured-project.reverse {
+          grid-template-columns: 1fr;
+        }
+        .featured-project.reverse .fp-media {
+          order: 0;
+        }
+        .featured-project.reverse .fp-content {
+          order: 1;
+        }
+        .fp-media {
+          min-height: 240px;
+        }
+        .fp-media-overlay {
+          background: linear-gradient(
+            to bottom,
+            transparent 50%,
+            var(--card-bg)
+          );
+        }
+        .hero-3d-group {
+          display: none;
+        }
+      }
+      @media (max-width: 576px) {
+        .hero-name {
+          font-size: 3rem;
+        }
+        .fp-content {
+          padding: 1.5rem;
+        }
+      }
+
+      /* ─── SHIMMER LOADER ────────────────────────────────────── */
+      .img-shimmer {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: linear-gradient(
+          90deg,
+          var(--bg3) 25%,
+          rgba(0, 229, 255, 0.05) 50%,
+          var(--bg3) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.6s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ─── CAROUSEL OVERRIDES ─────────────────────────────────── */
+      .carousel-indicators [data-bs-target] {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        margin: 0 3px;
+      }
+      .carousel-indicators .active {
+        background: var(--accent) !important;
+        transform: scale(1.3);
+      }
+      .carousel-control-prev-icon,
+      .carousel-control-next-icon {
+        display: none;
+      }
+
+      .carousel-image-count {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 100px;
+        padding: 3px 10px;
+        font-size: 0.72rem;
+        font-family: "Space Mono", monospace;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      /* ─── FORK BADGE ─────────────────────────────────────────── */
+      .fork-badge {
+        font-size: 0.62rem;
+        padding: 2px 8px;
+        border-radius: 100px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      /* readme-loading placeholder keeps aspect ratio */
+      .readme-loading {
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* ─── FEATURED PROJECT MEDIA LOADING ─────────────────────── */
+      .fp-gh-loading {
+        width: 100%;
+        height: 100%;
+        min-height: 360px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          var(--bg3) 0%,
+          rgba(0, 229, 255, 0.04) 100%
+        );
+      }
+      .fp-media .fp-gh-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.6s ease;
+      }
+      .fp-media:hover .fp-gh-img {
+        transform: scale(1.04);
+      }
+
+      /* ─── CURSOR BACKGROUND CANVAS ────────────────────────────── */
+      #cursor-bg-canvas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.55;
+      }
+      .lang-cpp {
+        background: #f34b7d;
+      }
+      .lang-python {
+        background: #3572a5;
+      }
+      .lang-javascript {
+        background: #f1e05a;
+      }
+      .lang-typescript {
+        background: #2b7489;
+      }
+      .lang-rust {
+        background: #dea584;
+      }
+      .lang-go {
+        background: #00add8;
+      }
+      .lang-csharp {
+        background: #178600;
+      }
+      .lang-html {
+        background: #e34c26;
+      }
+      .lang-css {
+        background: #563d7c;
+      }
+      .lang-default {
+        background: #858585;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cursor Background Canvas -->
+    <canvas id="cursor-bg-canvas"></canvas>
+
+    <!-- Custom Cursor -->
+    <div id="cursor"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- ─── NAVBAR ──────────────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <a class="navbar-brand" href="#hero"
+          >ROB<span style="color: var(--accent3)">.</span></a
+        >
+        <button
+          class="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#nav"
+        >
+          <i
+            class="bi bi-list"
+            style="color: var(--text); font-size: 1.5rem"
+          ></i>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+          <ul class="navbar-nav ms-auto gap-1">
+            <li class="nav-item">
+              <a class="nav-link" href="#projects">Projects</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#github-repos">GitHub</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#skills">Skills</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#education">Education</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#experience">Experience</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#links">Links</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ─── HERO ──────────────────────────────────────────────────────── -->
+    <section id="hero">
+      <canvas id="hero-canvas"></canvas>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+
+      <div class="container hero-content">
+        <div class="row">
+          <div class="col-lg-7">
+            <div class="hero-badge">Available for opportunities</div>
+            <h1 class="hero-name">
+              Hi, I'm<br />
+              <span class="accent-word">Robinson</span>
+            </h1>
+            <p class="hero-subtitle">
+              A student passionate about everything computers — building tools,
+              writing emulators, and exploring new tech. My goal is to do as
+              many unique things as possible.
+            </p>
+            <div class="hero-actions">
+              <a href="#projects" class="btn-primary-custom"
+                >View Projects <i class="bi bi-arrow-down ms-1"></i
+              ></a>
+              <a href="#links" class="btn-outline-custom">Get in Touch</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Cube -->
+      <div class="hero-3d-group">
+        <div class="hero-3d-inner">
+          <div class="cube-face f1"></div>
+          <div class="cube-face f2"></div>
+          <div class="cube-face f3"></div>
+          <div class="cube-face f4"></div>
+          <div class="cube-face f5"></div>
+          <div class="cube-face f6"></div>
+        </div>
+      </div>
+
+      <div class="scroll-indicator">
+        <div class="scroll-line"></div>
+        <span>scroll</span>
+      </div>
+    </section>
+
+    <!-- ─── STATS STRIP ──────────────────────────────────────────────── -->
+    <div class="stats-strip">
+      <div class="container">
+        <div class="row" id="stats-row">
+          <div class="col-6 col-md-3 stat-item reveal">
+            <span class="stat-number" id="stat-repos">—</span>
+            <span class="stat-label">Public Repos</span>
+          </div>
+          <div class="col-6 col-md-3 stat-item reveal reveal-delay-1">
+            <span class="stat-number" id="stat-stars">—</span>
+            <span class="stat-label">GitHub Stars</span>
+          </div>
+          <div class="col-6 col-md-3 stat-item reveal reveal-delay-2">
+            <span class="stat-number" id="stat-langs">—</span>
+            <span class="stat-label">Languages Used</span>
+          </div>
+          <div class="col-6 col-md-3 stat-item reveal reveal-delay-3">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Things to Learn</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── FEATURED PROJECTS ────────────────────────────────────────── -->
+    <section id="projects">
+      <div class="container">
+        <div class="reveal">
+          <p class="section-label">// hand-picked</p>
+          <h2 class="section-title">Featured<br />Projects</h2>
+          <div class="section-divider"></div>
+        </div>
+
+        <!-- Chrultrabook Tools -->
+        <div class="featured-project tilt3d reveal">
+          <div class="fp-media" id="fp-media-0">
+            <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
+            <div class="fp-media-overlay"></div>
+          </div>
+          <div class="fp-content">
+            <p class="fp-number">01 / FEATURED</p>
+            <h3 class="fp-title">Chrultrabook Tools</h3>
+            <p class="fp-desc">
+              Restores lost functionality and adds powerful new features to all
+              Chromebooks running Windows, Linux and macOS. Cross-platform and
+              actively maintained.
+            </p>
+            <div class="fp-tags" id="fp-tags-0">
+              <span class="fp-tag cyan">Loading languages…</span>
+            </div>
+            <a
+              href="https://github.com/death7654/Chrultrabook-Tools"
+              target="_blank"
+              class="fp-link"
+            >
+              View on GitHub <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Driver Installer -->
+        <div class="featured-project reverse tilt3d reveal">
+          <div class="fp-content">
+            <p class="fp-number">02 / FEATURED</p>
+            <h3 class="fp-title">Chromebook Driver Installer</h3>
+            <p class="fp-desc">
+              Automated driver installation system for Chromebook users with
+              over 5,000 downloads — a Rust CLI tool paired with a structured
+              hardware database cataloging 200+ Chromebook models with chipset
+              info and driver mappings.
+            </p>
+            <div class="fp-tags" id="fp-tags-1">
+              <span class="fp-tag cyan">Loading languages…</span>
+            </div>
+            <a
+              href="https://github.com/death7654/Chromebook-Driver-Installer"
+              target="_blank"
+              class="fp-link"
+            >
+              View on GitHub <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+          <div class="fp-media" id="fp-media-1">
+            <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
+            <div
+              class="fp-media-overlay"
+              style="
+                background: linear-gradient(
+                  to left,
+                  transparent 60%,
+                  var(--card-bg)
+                );
+              "
+            ></div>
+          </div>
+        </div>
+
+        <!-- ESP32 Bare Metal Kernel -->
+        <div class="featured-project tilt3d reveal">
+          <div class="fp-media" id="fp-media-4">
+            <img src="./images/esp32.gif" alt="ESP32 Bare Metal Kernel" class="fp-gh-img"
+     onerror="this.style.opacity='0.3'"/>
+            <div class="fp-media-overlay"></div>
+          </div>
+          <div class="fp-content">
+            <p class="fp-number">03 / FEATURED</p>
+            <h3 class="fp-title">Bare Metal ESP32 Kernel</h3>
+            <p class="fp-desc">
+              A two-stage bootloader and kernel for the ESP32, built from the
+              TRM up — custom Xtensa assembly trampoline, register-level SPI/SD
+              driver, FAT32 filesystem, GPIO/UART HALs, and an interactive
+              kernel shell with a domain-specific script interpreter.
+            </p>
+            <div class="fp-tags">
+              <span class="fp-tag cyan">C</span>
+              <span class="fp-tag violet">Python</span>
+              <span class="fp-tag amber">Make</span>
+            </div>
+            <!-- <a
+              href="https://github.com/death7654/ESP32-Bare-Metal-Kernel"
+              target="_blank"
+              class="fp-link"
+            >
+              View on GitHub <i class="bi bi-arrow-right"></i>
+            </a> -->
+          </div>
+        </div>
+
+        <!-- GameBoy Emulator Rust -->
+        <div class="featured-project reverse tilt3d reveal">
+          <div class="fp-content">
+            <p class="fp-number">04 / FEATURED</p>
+            <h3 class="fp-title">Game Boy Emulator</h3>
+            <p class="fp-desc">
+              A cycle-accurate Game Boy emulator built in Rust — emulating the
+              LR35902 CPU, PPU, memory bus, MBC1/MBC3 cartridge mappers,
+              scanline rendering, tile caching, sprite compositing, and OAM DMA
+              timing from scratch.
+            </p>
+            <div class="fp-tags" id="fp-tags-2">
+              <span class="fp-tag cyan">Loading languages…</span>
+            </div>
+            <a
+              href="https://github.com/death7654/Gameboy-Emulator-Rust"
+              target="_blank"
+              class="fp-link"
+            >
+              View on GitHub <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+          <div class="fp-media" id="fp-media-2">
+            <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
+            <div
+              class="fp-media-overlay"
+              style="
+                background: linear-gradient(
+                  to left,
+                  transparent 60%,
+                  var(--card-bg)
+                );
+              "
+            ></div>
+          </div>
+        </div>
+
+        <!-- Space Invaders Emulator -->
+        <div class="featured-project tilt3d reveal">
+          <div class="fp-media" id="fp-media-3">
+            <div class="fp-gh-loading"><div class="gh-spinner"></div></div>
+            <div class="fp-media-overlay"></div>
+          </div>
+          <div class="fp-content">
+            <p class="fp-number">05 / FEATURED</p>
+            <h3 class="fp-title">Space Invaders / Intel 8080</h3>
+            <p class="fp-desc">
+              A faithful emulation of the classic 1978 arcade game, implementing
+              the Intel 8080 CPU, hardware interrupts, shift registers, and
+              original sound logic.
+            </p>
+            <div class="fp-tags" id="fp-tags-3">
+              <span class="fp-tag cyan">Loading languages…</span>
+            </div>
+            <a
+              href="https://github.com/death7654/Intel-8080-Emulator"
+              target="_blank"
+              class="fp-link"
+            >
+              View on GitHub <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── GITHUB REPOS ──────────────────────────────────────────────── -->
+    <section id="github-repos" style="background: var(--bg)">
+      <div class="container">
+        <div class="reveal">
+          <p class="section-label">// live from github api</p>
+          <h2 class="section-title">All Repositories</h2>
+          <div class="section-divider"></div>
+        </div>
+
+        <!-- Filter buttons -->
+        <div class="d-flex gap-2 flex-wrap mb-4 reveal" id="lang-filters">
+          <button
+            class="btn-filter active"
+            data-lang="all"
+            onclick="filterRepos('all', this)"
+          >
+            All
+          </button>
+        </div>
+
+        <div id="repos-grid" class="row g-4">
+          <div class="gh-loading col-12">
+            <div class="gh-spinner"></div>
+            <span
+              style="
+                font-family: &quot;Space Mono&quot;, monospace;
+                font-size: 0.8rem;
+                color: var(--muted);
+              "
+              >Fetching from GitHub API...</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SKILLS ───────────────────────────────────────────────────── -->
+    <section id="skills">
+      <div class="container">
+        <div class="reveal">
+          <p class="section-label">// toolbox</p>
+          <h2 class="section-title">Skills &amp; Tech</h2>
+          <div class="section-divider"></div>
+        </div>
+        <div id="skills-grid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── EDUCATION ─────────────────────────────────────────────── -->
+    <section id="education" style="background: var(--bg)">
+      <div class="container">
+        <div class="reveal">
+          <p class="section-label">// academia</p>
+          <h2 class="section-title">Education</h2>
+          <div class="section-divider"></div>
+        </div>
+        <div class="reveal" style="max-width: 760px">
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 120px 1fr;
+              gap: 0 2rem;
+              position: relative;
+              padding-bottom: 2.5rem;
+            "
+          >
+            <div style="text-align: right; padding-top: 0.25rem">
+              <span
+                style="
+                  font-family: &quot;Space Mono&quot;, monospace;
+                  font-size: 0.7rem;
+                  color: var(--muted);
+                  line-height: 1.5;
+                "
+                >Sep 2024<br />— May 2028</span
+              >
+            </div>
+            <div
+              style="
+                position: relative;
+                padding-left: 1.5rem;
+                border-left: 1px solid var(--card-border);
+              "
+            >
+              <span
+                style="
+                  position: absolute;
+                  left: -5px;
+                  top: 6px;
+                  width: 9px;
+                  height: 9px;
+                  background: var(--accent2);
+                  border-radius: 50%;
+                  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+                  display: block;
+                "
+              ></span>
+              <div
+                style="
+                  background: var(--card-bg);
+                  border: 1px solid var(--card-border);
+                  border-radius: 16px;
+                  padding: 1.5rem;
+                  transition: var(--transition);
+                "
+                onmouseover="
+                  this.style.borderColor = 'rgba(124,58,237,0.4)';
+                  this.style.boxShadow = '0 0 20px rgba(124,58,237,0.12)';
+                "
+                onmouseout="
+                  this.style.borderColor = '';
+                  this.style.boxShadow = '';
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                    margin-bottom: 0.5rem;
+                  "
+                >
+                  <h4 style="font-size: 1.05rem; font-weight: 700; margin: 0">
+                    B.Tech in Artificial Intelligence and Data Science
+                  </h4>
+                  <span
+                    style="
+                      font-size: 0.72rem;
+                      background: rgba(124, 58, 237, 0.1);
+                      border: 1px solid rgba(124, 58, 237, 0.25);
+                      border-radius: 100px;
+                      padding: 3px 12px;
+                      color: var(--accent2);
+                      font-family: &quot;Space Mono&quot;, monospace;
+                    "
+                    >CGPA: 9.32 / 10</span
+                  >
+                </div>
+                <p
+                  style="
+                    font-size: 0.85rem;
+                    color: var(--accent2);
+                    margin-bottom: 0.75rem;
+                    font-family: &quot;Space Mono&quot;, monospace;
+                    font-weight: 600;
+                  "
+                >
+                  Vimal Jyothi Engineering College — Chemperi, Kerala
+                </p>
+                <p style="font-size: 0.88rem; color: var(--muted); margin: 0">
+                  Minor in Electronics and Communications
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── EXPERIENCE ────────────────────────────────────────────────── -->
+    <section id="experience" style="background: var(--bg2)">
+      <div class="container">
+        <div class="reveal">
+          <p class="section-label">// work history</p>
+          <h2 class="section-title">Experience</h2>
+          <div class="section-divider"></div>
+        </div>
+        <div class="reveal" style="max-width: 760px">
+          <div style="display: flex; flex-direction: column; gap: 0">
+            <!-- Timeline item -->
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 120px 1fr;
+                gap: 0 2rem;
+                position: relative;
+                padding-bottom: 2.5rem;
+              "
+            >
+              <!-- Date col -->
+              <div style="text-align: right; padding-top: 0.25rem">
+                <span
+                  style="
+                    font-family: &quot;Space Mono&quot;, monospace;
+                    font-size: 0.7rem;
+                    color: var(--muted);
+                    line-height: 1.5;
+                  "
+                  >May 2023<br />— Present</span
+                >
+              </div>
+              <!-- Line + dot -->
+              <div
+                style="
+                  position: relative;
+                  padding-left: 1.5rem;
+                  border-left: 1px solid var(--card-border);
+                "
+              >
+                <span
+                  style="
+                    position: absolute;
+                    left: -5px;
+                    top: 6px;
+                    width: 9px;
+                    height: 9px;
+                    background: var(--accent);
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+                    display: block;
+                  "
+                ></span>
+                <div
+                  style="
+                    background: var(--card-bg);
+                    border: 1px solid var(--card-border);
+                    border-radius: 16px;
+                    padding: 1.5rem;
+                    transition: var(--transition);
+                  "
+                  onmouseover="
+                    this.style.borderColor = 'rgba(0,229,255,0.4)';
+                    this.style.boxShadow = '0 0 20px rgba(0,229,255,0.12)';
+                  "
+                  onmouseout="
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      flex-wrap: wrap;
+                      gap: 0.5rem;
+                      margin-bottom: 0.5rem;
+                    "
+                  >
+                    <h4 style="font-size: 1.05rem; font-weight: 700; margin: 0">
+                      Open Source Contributor
+                    </h4>
+                    <span
+                      style="
+                        font-size: 0.72rem;
+                        background: rgba(0, 229, 255, 0.08);
+                        border: 1px solid rgba(0, 229, 255, 0.2);
+                        border-radius: 100px;
+                        padding: 3px 12px;
+                        color: var(--accent);
+                        font-family: &quot;Space Mono&quot;, monospace;
+                      "
+                      >Remote</span
+                    >
+                  </div>
+                  <p
+                    style="
+                      font-size: 0.85rem;
+                      color: var(--accent);
+                      margin-bottom: 0.75rem;
+                      font-family: &quot;Space Mono&quot;, monospace;
+                      font-weight: 600;
+                    "
+                  >
+                    Chrultrabook Project
+                  </p>
+                  <ul
+                    style="
+                      margin: 0;
+                      padding-left: 1.2rem;
+                      color: var(--muted);
+                      font-size: 0.88rem;
+                      line-height: 1.75;
+                    "
+                  >
+                    <li>
+                      Developed and maintained Chrultrabook Tools, a
+                      cross-platform system utility application serving users
+                      running alternate operating systems on Chromebook
+                      hardware.
+                    </li>
+                    <li>
+                      Provided technical support and troubleshooting for
+                      community members transitioning Chromebooks to Linux,
+                      Windows, and other operating systems.
+                    </li>
+                    <li>
+                      Collaborated with project maintainers to improve
+                      documentation, hardware compatibility databases, and
+                      user-facing tools.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── LINKS ────────────────────────────────────────────────────── -->
+    <section id="links">
+      <div class="container">
+        <div class="reveal">
+          <p class="section-label">// find me online</p>
+          <h2 class="section-title">Connect</h2>
+          <div class="section-divider"></div>
+        </div>
+        <div class="row g-4 justify-content-center">
+          <div class="col-6 col-md-3 reveal">
+            <a
+              href="https://github.com/death7654"
+              target="_blank"
+              class="link-card github d-block"
+            >
+              <div class="link-card-icon"><i class="bi bi-github"></i></div>
+              <div class="link-card-name">GitHub</div>
+              <div class="link-card-handle">@death7654</div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3 reveal reveal-delay-1">
+            <a
+              href="https://www.instagram.com/robinsongeorge301/"
+              target="_blank"
+              class="link-card instagram d-block"
+            >
+              <div class="link-card-icon"><i class="bi bi-instagram"></i></div>
+              <div class="link-card-name">Instagram</div>
+              <div class="link-card-handle">@robinsongeorge301</div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3 reveal reveal-delay-2">
+            <a
+              href="https://www.linkedin.com/in/robinsonarysseril/"
+              target="_blank"
+              class="link-card linkedin d-block"
+            >
+              <div class="link-card-icon"><i class="bi bi-linkedin"></i></div>
+              <div class="link-card-name">LinkedIn</div>
+              <div class="link-card-handle">Robinson Arysseril</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── FOOTER ───────────────────────────────────────────────────── -->
+    <footer>
+      <p>
+        Built by <span>Robinson</span> · Powered by Bootstrap 5 + GitHub API
+      </p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+      .btn-filter {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        color: var(--muted);
+        border-radius: 100px;
+        padding: 6px 16px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        cursor: none;
+        transition: all 0.3s;
+        font-family: "Space Mono", monospace;
+      }
+      .btn-filter.active,
+      .btn-filter:hover {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+      }
+    </style>
+
+    <script>
+      /* ─── CURSOR BACKGROUND CANVAS ───────────────────────────── */
+      (function () {
+        const bgCanvas = document.getElementById("cursor-bg-canvas");
+        const bgCtx = bgCanvas.getContext("2d");
+        let BW, BH;
+
+        function resizeBg() {
+          BW = bgCanvas.width = window.innerWidth;
+          BH = bgCanvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeBg);
+        resizeBg();
+
+        // Trail: store last N cursor positions
+        const TRAIL_LEN = 28;
+        const trail = [];
+
+        // Ripples triggered on click
+        const ripples = [];
+
+        document.addEventListener("mousemove", (e) => {
+          trail.push({ x: e.clientX, y: e.clientY, t: Date.now() });
+          if (trail.length > TRAIL_LEN) trail.shift();
+        });
+
+        document.addEventListener("click", (e) => {
+          ripples.push({
+            x: e.clientX,
+            y: e.clientY,
+            r: 0,
+            alpha: 0.6,
+            born: Date.now(),
+          });
+        });
+
+        // Ambient floating orbs that drift toward cursor
+        const NUM_ORBS = 7;
+        const orbs = Array.from({ length: NUM_ORBS }, (_, i) => ({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          r: 60 + Math.random() * 120,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          hue: [180, 260, 340][i % 3], // cyan / violet / pink
+          alpha: 0.04 + Math.random() * 0.05,
+          speed: 0.005 + Math.random() * 0.008,
+        }));
+
+        let animMx = window.innerWidth / 2,
+          animMy = window.innerHeight / 2;
+        document.addEventListener("mousemove", (e) => {
+          animMx = e.clientX;
+          animMy = e.clientY;
+        });
+
+        function drawBg() {
+          bgCtx.clearRect(0, 0, BW, BH);
+
+          // Draw ambient orbs — drift slightly toward cursor
+          orbs.forEach((o) => {
+            o.vx += (animMx - o.x) * o.speed * 0.002;
+            o.vy += (animMy - o.y) * o.speed * 0.002;
+            o.vx *= 0.98;
+            o.vy *= 0.98;
+            o.x += o.vx;
+            o.y += o.vy;
+            // Wrap
+            if (o.x < -o.r) o.x = BW + o.r;
+            if (o.x > BW + o.r) o.x = -o.r;
+            if (o.y < -o.r) o.y = BH + o.r;
+            if (o.y > BH + o.r) o.y = -o.r;
+
+            const g = bgCtx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+            g.addColorStop(0, `hsla(${o.hue},100%,60%,${o.alpha})`);
+            g.addColorStop(1, `hsla(${o.hue},100%,60%,0)`);
+            bgCtx.beginPath();
+            bgCtx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+            bgCtx.fillStyle = g;
+            bgCtx.fill();
+          });
+
+          // Draw cursor glow
+          if (trail.length > 0) {
+            const last = trail[trail.length - 1];
+            const glow = bgCtx.createRadialGradient(
+              last.x,
+              last.y,
+              0,
+              last.x,
+              last.y,
+              140,
+            );
+            glow.addColorStop(0, "rgba(0,229,255,0.12)");
+            glow.addColorStop(0.4, "rgba(0,229,255,0.05)");
+            glow.addColorStop(1, "rgba(0,229,255,0)");
+            bgCtx.beginPath();
+            bgCtx.arc(last.x, last.y, 140, 0, Math.PI * 2);
+            bgCtx.fillStyle = glow;
+            bgCtx.fill();
+          }
+
+          // Draw trailing comet tail
+          if (trail.length > 1) {
+            for (let i = 1; i < trail.length; i++) {
+              const t = i / trail.length;
+              const prev = trail[i - 1];
+              const curr = trail[i];
+              bgCtx.beginPath();
+              bgCtx.moveTo(prev.x, prev.y);
+              bgCtx.lineTo(curr.x, curr.y);
+              bgCtx.strokeStyle = `rgba(0,229,255,${t * 0.18})`;
+              bgCtx.lineWidth = t * 4;
+              bgCtx.lineCap = "round";
+              bgCtx.stroke();
+            }
+          }
+
+          // Draw click ripples
+          const now = Date.now();
+          for (let i = ripples.length - 1; i >= 0; i--) {
+            const rp = ripples[i];
+            const age = now - rp.born;
+            rp.r += 6;
+            rp.alpha = Math.max(0, 0.6 - age / 600);
+            if (rp.alpha <= 0) {
+              ripples.splice(i, 1);
+              continue;
+            }
+            bgCtx.beginPath();
+            bgCtx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+            bgCtx.strokeStyle = `rgba(0,229,255,${rp.alpha})`;
+            bgCtx.lineWidth = 1.5;
+            bgCtx.stroke();
+          }
+
+          requestAnimationFrame(drawBg);
+        }
+        drawBg();
+      })();
+
+      /* ─── CURSOR ─────────────────────────────────────────────── */
+      const cursor = document.getElementById("cursor");
+      const ring = document.getElementById("cursor-ring");
+      let mx = 0,
+        my = 0,
+        rx = 0,
+        ry = 0;
+      document.addEventListener("mousemove", (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+      });
+      (function animCursor() {
+        rx += (mx - rx) * 0.15;
+        ry += (my - ry) * 0.15;
+        cursor.style.left = mx + "px";
+        cursor.style.top = my + "px";
+        ring.style.left = rx + "px";
+        ring.style.top = ry + "px";
+        requestAnimationFrame(animCursor);
+      })();
+      document
+        .querySelectorAll(
+          "a,button,.link-card,.project-card,.skill-card,.btn-filter",
+        )
+        .forEach((el) => {
+          el.addEventListener("mouseenter", () => {
+            cursor.style.width = "20px";
+            cursor.style.height = "20px";
+            ring.style.width = "50px";
+            ring.style.height = "50px";
+            ring.style.opacity = "0.3";
+          });
+          el.addEventListener("mouseleave", () => {
+            cursor.style.width = "12px";
+            cursor.style.height = "12px";
+            ring.style.width = "36px";
+            ring.style.height = "36px";
+            ring.style.opacity = "0.5";
+          });
+        });
+
+      /* ─── HERO CANVAS PARTICLES ──────────────────────────────── */
+      (function () {
+        const canvas = document.getElementById("hero-canvas");
+        const ctx = canvas.getContext("2d");
+        let W, H, particles;
+        function resize() {
+          W = canvas.width = canvas.offsetWidth;
+          H = canvas.height = canvas.offsetHeight;
+        }
+        window.addEventListener("resize", () => {
+          resize();
+          init();
+        });
+        resize();
+        function Particle() {
+          this.x = Math.random() * W;
+          this.y = Math.random() * H;
+          this.vx = (Math.random() - 0.5) * 0.3;
+          this.vy = (Math.random() - 0.5) * 0.3;
+          this.r = Math.random() * 1.5 + 0.3;
+          this.alpha = Math.random() * 0.4 + 0.1;
+        }
+        function init() {
+          particles = Array.from({ length: 80 }, () => new Particle());
+        }
+        function draw() {
+          ctx.clearRect(0, 0, W, H);
+          particles.forEach((p) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0) p.x = W;
+            if (p.x > W) p.x = 0;
+            if (p.y < 0) p.y = H;
+            if (p.y > H) p.y = 0;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0,229,255,${p.alpha})`;
+            ctx.fill();
+          });
+          // lines between nearby particles
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const d = Math.sqrt(dx * dx + dy * dy);
+              if (d < 120) {
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = `rgba(0,229,255,${0.06 * (1 - d / 120)})`;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(draw);
+        }
+        init();
+        draw();
+      })();
+
+      /* ─── 3D TILT ON FEATURED CARDS ─────────────────────────── */
+      document.querySelectorAll(".tilt3d").forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          card.style.transform = `translateY(-4px) rotateX(${-y * 4}deg) rotateY(${x * 6}deg)`;
+        });
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "translateY(0) rotateX(0) rotateY(0)";
+        });
+      });
+
+      /* ─── SCROLL REVEAL ──────────────────────────────────────── */
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("visible");
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      /* ─── SKILLS DATA ────────────────────────────────────────── */
+      const skillCategories = [
+        {
+          label: "Systems & Embedded",
+          color: "cyan",
+          pills: [
+            { icon: "bi-braces", name: "C / C++" },
+            { icon: "bi-shield-fill", name: "Rust" },
+            { icon: "bi-lightning-fill", name: "Zig" },
+            { icon: "bi-cpu-fill", name: "Xtensa Assembly" },
+          ],
+        },
+        {
+          label: "General Purpose",
+          color: "violet",
+          pills: [
+            { icon: "bi-code", name: "Python" },
+            { icon: "bi-cup-hot-fill", name: "Java" },
+            { icon: "bi-filetype-js", name: "JavaScript" },
+            { icon: "bi-filetype-tsx", name: "TypeScript" },
+            { icon: "bi-database-fill", name: "MySQL" },
+          ],
+        },
+        {
+          label: "Web & UI",
+          color: "pink",
+          pills: [
+            { icon: "bi-window-sidebar", name: "Tauri" },
+            { icon: "bi-hexagon-fill", name: "Angular" },
+            { icon: "bi-grid-1x2-fill", name: "Bootstrap" },
+            { icon: "bi-filetype-html", name: "HTML / CSS" },
+          ],
+        },
+        {
+          label: "Data Science",
+          color: "amber",
+          pills: [
+            { icon: "bi-table", name: "Pandas" },
+            { icon: "bi-calculator-fill", name: "NumPy" },
+            { icon: "bi-graph-up", name: "Matplotlib" },
+            { icon: "bi-robot", name: "Scikit-Learn" },
+            { icon: "bi-infinity", name: "SciPy" },
+          ],
+        },
+        {
+          label: "Developer Tools",
+          color: "cyan",
+          pills: [
+            { icon: "bi-git", name: "Git" },
+            { icon: "bi-terminal-fill", name: "Make" },
+          ],
+        },
+      ];
+
+      const skillsGrid = document.getElementById("skills-grid");
+      skillCategories.forEach((cat, ci) => {
+        const section = document.createElement("div");
+        section.className = "skill-category reveal";
+        section.style.transitionDelay = `${ci * 0.1}s`;
+
+        const pillsHtml = cat.pills
+          .map(
+            (p) =>
+              `<span class="skill-pill ${cat.color}"><i class="bi ${p.icon}"></i>${p.name}</span>`,
+          )
+          .join("");
+
+        section.innerHTML = `
     <div class="skill-category-label">${cat.label}</div>
     <div class="skill-pill-row">${pillsHtml}</div>
   `;
-  skillsGrid.appendChild(section);
-  observer.observe(section);
-});
+        skillsGrid.appendChild(section);
+        observer.observe(section);
+      });
 
-/* ─── LANG COLOR MAP ─────────────────────────────────────── */
-const langColors = {
-  'C++': '#f34b7d', 'C': '#555555', 'Python': '#3572A5',
-  'JavaScript': '#f1e05a', 'TypeScript': '#2b7489',
-  'Rust': '#dea584', 'Go': '#00ADD8', 'C#': '#178600',
-  'HTML': '#e34c26', 'CSS': '#563d7c', 'Shell': '#89e051',
-  'PowerShell': '#012456', 'Makefile': '#427819',
-  'Zig': '#ec915c', 'Assembly': '#6E4C13',
-};
-function langClass(lang) {
-  if (!lang) return 'lang-default';
-  const key = (lang || '').toLowerCase().replace('#','sharp').replace('+','p');
-  return 'lang-' + key;
-}
+      /* ─── LANG COLOR MAP ─────────────────────────────────────── */
+      const langColors = {
+        "C++": "#f34b7d",
+        C: "#555555",
+        Python: "#3572A5",
+        JavaScript: "#f1e05a",
+        TypeScript: "#2b7489",
+        Rust: "#dea584",
+        Go: "#00ADD8",
+        "C#": "#178600",
+        HTML: "#e34c26",
+        CSS: "#563d7c",
+        Shell: "#89e051",
+        PowerShell: "#012456",
+        Makefile: "#427819",
+        Zig: "#ec915c",
+        Assembly: "#6E4C13",
+      };
+      function langClass(lang) {
+        if (!lang) return "lang-default";
+        const key = (lang || "")
+          .toLowerCase()
+          .replace("#", "sharp")
+          .replace("+", "p");
+        return "lang-" + key;
+      }
 
-/* ─── GITHUB API (paginated — fetches ALL public repos) ──── */
-const GH_USER = 'death7654';
-let allRepos = [];
-let langs    = new Set(['all']);
+      /* ─── GITHUB API (paginated — fetches ALL public repos) ──── */
+      const GH_USER = "death7654";
+      let allRepos = [];
+      let langs = new Set(["all"]);
 
-/* Warn when opened as a local file — fetch() is blocked by the browser
+      /* Warn when opened as a local file — fetch() is blocked by the browser
    under file:// due to CORS / same-origin rules. The site must be served
    over HTTP(S) (e.g. GitHub Pages, a local server) to load GitHub data. */
-if (location.protocol === 'file:') {
-  const banner = document.createElement('div');
-  banner.style.cssText = `
+      if (location.protocol === "file:") {
+        const banner = document.createElement("div");
+        banner.style.cssText = `
     position:fixed;bottom:0;left:0;right:0;z-index:9999;
     background:#1a0a00;border-top:1px solid #f59e0b;
     padding:0.75rem 1.5rem;display:flex;align-items:center;gap:0.75rem;
     font-family:'Space Mono',monospace;font-size:0.75rem;color:#fbbf24;
   `;
-  banner.innerHTML = `
+        banner.innerHTML = `
     <i class="bi bi-exclamation-triangle-fill" style="font-size:1rem;flex-shrink:0;"></i>
     <span><strong>Local file detected.</strong> GitHub data won't load when opened as a file://
     — browser security blocks external API calls. Upload to GitHub Pages or use a local server
@@ -1487,101 +2278,115 @@ if (location.protocol === 'file:') {
     to see live repo data and images.</span>
     <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#fbbf24;font-size:1.1rem;cursor:pointer;padding:0 4px;">×</button>
   `;
-  document.body.appendChild(banner);
-}
+        document.body.appendChild(banner);
+      }
 
+      async function fetchAllPages(baseUrl) {
+        let results = [];
+        let page = 1;
+        while (true) {
+          const res = await fetch(`${baseUrl}&page=${page}&per_page=100`, {
+            headers: { Accept: "application/vnd.github.v3+json" },
+          });
+          if (!res.ok) {
+            if (res.status === 403) throw new Error("rate_limit");
+            throw new Error(`HTTP ${res.status}`);
+          }
+          const data = await res.json();
+          if (!Array.isArray(data) || data.length === 0) break;
+          results = results.concat(data);
+          // If we got less than 100 results, we're on the last page
+          if (data.length < 100) break;
+          page++;
+        }
+        return results;
+      }
 
+      async function fetchGitHub() {
+        const grid = document.getElementById("repos-grid");
+        try {
+          const repos = await fetchAllPages(
+            `https://api.github.com/users/${GH_USER}/repos?type=public&sort=updated`,
+          );
 
-async function fetchAllPages(baseUrl) {
-  let results = [];
-  let page = 1;
-  while (true) {
-    const res = await fetch(`${baseUrl}&page=${page}&per_page=100`, {
-      headers: { 'Accept': 'application/vnd.github.v3+json' }
-    });
-    if (!res.ok) {
-      if (res.status === 403) throw new Error('rate_limit');
-      throw new Error(`HTTP ${res.status}`);
-    }
-    const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) break;
-    results = results.concat(data);
-    // If we got less than 100 results, we're on the last page
-    if (data.length < 100) break;
-    page++;
-  }
-  return results;
-}
+          if (!repos.length) throw new Error("empty");
 
-async function fetchGitHub() {
-  const grid = document.getElementById('repos-grid');
-  try {
-    const repos = await fetchAllPages(
-      `https://api.github.com/users/${GH_USER}/repos?type=public&sort=updated`
-    );
+          // For forks: only keep them if the user has contributed (has commits in repo)
+          const forks = repos.filter((r) => r.fork);
+          const nonForks = repos.filter((r) => !r.fork);
 
-    if (!repos.length) throw new Error('empty');
+          // Check each fork for user contributions (search commits by author)
+          const forkChecks = await Promise.all(
+            forks.map(async (r) => {
+              try {
+                const res = await fetch(
+                  `https://api.github.com/repos/${GH_USER}/${r.name}/commits?author=${GH_USER}&per_page=1`,
+                  { headers: { Accept: "application/vnd.github.v3+json" } },
+                );
+                if (!res.ok) return null;
+                const data = await res.json();
+                return Array.isArray(data) && data.length > 0 ? r : null;
+              } catch {
+                return null;
+              }
+            }),
+          );
+          const contributedForks = forkChecks.filter(Boolean);
 
-    // For forks: only keep them if the user has contributed (has commits in repo)
-    const forks    = repos.filter(r => r.fork);
-    const nonForks = repos.filter(r => !r.fork);
+          // Merge: own repos + only forks with contributions
+          const filteredRepos = [...nonForks, ...contributedForks];
 
-    // Check each fork for user contributions (search commits by author)
-    const forkChecks = await Promise.all(forks.map(async r => {
-      try {
-        const res = await fetch(
-          `https://api.github.com/repos/${GH_USER}/${r.name}/commits?author=${GH_USER}&per_page=1`,
-          { headers: { 'Accept': 'application/vnd.github.v3+json' } }
-        );
-        if (!res.ok) return null;
-        const data = await res.json();
-        return Array.isArray(data) && data.length > 0 ? r : null;
-      } catch { return null; }
-    }));
-    const contributedForks = forkChecks.filter(Boolean);
+          // Sort by stars descending
+          allRepos = filteredRepos.sort(
+            (a, b) => b.stargazers_count - a.stargazers_count,
+          );
 
-    // Merge: own repos + only forks with contributions
-    const filteredRepos = [...nonForks, ...contributedForks];
+          // Stats (based on all public repos for accuracy)
+          const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+          repos.forEach((r) => {
+            if (r.language) langs.add(r.language);
+          });
 
-    // Sort by stars descending
-    allRepos = filteredRepos.sort((a, b) => b.stargazers_count - a.stargazers_count);
+          document.getElementById("stat-repos").textContent = repos.length;
+          document.getElementById("stat-stars").textContent = totalStars;
+          document.getElementById("stat-langs").textContent = langs.size - 1;
 
-    // Stats (based on all public repos for accuracy)
-    const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
-    repos.forEach(r => { if (r.language) langs.add(r.language); });
+          // Build language filter buttons
+          const filterRow = document.getElementById("lang-filters");
+          filterRow.innerHTML = `<button class="btn-filter active" data-lang="all" onclick="filterRepos('all',this)">All (${allRepos.length})</button>`;
+          const langCount = {};
+          allRepos.forEach((r) => {
+            if (r.language)
+              langCount[r.language] = (langCount[r.language] || 0) + 1;
+          });
+          Object.keys(langCount)
+            .sort()
+            .forEach((lang) => {
+              const btn = document.createElement("button");
+              btn.className = "btn-filter";
+              btn.textContent = `${lang} (${langCount[lang]})`;
+              btn.setAttribute("data-lang", lang);
+              btn.onclick = function () {
+                filterRepos(lang, this);
+              };
+              filterRow.appendChild(btn);
+            });
 
-    document.getElementById('stat-repos').textContent = repos.length;
-    document.getElementById('stat-stars').textContent = totalStars;
-    document.getElementById('stat-langs').textContent = langs.size - 1;
+          renderRepos(allRepos);
 
-    // Build language filter buttons
-    const filterRow = document.getElementById('lang-filters');
-    filterRow.innerHTML = `<button class="btn-filter active" data-lang="all" onclick="filterRepos('all',this)">All (${allRepos.length})</button>`;
-    const langCount = {};
-    allRepos.forEach(r => { if (r.language) langCount[r.language] = (langCount[r.language]||0)+1; });
-    Object.keys(langCount).sort().forEach(lang => {
-      const btn = document.createElement('button');
-      btn.className = 'btn-filter';
-      btn.textContent = `${lang} (${langCount[lang]})`;
-      btn.setAttribute('data-lang', lang);
-      btn.onclick = function() { filterRepos(lang, this); };
-      filterRow.appendChild(btn);
-    });
-
-    renderRepos(allRepos);
-
-    // Load featured project images from GitHub API
-    loadFeaturedImages();
-
-  } catch(e) {
-    const isRateLimit = e.message === 'rate_limit';
-    grid.innerHTML = `
+          // Load featured project images from GitHub API
+          loadFeaturedImages();
+        } catch (e) {
+          const isRateLimit = e.message === "rate_limit";
+          grid.innerHTML = `
       <div class="col-12 text-center py-5">
-        <i class="bi bi-${isRateLimit ? 'hourglass' : 'exclamation-circle'}" style="font-size:2.5rem;color:var(--muted)"></i>
+        <i class="bi bi-${isRateLimit ? "hourglass" : "exclamation-circle"}" style="font-size:2.5rem;color:var(--muted)"></i>
         <p style="color:var(--muted);margin-top:1rem;font-family:'Space Mono',monospace;font-size:0.8rem;line-height:1.8">
-          ${isRateLimit
-            ? 'GitHub API rate limit reached (60 req/hr for unauthenticated users).<br>Try again in a few minutes.'
-            : 'Could not load repositories. Check your connection or try again.'}
+          ${
+            isRateLimit
+              ? "GitHub API rate limit reached (60 req/hr for unauthenticated users).<br>Try again in a few minutes."
+              : "Could not load repositories. Check your connection or try again."
+          }
           <br><br>
           <a href="https://github.com/${GH_USER}?tab=repositories" target="_blank"
              style="color:var(--accent);text-decoration:none;border:1px solid rgba(0,229,255,0.3);padding:8px 20px;border-radius:100px;display:inline-flex;align-items:center;gap:8px;">
@@ -1589,113 +2394,158 @@ async function fetchGitHub() {
           </a>
         </p>
       </div>`;
-  }
-}
-
-/* ─── FEATURED PROJECT IMAGES FROM GITHUB API ────────────── */
-const featuredProjects = [
-  { repo: 'Chrultrabook-Tools',          mediaId: 'fp-media-0', tagsId: 'fp-tags-0' },
-  { repo: 'Chromebook-Driver-Installer', mediaId: 'fp-media-1', tagsId: 'fp-tags-1' },
-  { repo: 'ESP32-Bare-Metal-Kernel',     mediaId: 'fp-media-4', tagsId: 'fp-tags-4' },
-  { repo: 'Gameboy-Emulator-Rust',       mediaId: 'fp-media-2', tagsId: 'fp-tags-2' },
-  { repo: 'Intel-8080-Emulator',         mediaId: 'fp-media-3', tagsId: 'fp-tags-3' },
-];
-
-/* Tag color cycle for language pills */
-const tagColors = ['cyan', 'violet', 'pink', 'amber'];
-
-function renderLangTags(langs, tagsEl) {
-  if (!tagsEl) return;
-  const entries = Object.keys(langs); // sorted by bytes descending from GitHub
-  if (!entries.length) { tagsEl.innerHTML = ''; return; }
-  tagsEl.innerHTML = entries.map((lang, i) =>
-    `<span class="fp-tag ${tagColors[i % tagColors.length]}">${lang}</span>`
-  ).join('');
-}
-
-async function loadFeaturedImages() {
-  for (const fp of featuredProjects) {
-    try {
-      const mediaEl = document.getElementById(fp.mediaId);
-      const tagsEl  = document.getElementById(fp.tagsId);
-
-      // Fetch repo info (branch) + languages in parallel
-      const [repoRes, langRes] = await Promise.all([
-        fetch(`https://api.github.com/repos/${GH_USER}/${fp.repo}`,
-              { headers: { 'Accept': 'application/vnd.github.v3+json' } }),
-        fetch(`https://api.github.com/repos/${GH_USER}/${fp.repo}/languages`,
-              { headers: { 'Accept': 'application/vnd.github.v3+json' } })
-      ]);
-
-      let branch = 'main';
-      if (repoRes.ok) {
-        const repoData = await repoRes.json();
-        branch = repoData.default_branch || 'main';
+        }
       }
 
-      if (langRes.ok && tagsEl) {
-        const langs = await langRes.json();
-        renderLangTags(langs, tagsEl);
+      /* ─── FEATURED PROJECT IMAGES FROM GITHUB API ────────────── */
+      const featuredProjects = [
+        {
+          repo: "Chrultrabook-Tools",
+          mediaId: "fp-media-0",
+          tagsId: "fp-tags-0",
+        },
+        {
+          repo: "Chromebook-Driver-Installer",
+          mediaId: "fp-media-1",
+          tagsId: "fp-tags-1",
+        },
+        {
+          repo: "ESP32-Bare-Metal-Kernel",
+          mediaId: "fp-media-4",
+          tagsId: "fp-tags-4",
+        },
+        {
+          repo: "Gameboy-Emulator-Rust",
+          mediaId: "fp-media-2",
+          tagsId: "fp-tags-2",
+        },
+        {
+          repo: "Intel-8080-Emulator",
+          mediaId: "fp-media-3",
+          tagsId: "fp-tags-3",
+        },
+      ];
+
+      /* Tag color cycle for language pills */
+      const tagColors = ["cyan", "violet", "pink", "amber"];
+
+      function renderLangTags(langs, tagsEl) {
+        if (!tagsEl) return;
+        const entries = Object.keys(langs); // sorted by bytes descending from GitHub
+        if (!entries.length) {
+          tagsEl.innerHTML = "";
+          return;
+        }
+        tagsEl.innerHTML = entries
+          .map(
+            (lang, i) =>
+              `<span class="fp-tag ${tagColors[i % tagColors.length]}">${lang}</span>`,
+          )
+          .join("");
       }
 
-      if (!mediaEl) continue;
+      async function loadFeaturedImages() {
+        for (const fp of featuredProjects) {
+          try {
+            const mediaEl = document.getElementById(fp.mediaId);
+            const tagsEl = document.getElementById(fp.tagsId);
 
-      const res = await fetch(
-        `https://api.github.com/repos/${GH_USER}/${fp.repo}/readme`,
-        { headers: { 'Accept': 'application/vnd.github.v3+json' } }
-      );
+            // Fetch repo info (branch) + languages in parallel
+            const [repoRes, langRes] = await Promise.all([
+              fetch(`https://api.github.com/repos/${GH_USER}/${fp.repo}`, {
+                headers: { Accept: "application/vnd.github.v3+json" },
+              }),
+              fetch(
+                `https://api.github.com/repos/${GH_USER}/${fp.repo}/languages`,
+                { headers: { Accept: "application/vnd.github.v3+json" } },
+              ),
+            ]);
 
-      let images = [];
-      if (res.ok) {
-        const data = await res.json();
-        const text = atob(data.content.replace(/\n/g, ''));
-        const raw = extractImages(text, GH_USER, fp.repo, branch);
-        const verified = await Promise.all(raw.slice(0, 6).map(url => new Promise(r => {
-          const img = new Image();
-          img.onload  = () => r(url);
-          img.onerror = () => r(null);
-          img.src = url;
-          setTimeout(() => r(null), 5000);
-        })));
-        images = verified.filter(Boolean);
+            let branch = "main";
+            if (repoRes.ok) {
+              const repoData = await repoRes.json();
+              branch = repoData.default_branch || "main";
+            }
+
+            if (langRes.ok && tagsEl) {
+              const langs = await langRes.json();
+              renderLangTags(langs, tagsEl);
+            }
+
+            if (!mediaEl) continue;
+
+            const res = await fetch(
+              `https://api.github.com/repos/${GH_USER}/${fp.repo}/readme`,
+              { headers: { Accept: "application/vnd.github.v3+json" } },
+            );
+
+            let images = [];
+            if (res.ok) {
+              const data = await res.json();
+              const text = atob(data.content.replace(/\n/g, ""));
+              const raw = extractImages(text, GH_USER, fp.repo, branch);
+              const verified = await Promise.all(
+                raw.slice(0, 6).map(
+                  (url) =>
+                    new Promise((r) => {
+                      const img = new Image();
+                      img.onload = () => r(url);
+                      img.onerror = () => r(null);
+                      img.src = url;
+                      setTimeout(() => r(null), 5000);
+                    }),
+                ),
+              );
+              images = verified.filter(Boolean);
+            }
+
+            if (images.length === 0) {
+              images = [
+                `https://opengraph.githubassets.com/1/${GH_USER}/${fp.repo}`,
+              ];
+            }
+
+            applyFeaturedImage(mediaEl, images);
+          } catch {
+            const mediaEl = document.getElementById(fp.mediaId);
+            const tagsEl = document.getElementById(fp.tagsId);
+            if (mediaEl)
+              applyFeaturedImage(mediaEl, [
+                `https://opengraph.githubassets.com/1/${GH_USER}/${fp.repo}`,
+              ]);
+            if (tagsEl) tagsEl.innerHTML = "";
+          }
+        }
       }
 
-      if (images.length === 0) {
-        images = [`https://opengraph.githubassets.com/1/${GH_USER}/${fp.repo}`];
-      }
+      function applyFeaturedImage(mediaEl, images) {
+        const overlay = mediaEl.querySelector(".fp-media-overlay");
+        const overlayHTML = overlay
+          ? overlay.outerHTML
+          : '<div class="fp-media-overlay"></div>';
 
-      applyFeaturedImage(mediaEl, images);
-    } catch {
-      const mediaEl = document.getElementById(fp.mediaId);
-      const tagsEl  = document.getElementById(fp.tagsId);
-      if (mediaEl) applyFeaturedImage(mediaEl, [`https://opengraph.githubassets.com/1/${GH_USER}/${fp.repo}`]);
-      if (tagsEl)  tagsEl.innerHTML = '';
-    }
-  }
-}
-
-function applyFeaturedImage(mediaEl, images) {
-  const overlay = mediaEl.querySelector('.fp-media-overlay');
-  const overlayHTML = overlay ? overlay.outerHTML : '<div class="fp-media-overlay"></div>';
-
-  if (images.length === 1) {
-    mediaEl.innerHTML = `
+        if (images.length === 1) {
+          mediaEl.innerHTML = `
       <img src="${images[0]}" alt="Project preview" class="fp-gh-img"
            onerror="this.style.opacity='0.3'"/>
       ${overlayHTML}`;
-    return;
-  }
+          return;
+        }
 
-  // Multiple: carousel
-  const cid = `fp-carousel-${Math.random().toString(36).slice(2,7)}`;
-  const slides = images.map((url, i) => `
-    <div class="carousel-item${i===0?' active':''}">
-      <img src="${url}" alt="Screenshot ${i+1}" class="fp-gh-img"
+        // Multiple: carousel
+        const cid = `fp-carousel-${Math.random().toString(36).slice(2, 7)}`;
+        const slides = images
+          .map(
+            (url, i) => `
+    <div class="carousel-item${i === 0 ? " active" : ""}">
+      <img src="${url}" alt="Screenshot ${i + 1}" class="fp-gh-img"
            style="aspect-ratio:16/9;width:100%;object-fit:cover;"
            onerror="this.parentElement.remove()"/>
-    </div>`).join('');
+    </div>`,
+          )
+          .join("");
 
-  mediaEl.innerHTML = `
+        mediaEl.innerHTML = `
     <div id="${cid}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000"
          style="height:100%;width:100%;border-radius:0;">
       <div class="carousel-inner" style="height:100%;">${slides}</div>
@@ -1713,114 +2563,134 @@ function applyFeaturedImage(mediaEl, images) {
       </button>
     </div>
     ${overlayHTML}`;
-}
+      }
 
-function filterRepos(lang, btn) {
-  document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const filtered = lang === 'all' ? allRepos : allRepos.filter(r => r.language === lang);
-  renderRepos(filtered);
-}
+      function filterRepos(lang, btn) {
+        document
+          .querySelectorAll(".btn-filter")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const filtered =
+          lang === "all"
+            ? allRepos
+            : allRepos.filter((r) => r.language === lang);
+        renderRepos(filtered);
+      }
 
-/* ─── README IMAGE CACHE & QUEUE ─────────────────────────── */
-const readmeCache = {};        // repoFullName → images[]
-const readmeQueue = [];        // pending fetch tasks
-let   queueRunning = false;
+      /* ─── README IMAGE CACHE & QUEUE ─────────────────────────── */
+      const readmeCache = {}; // repoFullName → images[]
+      const readmeQueue = []; // pending fetch tasks
+      let queueRunning = false;
 
-// Throttled queue — max 2 concurrent README fetches to avoid rate limit
-async function runQueue() {
-  if (queueRunning) return;
-  queueRunning = true;
-  while (readmeQueue.length > 0) {
-    const batch = readmeQueue.splice(0, 2);
-    await Promise.all(batch.map(fn => fn()));
-    if (readmeQueue.length > 0) await delay(400); // gentle throttle
-  }
-  queueRunning = false;
-}
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+      // Throttled queue — max 2 concurrent README fetches to avoid rate limit
+      async function runQueue() {
+        if (queueRunning) return;
+        queueRunning = true;
+        while (readmeQueue.length > 0) {
+          const batch = readmeQueue.splice(0, 2);
+          await Promise.all(batch.map((fn) => fn()));
+          if (readmeQueue.length > 0) await delay(400); // gentle throttle
+        }
+        queueRunning = false;
+      }
+      function delay(ms) {
+        return new Promise((r) => setTimeout(r, ms));
+      }
 
-function extractImages(readmeText, owner, repo, branch) {
-  const imgs = [];
-  const seen = new Set();
+      function extractImages(readmeText, owner, repo, branch) {
+        const imgs = [];
+        const seen = new Set();
 
-  function resolve(src) {
-    if (!src) return null;
-    src = src.trim();
-    // Skip badges (shields.io, badge, svg tiny images)
-    if (/shields\.io|badge|\.svg(\?|$)/i.test(src)) return null;
-    // Already absolute
-    if (/^https?:\/\//i.test(src)) return src;
-    // Relative → raw.githubusercontent
-    const clean = src.replace(/^\.?\//, '');
-    return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${clean}`;
-  }
+        function resolve(src) {
+          if (!src) return null;
+          src = src.trim();
+          // Skip badges (shields.io, badge, svg tiny images)
+          if (/shields\.io|badge|\.svg(\?|$)/i.test(src)) return null;
+          // Already absolute
+          if (/^https?:\/\//i.test(src)) return src;
+          // Relative → raw.githubusercontent
+          const clean = src.replace(/^\.?\//, "");
+          return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${clean}`;
+        }
 
-  // Markdown: ![alt](url) or ![alt](url "title")
-  const mdRe = /!\[[^\]]*\]\(([^)\s"]+)(?:\s+"[^"]*")?\)/g;
-  let m;
-  while ((m = mdRe.exec(readmeText)) !== null) {
-    const url = resolve(m[1]);
-    if (url && !seen.has(url)) { seen.add(url); imgs.push(url); }
-  }
+        // Markdown: ![alt](url) or ![alt](url "title")
+        const mdRe = /!\[[^\]]*\]\(([^)\s"]+)(?:\s+"[^"]*")?\)/g;
+        let m;
+        while ((m = mdRe.exec(readmeText)) !== null) {
+          const url = resolve(m[1]);
+          if (url && !seen.has(url)) {
+            seen.add(url);
+            imgs.push(url);
+          }
+        }
 
-  // HTML: <img src="...">
-  const htmlRe = /<img[^>]+src=["']([^"']+)["']/gi;
-  while ((m = htmlRe.exec(readmeText)) !== null) {
-    const url = resolve(m[1]);
-    if (url && !seen.has(url)) { seen.add(url); imgs.push(url); }
-  }
+        // HTML: <img src="...">
+        const htmlRe = /<img[^>]+src=["']([^"']+)["']/gi;
+        while ((m = htmlRe.exec(readmeText)) !== null) {
+          const url = resolve(m[1]);
+          if (url && !seen.has(url)) {
+            seen.add(url);
+            imgs.push(url);
+          }
+        }
 
-  return imgs.slice(0, 8); // cap at 8 images per repo
-}
+        return imgs.slice(0, 8); // cap at 8 images per repo
+      }
 
-async function fetchReadmeImages(owner, repo, branch, cardId) {
-  const key = `${owner}/${repo}`;
-  const ogFallback = `https://opengraph.githubassets.com/1/${key}`;
-  if (readmeCache[key] !== undefined) {
-    applyImagesToCard(cardId, readmeCache[key], ogFallback);
-    return;
-  }
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${key}/readme`,
-      { headers: { 'Accept': 'application/vnd.github.v3+json' } }
-    );
-    if (!res.ok) { readmeCache[key] = []; applyImagesToCard(cardId, [], ogFallback); return; }
-    const data = await res.json();
-    // README content is base64-encoded
-    const text = atob(data.content.replace(/\n/g, ''));
-    const imgs = extractImages(text, owner, repo, branch || 'main');
-    // Verify images load (filter out broken ones) — check first 4
-    const verified = await Promise.all(
-      imgs.slice(0, 6).map(url => new Promise(res => {
-        const img = new Image();
-        img.onload  = () => res(url);
-        img.onerror = () => res(null);
-        img.src = url;
-        setTimeout(() => res(null), 5000); // 5s timeout
-      }))
-    );
-    const valid = verified.filter(Boolean);
-    readmeCache[key] = valid;
-    applyImagesToCard(cardId, valid, ogFallback);
-  } catch {
-    readmeCache[key] = [];
-    applyImagesToCard(cardId, [], ogFallback);
-  }
-}
+      async function fetchReadmeImages(owner, repo, branch, cardId) {
+        const key = `${owner}/${repo}`;
+        const ogFallback = `https://opengraph.githubassets.com/1/${key}`;
+        if (readmeCache[key] !== undefined) {
+          applyImagesToCard(cardId, readmeCache[key], ogFallback);
+          return;
+        }
+        try {
+          const res = await fetch(
+            `https://api.github.com/repos/${key}/readme`,
+            { headers: { Accept: "application/vnd.github.v3+json" } },
+          );
+          if (!res.ok) {
+            readmeCache[key] = [];
+            applyImagesToCard(cardId, [], ogFallback);
+            return;
+          }
+          const data = await res.json();
+          // README content is base64-encoded
+          const text = atob(data.content.replace(/\n/g, ""));
+          const imgs = extractImages(text, owner, repo, branch || "main");
+          // Verify images load (filter out broken ones) — check first 4
+          const verified = await Promise.all(
+            imgs.slice(0, 6).map(
+              (url) =>
+                new Promise((res) => {
+                  const img = new Image();
+                  img.onload = () => res(url);
+                  img.onerror = () => res(null);
+                  img.src = url;
+                  setTimeout(() => res(null), 5000); // 5s timeout
+                }),
+            ),
+          );
+          const valid = verified.filter(Boolean);
+          readmeCache[key] = valid;
+          applyImagesToCard(cardId, valid, ogFallback);
+        } catch {
+          readmeCache[key] = [];
+          applyImagesToCard(cardId, [], ogFallback);
+        }
+      }
 
-function applyImagesToCard(cardId, images, ogFallback) {
-  const mediaEl = document.getElementById(`media-${cardId}`);
-  if (!mediaEl) return;
+      function applyImagesToCard(cardId, images, ogFallback) {
+        const mediaEl = document.getElementById(`media-${cardId}`);
+        if (!mediaEl) return;
 
-  // Always have the OG fallback ready
-  const ogSrc = ogFallback || '';
+        // Always have the OG fallback ready
+        const ogSrc = ogFallback || "";
 
-  // If no README images, use the GitHub social preview (OG / Discord banner)
-  if (!images || images.length === 0) {
-    if (ogSrc) {
-      mediaEl.innerHTML = `
+        // If no README images, use the GitHub social preview (OG / Discord banner)
+        if (!images || images.length === 0) {
+          if (ogSrc) {
+            mediaEl.innerHTML = `
         <div style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg3);">
           <img src="${ogSrc}" alt="Preview"
                style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.6s ease;"
@@ -1828,45 +2698,53 @@ function applyImagesToCard(cardId, images, ogFallback) {
                onmouseout="this.style.transform='scale(1)'"
                onerror="this.style.opacity='0.15'"/>
         </div>`;
-    } else {
-      mediaEl.innerHTML = `
+          } else {
+            mediaEl.innerHTML = `
         <div style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg3);">
-          <img src="https://opengraph.githubassets.com/1/${cardId.split('-')[0]}"
+          <img src="https://opengraph.githubassets.com/1/${cardId.split("-")[0]}"
                alt="Preview"
                style="width:100%;height:100%;object-fit:cover;display:block;"
                onerror="this.style.opacity='0.15'"/>
         </div>`;
-    }
-    return;
-  }
+          }
+          return;
+        }
 
-  if (images.length === 1) {
-    mediaEl.innerHTML = `
+        if (images.length === 1) {
+          mediaEl.innerHTML = `
       <div style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg3);">
         <img src="${images[0]}" alt="Preview"
              style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.6s ease;"
              onmouseover="this.style.transform='scale(1.06)'"
              onmouseout="this.style.transform='scale(1)'"
-             onerror="this.src='${ogSrc || ''}';this.onerror=function(){this.style.opacity='0.15';}"/>
+             onerror="this.src='${ogSrc || ""}';this.onerror=function(){this.style.opacity='0.15';}"/>
       </div>`;
-    return;
-  }
+          return;
+        }
 
-  // Multiple images → Bootstrap carousel
-  const cid = `carousel-${cardId}`;
-  const indicators = images.map((_, i) => `
+        // Multiple images → Bootstrap carousel
+        const cid = `carousel-${cardId}`;
+        const indicators = images
+          .map(
+            (_, i) => `
     <button type="button" data-bs-target="#${cid}" data-bs-slide-to="${i}"
-            ${i===0?'class="active" aria-current="true"':''}
-            aria-label="Slide ${i+1}"></button>`).join('');
+            ${i === 0 ? 'class="active" aria-current="true"' : ""}
+            aria-label="Slide ${i + 1}"></button>`,
+          )
+          .join("");
 
-  const slides = images.map((url, i) => `
-    <div class="carousel-item${i===0?' active':''}">
-      <img src="${url}" alt="Screenshot ${i+1}"
+        const slides = images
+          .map(
+            (url, i) => `
+    <div class="carousel-item${i === 0 ? " active" : ""}">
+      <img src="${url}" alt="Screenshot ${i + 1}"
            style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--bg3);"
            onerror="this.parentElement.remove()"/>
-    </div>`).join('');
+    </div>`,
+          )
+          .join("");
 
-  mediaEl.innerHTML = `
+        mediaEl.innerHTML = `
     <div id="${cid}" class="carousel slide" data-bs-ride="false" style="border-radius:0;">
       <div class="carousel-indicators" style="margin-bottom:6px;">${indicators}</div>
       <div class="carousel-inner" style="aspect-ratio:16/9;background:var(--bg3);">
@@ -1888,113 +2766,131 @@ function applyImagesToCard(cardId, images, ogFallback) {
         <i class="bi bi-images"></i> ${images.length}
       </div>
     </div>`;
-}
+      }
 
-/* ─── LAZY LOAD OBSERVER for README images ────────────────── */
-const readmeObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-    const el = entry.target;
-    const owner  = el.dataset.owner;
-    const repo   = el.dataset.repo;
-    const branch = el.dataset.branch;
-    const cid    = el.dataset.cardid;
-    if (!owner) return;
-    readmeObserver.unobserve(el);
-    readmeQueue.push(() => fetchReadmeImages(owner, repo, branch, cid));
-    runQueue();
-  });
-}, { rootMargin: '200px' });
+      /* ─── LAZY LOAD OBSERVER for README images ────────────────── */
+      const readmeObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const owner = el.dataset.owner;
+            const repo = el.dataset.repo;
+            const branch = el.dataset.branch;
+            const cid = el.dataset.cardid;
+            if (!owner) return;
+            readmeObserver.unobserve(el);
+            readmeQueue.push(() => fetchReadmeImages(owner, repo, branch, cid));
+            runQueue();
+          });
+        },
+        { rootMargin: "200px" },
+      );
 
-/* ─── LANGUAGE CACHE & LAZY FETCHER ──────────────────────── */
-const langCache = {}; // key: "owner/repo" → { Lang: bytes, ... }
-const langQueue = [];
-let langRunning = 0;
-const LANG_CONCURRENCY = 3;
+      /* ─── LANGUAGE CACHE & LAZY FETCHER ──────────────────────── */
+      const langCache = {}; // key: "owner/repo" → { Lang: bytes, ... }
+      const langQueue = [];
+      let langRunning = 0;
+      const LANG_CONCURRENCY = 3;
 
-function runLangQueue() {
-  while (langRunning < LANG_CONCURRENCY && langQueue.length) {
-    const fn = langQueue.shift();
-    langRunning++;
-    fn().finally(() => { langRunning--; runLangQueue(); });
-  }
-}
+      function runLangQueue() {
+        while (langRunning < LANG_CONCURRENCY && langQueue.length) {
+          const fn = langQueue.shift();
+          langRunning++;
+          fn().finally(() => {
+            langRunning--;
+            runLangQueue();
+          });
+        }
+      }
 
-async function fetchRepoLangs(owner, repo, cardId) {
-  const key = `${owner}/${repo}`;
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${key}/languages`,
-      { headers: { 'Accept': 'application/vnd.github.v3+json' } }
-    );
-    if (!res.ok) throw new Error('lang fetch failed');
-    const langs = await res.json();
-    langCache[key] = langs;
-    applyLangsToCard(cardId, langs);
-  } catch {
-    langCache[key] = {};
-  }
-}
+      async function fetchRepoLangs(owner, repo, cardId) {
+        const key = `${owner}/${repo}`;
+        try {
+          const res = await fetch(
+            `https://api.github.com/repos/${key}/languages`,
+            { headers: { Accept: "application/vnd.github.v3+json" } },
+          );
+          if (!res.ok) throw new Error("lang fetch failed");
+          const langs = await res.json();
+          langCache[key] = langs;
+          applyLangsToCard(cardId, langs);
+        } catch {
+          langCache[key] = {};
+        }
+      }
 
-function applyLangsToCard(cardId, langs) {
-  const el = document.getElementById(`langs-${cardId}`);
-  if (!el) return;
-  const names = Object.keys(langs);
-  if (!names.length) { el.innerHTML = ''; return; }
-  el.innerHTML = names.map(lang => {
-    const color = langColors[lang] || '#858585';
-    return `<span class="project-lang-badge">
+      function applyLangsToCard(cardId, langs) {
+        const el = document.getElementById(`langs-${cardId}`);
+        if (!el) return;
+        const names = Object.keys(langs);
+        if (!names.length) {
+          el.innerHTML = "";
+          return;
+        }
+        el.innerHTML = names
+          .map((lang) => {
+            const color = langColors[lang] || "#858585";
+            return `<span class="project-lang-badge">
       <span class="project-lang-dot" style="background:${color}"></span>
       ${lang}
     </span>`;
-  }).join('');
-}
+          })
+          .join("");
+      }
 
-const langObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-    const el = entry.target;
-    const owner  = el.dataset.owner;
-    const repo   = el.dataset.repo;
-    const cid    = el.dataset.cardid;
-    if (!owner) return;
-    langObserver.unobserve(el);
-    const key = `${owner}/${repo}`;
-    if (langCache[key] !== undefined) {
-      applyLangsToCard(cid, langCache[key]);
-    } else {
-      langQueue.push(() => fetchRepoLangs(owner, repo, cid));
-      runLangQueue();
-    }
-  });
-}, { rootMargin: '300px' });
+      const langObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const owner = el.dataset.owner;
+            const repo = el.dataset.repo;
+            const cid = el.dataset.cardid;
+            if (!owner) return;
+            langObserver.unobserve(el);
+            const key = `${owner}/${repo}`;
+            if (langCache[key] !== undefined) {
+              applyLangsToCard(cid, langCache[key]);
+            } else {
+              langQueue.push(() => fetchRepoLangs(owner, repo, cid));
+              runLangQueue();
+            }
+          });
+        },
+        { rootMargin: "300px" },
+      );
 
-/* ─── RENDER REPOS ────────────────────────────────────────── */
-function renderRepos(repos) {
-  const grid = document.getElementById('repos-grid');
-  if (repos.length === 0) {
-    grid.innerHTML = `<div class="col-12 text-center py-4" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:0.8rem;">No repos in this language.</div>`;
-    return;
-  }
+      /* ─── RENDER REPOS ────────────────────────────────────────── */
+      function renderRepos(repos) {
+        const grid = document.getElementById("repos-grid");
+        if (repos.length === 0) {
+          grid.innerHTML = `<div class="col-12 text-center py-4" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:0.8rem;">No repos in this language.</div>`;
+          return;
+        }
 
-  grid.innerHTML = repos.map((r, i) => {
-    const updated = new Date(r.updated_at).toLocaleDateString('en-US', {year:'numeric',month:'short'});
-    const desc    = r.description || 'No description provided.';
-    const cardId  = `${r.name}-${i}`.replace(/[^a-z0-9-]/gi, '-');
-    const branch  = r.default_branch || 'main';
+        grid.innerHTML = repos
+          .map((r, i) => {
+            const updated = new Date(r.updated_at).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+            });
+            const desc = r.description || "No description provided.";
+            const cardId = `${r.name}-${i}`.replace(/[^a-z0-9-]/gi, "-");
+            const branch = r.default_branch || "main";
 
-    // Check cache immediately (from previous filter)
-    const cached = readmeCache[`${GH_USER}/${r.name}`];
-    let mediaSeed = `<div class="project-card-img-placeholder readme-loading">
+            // Check cache immediately (from previous filter)
+            const cached = readmeCache[`${GH_USER}/${r.name}`];
+            let mediaSeed = `<div class="project-card-img-placeholder readme-loading">
         <div class="img-shimmer"></div>
       </div>`;
-    if (cached !== undefined) {
-      // Will be replaced by applyImagesToCard right after render,
-      // but we seed with placeholder to avoid flash
-    }
+            if (cached !== undefined) {
+              // Will be replaced by applyImagesToCard right after render,
+              // but we seed with placeholder to avoid flash
+            }
 
-    return `
-    <div class="col-12 col-sm-6 col-lg-4 reveal" style="transition-delay:${(i%6)*0.06}s">
+            return `
+    <div class="col-12 col-sm-6 col-lg-4 reveal" style="transition-delay:${(i % 6) * 0.06}s">
       <div class="project-card h-100 d-flex flex-column"
            data-owner="${GH_USER}" data-repo="${r.name}"
            data-branch="${branch}" data-cardid="${cardId}">
@@ -2003,10 +2899,10 @@ function renderRepos(repos) {
         </div>
         <div class="project-card-body flex-grow-1 d-flex flex-column">
           <h4 class="project-card-title">
-            <a href="${r.html_url}" target="_blank">${r.name.replace(/-/g,' ')}</a>
-            ${r.fork ? `<span class="fork-badge">fork</span>` : ''}
+            <a href="${r.html_url}" target="_blank">${r.name.replace(/-/g, " ")}</a>
+            ${r.fork ? `<span class="fork-badge">fork</span>` : ""}
           </h4>
-          <p class="project-card-desc flex-grow-1">${desc.length > 110 ? desc.slice(0,110)+'…' : desc}</p>
+          <p class="project-card-desc flex-grow-1">${desc.length > 110 ? desc.slice(0, 110) + "…" : desc}</p>
           <div class="project-meta">
             <div class="d-flex align-items-center gap-2 flex-wrap" id="langs-${cardId}">
               <span class="project-lang-badge" style="opacity:0.4;">
@@ -2023,7 +2919,7 @@ function renderRepos(repos) {
               <span class="project-stars">
                 <i class="bi bi-star-fill" style="color:#f59e0b;font-size:0.7rem;"></i> ${r.stargazers_count}
               </span>
-              ${r.forks_count > 0 ? `<span class="project-stars"><i class="bi bi-share" style="font-size:0.7rem;"></i> ${r.forks_count}</span>` : ''}
+              ${r.forks_count > 0 ? `<span class="project-stars"><i class="bi bi-share" style="font-size:0.7rem;"></i> ${r.forks_count}</span>` : ""}
             </div>
             <div style="font-size:0.7rem;color:var(--muted);font-family:'Space Mono',monospace">
               Updated ${updated}
@@ -2032,57 +2928,68 @@ function renderRepos(repos) {
         </div>
       </div>
     </div>`;
-  }).join('');
+          })
+          .join("");
 
-  // Observe & wire up each card
-  grid.querySelectorAll('.project-card').forEach(card => {
-    const cardId = card.dataset.cardid;
-    const key = `${card.dataset.owner}/${card.dataset.repo}`;
+        // Observe & wire up each card
+        grid.querySelectorAll(".project-card").forEach((card) => {
+          const cardId = card.dataset.cardid;
+          const key = `${card.dataset.owner}/${card.dataset.repo}`;
 
-    // README images
-    if (readmeCache[key] !== undefined) {
-      applyImagesToCard(cardId, readmeCache[key], `https://opengraph.githubassets.com/1/${key}`);
-    } else {
-      readmeObserver.observe(card);
-    }
+          // README images
+          if (readmeCache[key] !== undefined) {
+            applyImagesToCard(
+              cardId,
+              readmeCache[key],
+              `https://opengraph.githubassets.com/1/${key}`,
+            );
+          } else {
+            readmeObserver.observe(card);
+          }
 
-    // Languages — lazy load
-    if (langCache[key] !== undefined) {
-      applyLangsToCard(cardId, langCache[key]);
-    } else {
-      langObserver.observe(card);
-    }
+          // Languages — lazy load
+          if (langCache[key] !== undefined) {
+            applyLangsToCard(cardId, langCache[key]);
+          } else {
+            langObserver.observe(card);
+          }
 
-    // 3D tilt
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width  - 0.5;
-      const y = (e.clientY - rect.top)  / rect.height - 0.5;
-      card.style.transform = `translateY(-8px) rotateX(${-y*5}deg) rotateY(${x*7}deg)`;
-    });
-    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-  });
+          // 3D tilt
+          card.addEventListener("mousemove", (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = `translateY(-8px) rotateX(${-y * 5}deg) rotateY(${x * 7}deg)`;
+          });
+          card.addEventListener("mouseleave", () => {
+            card.style.transform = "";
+          });
+        });
 
-  // Scroll-reveal re-observe
-  grid.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-}
+        // Scroll-reveal re-observe
+        grid.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+      }
 
-fetchGitHub();
+      fetchGitHub();
 
-/* ─── NAVBAR ACTIVE STATE ────────────────────────────────── */
-const sections = document.querySelectorAll('section[id]');
-window.addEventListener('scroll', () => {
-  const y = window.scrollY + 100;
-  sections.forEach(sec => {
-    const link = document.querySelector(`.nav-link[href="#${sec.id}"]`);
-    if (!link) return;
-    if (y >= sec.offsetTop && y < sec.offsetTop + sec.offsetHeight) {
-      link.style.color = 'var(--accent)';
-    } else {
-      link.style.color = '';
-    }
-  });
-}, { passive: true });
-</script>
-</body>
+      /* ─── NAVBAR ACTIVE STATE ────────────────────────────────── */
+      const sections = document.querySelectorAll("section[id]");
+      window.addEventListener(
+        "scroll",
+        () => {
+          const y = window.scrollY + 100;
+          sections.forEach((sec) => {
+            const link = document.querySelector(`.nav-link[href="#${sec.id}"]`);
+            if (!link) return;
+            if (y >= sec.offsetTop && y < sec.offsetTop + sec.offsetHeight) {
+              link.style.color = "var(--accent)";
+            } else {
+              link.style.color = "";
+            }
+          });
+        },
+        { passive: true },
+      );
+    </script>
+  </body>
 </html>
