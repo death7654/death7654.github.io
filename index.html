@@ -530,6 +530,69 @@
 
     /* ─── SKILLS ────────────────────────────────────────────────── */
     #skills { background: var(--bg); }
+
+    .skill-category {
+      margin-bottom: 2.5rem;
+    }
+    .skill-category-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .skill-category-label::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .skill-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .skill-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 100px;
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: var(--transition);
+      cursor: none;
+      white-space: nowrap;
+    }
+    .skill-pill i {
+      font-size: 1rem;
+      color: var(--accent);
+      transition: color 0.3s;
+    }
+    .skill-pill:hover {
+      border-color: var(--accent);
+      background: rgba(0,229,255,0.06);
+      transform: translateY(-3px);
+      box-shadow: var(--glow-sm);
+    }
+    .skill-pill.violet i { color: #a78bfa; }
+    .skill-pill.violet:hover { border-color: #a78bfa; background: rgba(124,58,237,0.06); box-shadow: 0 0 12px rgba(124,58,237,0.2); }
+    .skill-pill.pink i { color: #fb7185; }
+    .skill-pill.pink:hover { border-color: #fb7185; background: rgba(255,61,107,0.06); box-shadow: 0 0 12px rgba(255,61,107,0.2); }
+    .skill-pill.amber i { color: #fbbf24; }
+    .skill-pill.amber:hover { border-color: #fbbf24; background: rgba(251,191,36,0.06); box-shadow: 0 0 12px rgba(251,191,36,0.2); }
+
+    /* Keep old .skill-card for any legacy references */
     .skill-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -544,17 +607,8 @@
       transform: translateY(-6px) scale(1.02);
       box-shadow: var(--glow-sm);
     }
-    .skill-icon {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-      display: block;
-      color: var(--accent);
-    }
-    .skill-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
-    }
+    .skill-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; color: var(--accent); }
+    .skill-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 
     /* ─── LINKS ─────────────────────────────────────────────────── */
     #links { background: var(--bg2); }
@@ -754,6 +808,7 @@
         <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
         <li class="nav-item"><a class="nav-link" href="#github-repos">GitHub</a></li>
         <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+        <li class="nav-item"><a class="nav-link" href="#experience">Experience</a></li>
         <li class="nav-item"><a class="nav-link" href="#links">Links</a></li>
       </ul>
     </div>
@@ -933,8 +988,50 @@
       <h2 class="section-title">Skills &amp; Tech</h2>
       <div class="section-divider"></div>
     </div>
-    <div class="row g-3" id="skills-grid">
+    <div id="skills-grid">
       <!-- populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ─── EXPERIENCE ────────────────────────────────────────────────── -->
+<section id="experience" style="background: var(--bg2);">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">// work history</p>
+      <h2 class="section-title">Experience</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="reveal" style="max-width: 760px;">
+      <div style="display:flex; flex-direction:column; gap: 0;">
+
+        <!-- Timeline item -->
+        <div style="display:grid; grid-template-columns: 120px 1fr; gap: 0 2rem; position:relative; padding-bottom: 2.5rem;">
+          <!-- Date col -->
+          <div style="text-align:right; padding-top: 0.25rem;">
+            <span style="font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--muted); line-height:1.5;">May 2023<br>— Present</span>
+          </div>
+          <!-- Line + dot -->
+          <div style="position:relative; padding-left:1.5rem; border-left: 1px solid var(--card-border);">
+            <span style="position:absolute; left:-5px; top:6px; width:9px; height:9px; background:var(--accent); border-radius:50%; box-shadow: 0 0 10px rgba(0,229,255,0.5); display:block;"></span>
+            <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:1.5rem; transition: var(--transition);"
+                 onmouseover="this.style.borderColor='rgba(0,229,255,0.4)'; this.style.boxShadow='0 0 20px rgba(0,229,255,0.12)'"
+                 onmouseout="this.style.borderColor=''; this.style.boxShadow=''">
+              <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+                <h4 style="font-size:1.05rem; font-weight:700; margin:0;">Open Source Contributor</h4>
+                <span style="font-size:0.72rem; background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.2); border-radius:100px; padding:3px 12px; color:var(--accent); font-family:'Space Mono',monospace;">Remote</span>
+              </div>
+              <p style="font-size:0.85rem; color:var(--accent); margin-bottom:0.75rem; font-family:'Space Mono',monospace; font-weight:600;">Chrultrabook Project</p>
+              <ul style="margin:0; padding-left:1.2rem; color:var(--muted); font-size:0.88rem; line-height:1.75;">
+                <li>Developed and maintained Chrultrabook Tools, a cross-platform system utility application serving users running alternate operating systems on Chromebook hardware.</li>
+                <li>Provided technical support and troubleshooting for community members transitioning Chromebooks to Linux, Windows, and other operating systems.</li>
+                <li>Collaborated with project maintainers to improve documentation, hardware compatibility databases, and user-facing tools.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>
@@ -1215,29 +1312,76 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 /* ─── SKILLS DATA ────────────────────────────────────────── */
-const skills = [
-  { icon: 'bi-code-slash',   name: 'C++' },
-  { icon: 'bi-code',         name: 'Python' },
-  { icon: 'bi-filetype-js',  name: 'JavaScript' },
-  { icon: 'bi-filetype-html',name: 'HTML / CSS' },
-  { icon: 'bi-terminal-fill',name: 'Bash / CLI' },
-  { icon: 'bi-git',          name: 'Git' },
-  { icon: 'bi-windows',      name: 'Windows Dev' },
-  { icon: 'bi-hdd-network',  name: 'Linux' },
-  { icon: 'bi-cpu-fill',     name: 'Emulation' },
-  { icon: 'bi-cpu',          name: 'Low-Level Sys' },
-  { icon: 'bi-github',       name: 'GitHub' },
-  { icon: 'bi-braces',       name: 'Open Source' },
+const skillCategories = [
+  {
+    label: 'Systems & Embedded',
+    color: 'cyan',
+    pills: [
+      { icon: 'bi-filetype-cpp',   name: 'C / C++' },
+      { icon: 'bi-shield-fill',    name: 'Rust' },
+      { icon: 'bi-lightning-fill', name: 'Zig' },
+      { icon: 'bi-cpu-fill',       name: 'Xtensa Assembly' },
+    ]
+  },
+  {
+    label: 'General Purpose',
+    color: 'violet',
+    pills: [
+      { icon: 'bi-code',            name: 'Python' },
+      { icon: 'bi-cup-hot-fill',    name: 'Java' },
+      { icon: 'bi-filetype-js',     name: 'JavaScript' },
+      { icon: 'bi-filetype-tsx',    name: 'TypeScript' },
+      { icon: 'bi-database-fill',   name: 'MySQL' },
+    ]
+  },
+  {
+    label: 'Web & UI',
+    color: 'pink',
+    pills: [
+      { icon: 'bi-window-sidebar',  name: 'Tauri' },
+      { icon: 'bi-hexagon-fill',    name: 'Angular' },
+      { icon: 'bi-grid-1x2-fill',   name: 'Bootstrap' },
+      { icon: 'bi-filetype-html',   name: 'HTML / CSS' },
+    ]
+  },
+  {
+    label: 'Data Science',
+    color: 'amber',
+    pills: [
+      { icon: 'bi-table',           name: 'Pandas' },
+      { icon: 'bi-calculator-fill', name: 'NumPy' },
+      { icon: 'bi-graph-up',        name: 'Matplotlib' },
+      { icon: 'bi-robot',           name: 'Scikit-Learn' },
+      { icon: 'bi-infinity',        name: 'SciPy' },
+    ]
+  },
+  {
+    label: 'Developer Tools',
+    color: 'cyan',
+    pills: [
+      { icon: 'bi-git',             name: 'Git' },
+      { icon: 'bi-terminal-fill',   name: 'Make' },
+      { icon: 'bi-github',          name: 'GitHub' },
+    ]
+  },
 ];
+
 const skillsGrid = document.getElementById('skills-grid');
-skills.forEach((s, i) => {
-  const d = Math.floor(i / 4) * 4 + (i % 4);
-  const col = document.createElement('div');
-  col.className = `col-6 col-sm-4 col-md-3 col-lg-2 reveal`;
-  col.style.transitionDelay = `${(i % 6) * 0.07}s`;
-  col.innerHTML = `<div class="skill-card"><i class="bi ${s.icon} skill-icon"></i><div class="skill-name">${s.name}</div></div>`;
-  skillsGrid.appendChild(col);
-  observer.observe(col);
+skillCategories.forEach((cat, ci) => {
+  const section = document.createElement('div');
+  section.className = 'skill-category reveal';
+  section.style.transitionDelay = `${ci * 0.1}s`;
+
+  const pillsHtml = cat.pills.map(p =>
+    `<span class="skill-pill ${cat.color}"><i class="bi ${p.icon}"></i>${p.name}</span>`
+  ).join('');
+
+  section.innerHTML = `
+    <div class="skill-category-label">${cat.label}</div>
+    <div class="skill-pill-row">${pillsHtml}</div>
+  `;
+  skillsGrid.appendChild(section);
+  observer.observe(section);
 });
 
 /* ─── LANG COLOR MAP ─────────────────────────────────────── */
