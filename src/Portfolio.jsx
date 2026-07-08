@@ -1,0 +1,1302 @@
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import {
+  Github,
+  Linkedin,
+  Mail,
+  Menu,
+  X,
+  Search,
+  ExternalLink,
+  ChevronRight,
+  Terminal,
+  Cpu,
+  Brain,
+  Code2,
+  GraduationCap,
+  ArrowUpRight,
+  Star,
+  GitFork,
+  Users,
+} from "lucide-react";
+
+/* =========================================================================
+   DATA
+   ========================================================================= */
+
+const DOMAINS = {
+  systems: {
+    key: "systems",
+    label: "Low-Level & Embedded",
+    short: "Systems / Emulation",
+    hex: "#22D3EE",
+    text: "text-cyan-300",
+    borderStrong: "border-cyan-400/60",
+    border: "border-cyan-400/20",
+    bg: "bg-cyan-400/10",
+    dot: "bg-cyan-400",
+    glowShadow: "0 0 40px -8px rgba(34,211,238,0.35)",
+  },
+  ai: {
+    key: "ai",
+    label: "Machine Learning & AI",
+    short: "AI / ML",
+    hex: "#34D399",
+    text: "text-emerald-300",
+    borderStrong: "border-emerald-400/60",
+    border: "border-emerald-400/20",
+    bg: "bg-emerald-400/10",
+    dot: "bg-emerald-400",
+    glowShadow: "0 0 40px -8px rgba(52,211,153,0.35)",
+  },
+  web: {
+    key: "web",
+    label: "Fullstack & Systems Tooling",
+    short: "Web / Tooling",
+    hex: "#CBD5E1",
+    text: "text-slate-300",
+    borderStrong: "border-slate-300/60",
+    border: "border-slate-300/20",
+    bg: "bg-slate-300/10",
+    dot: "bg-slate-300",
+    glowShadow: "0 0 40px -8px rgba(203,213,225,0.25)",
+  },
+};
+
+const SKILLS = {
+  systems: [
+    "C/C++", "Rust", "Zig", "Xtensa Assembly", "SPI", "UART", "GPIO",
+    "FAT32", "MBR", "Memory-Mapped I/O", "Boot Stages", "DMA",
+    "Interrupt Handling", "Make",
+  ],
+  ai: [
+    "PyTorch", "TensorFlow", "Transformers", "Sentence-Transformers",
+    "Scikit-Learn", "Pandas", "NumPy", "Matplotlib", "SciPy", "LSTM",
+    "MinMax Scaling", "Prompt Engineering",
+  ],
+  web: [
+    "Python", "Java", "JavaScript", "TypeScript", "MySQL", "SQL", "JSON",
+    "REST APIs", "Tauri", "Angular", "Bootstrap", "HTML/CSS",
+  ],
+};
+
+const FEATURED = [
+  {
+    id: "chrultrabook",
+    index: "01",
+    domain: "systems",
+    title: "Chrultrabook Tools",
+    languages: ["TypeScript", "Rust", "HTML", "SCSS", "Nix", "Shell"],
+    stat: "45,000+ downloads",
+    url: "https://github.com/death7654/Chrultrabook-Tools",
+    description:
+      "Restores lost functionality and adds powerful new features to all Chromebooks running Windows, Linux, and macOS. Cross-platform and actively maintained, serving a large community. Features direct hardware access via a Rust backend, low-latency sensor polling, and fan curve calculations exposed over IPC to a polished frontend.",
+  },
+  {
+    id: "driver-installer",
+    index: "02",
+    domain: "systems",
+    title: "Chromebook Driver Installer",
+    languages: ["Rust", "JSON", "SQL"],
+    stat: "5,000+ downloads",
+    url: "https://github.com/death7654/Chromebook-Driver-Installer",
+    description:
+      "Automated driver installation system for Chromebook users. Combines a high-performance Rust CLI tool with a structured backend database cataloging 200+ models, built with a dynamic update mechanism that fetches metadata at runtime to eliminate application rebuilds.",
+  },
+  {
+    id: "esp32-kernel",
+    index: "03",
+    domain: "systems",
+    title: "Bare Metal ESP32 Kernel",
+    languages: ["C", "Python", "Make", "Xtensa Assembly"],
+    stat: "Built from the TRM up",
+    url: "https://github.com/death7654/ESP32-Bare-Metal-Kernel",
+    description:
+      "A two-stage bootloader and kernel for the ESP32, built entirely from the Technical Reference Manual. Features a custom Xtensa assembly trampoline transferring a kernel binary from DRAM to IRAM, a register-level SPI/SD card driver, a FAT32 filesystem driver traversing cluster chains, and an interactive kernel shell running a domain-specific script interpreter for runtime reprogramming.",
+  },
+  {
+    id: "gameboy",
+    index: "04",
+    domain: "systems",
+    title: "Game Boy Emulator",
+    languages: ["Rust"],
+    stat: "Cycle-accurate DMG core",
+    url: "https://github.com/death7654/Gameboy-Emulator-Rust",
+    description:
+      "A cycle-accurate Game Boy (DMG) emulator built from scratch. Implements accurate Sharp LR35902 CPU emulation, a pixel processing unit pipeline with scanline-based rendering, tile caching, sprite compositing, custom memory bank controllers (MBC1/MBC3), and exact OAM DMA timing.",
+  },
+  {
+    id: "8080",
+    index: "05",
+    domain: "systems",
+    title: "Space Invaders / Intel 8080",
+    languages: ["C++"],
+    stat: "1978 cabinet, faithfully",
+    url: "https://github.com/death7654/Intel-8080-Emulator",
+    description:
+      "A faithful emulation of the classic 1978 arcade cabinet hardware. Implements a complete Intel 8080 instruction set with accurate flag arithmetic, memory-mapped I/O, bitwise shift registers, and hardware-driven interrupt loops synchronized tightly to cycle counts to reproduce alternating VBLANK intervals.",
+  },
+];
+
+const EXPERIENCE = [
+  {
+    role: "Research Intern",
+    org: "Amrita School of Artificial Intelligence",
+    period: "May 2026 — Jun. 2026",
+    domain: "ai",
+    points: [
+      "Investigated and mitigated linguistic gender bias in AI systems under Dr. Premjith B.",
+      "Built an NLP pipeline using Sentence-BERT embeddings and a custom 5-layer feed-forward PyTorch architecture optimizing dual cross-entropy / contrastive loss functions.",
+      "Designed a self-correcting two-step LLM prompting framework built on SmolLM2.",
+    ],
+  },
+  {
+    role: "Open Source Contributor",
+    org: "Chrultrabook Project",
+    period: "May 2023 — Present",
+    domain: "systems",
+    points: [
+      "Maintain primary systems tooling and resolve upstream documentation gaps.",
+      "Manage centralized hardware compatibility schemas across supported devices.",
+      "Provide low-level support for thousands of alternate-OS desktop environments.",
+    ],
+  },
+];
+
+const GH_USERNAME = "death7654";
+
+// Real GitHub language colors (subset covering this profile's stack, with a gray fallback)
+const LANGUAGE_COLORS = {
+  C: "#555555",
+  "C++": "#f34b7d",
+  "C#": "#178600",
+  Python: "#3572A5",
+  JavaScript: "#f1e05a",
+  TypeScript: "#3178c6",
+  Rust: "#dea584",
+  Go: "#00ADD8",
+  Zig: "#ec915c",
+  Java: "#b07219",
+  Kotlin: "#A97BFF",
+  HTML: "#e34c26",
+  CSS: "#563d7c",
+  SCSS: "#c6538c",
+  Shell: "#89e051",
+  Makefile: "#427819",
+  Nix: "#7e7eff",
+  Dockerfile: "#384d54",
+  Assembly: "#6E4C13",
+};
+const LANGUAGE_FALLBACK_COLOR = "#8b949e";
+
+// Best-effort mapping from a repo's primary language to one of our three domains,
+// so live-fetched repos still slot into the same Systems / AI / Web filter as the
+// hand-written featured projects.
+const SYSTEMS_LANGS = new Set([
+  "C", "C++", "Rust", "Zig", "Assembly", "Makefile", "Shell", "Dockerfile", "Nix",
+]);
+const AI_LANGS = new Set(["Python", "Jupyter Notebook", "R", "MATLAB"]);
+
+function inferDomain(language) {
+  if (!language) return "web";
+  if (SYSTEMS_LANGS.has(language)) return "systems";
+  if (AI_LANGS.has(language)) return "ai";
+  return "web";
+}
+
+const GITHUB_URL = `https://github.com/${GH_USERNAME}`;
+const LINKEDIN_URL = "https://linkedin.com/in/robinsonarysseril";
+const EMAIL = "robinsongeorgearysseril301@gmail.com";
+
+
+/* =========================================================================
+   BOOT SEQUENCE
+   ========================================================================= */
+
+const BOOT_LINES = [
+  "[ OK ] initializing kernel image \u2026",
+  "[ OK ] mounting root filesystem (FAT32) \u2026",
+  "[ OK ] loading modules: rust, pytorch, xtensa-gcc \u2026",
+  "[ OK ] enumerating devices on SPI / UART bus \u2026",
+  "[ OK ] establishing uplink \u2026",
+  "> whoami",
+  "robinson_george_arysseril",
+];
+
+function BootSequence({ onDone }) {
+  const [visibleLines, setVisibleLines] = useState(0);
+  const [skip, setSkip] = useState(false);
+
+  useEffect(() => {
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      onDone();
+      return;
+    }
+    if (visibleLines < BOOT_LINES.length) {
+      const t = setTimeout(() => setVisibleLines((v) => v + 1), 220);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(onDone, 550);
+    return () => clearTimeout(t);
+  }, [visibleLines, onDone]);
+
+  useEffect(() => {
+    if (!skip) return;
+    onDone();
+  }, [skip, onDone]);
+
+  return (
+    <motion.div
+      style={{ backgroundColor: "#05070C", zIndex: 100 }}
+      className="fixed inset-0 flex items-center justify-center px-6 cursor-pointer"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      onClick={() => setSkip(true)}
+    >
+      <div className="w-full max-w-lg font-mono text-xs leading-relaxed text-cyan-300/90">
+        {BOOT_LINES.slice(0, visibleLines).map((line, i) => (
+          <div key={i} className={i === BOOT_LINES.length - 1 ? "text-emerald-300 mt-2" : "text-slate-300"}>
+            {line}
+          </div>
+        ))}
+        <span className="inline-block w-2 h-3.5 align-middle bg-cyan-300 animate-pulse ml-0.5" />
+        <div className="mt-8 text-xs tracking-widest text-slate-500 uppercase">
+          tap anywhere to skip
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* =========================================================================
+   SHARED BITS
+   ========================================================================= */
+
+function LangBadge({ label, domain, hex, size = "sm" }) {
+  const d = DOMAINS[domain] || DOMAINS.web;
+  const pad = size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border ${d.border} ${d.bg} ${pad} font-mono text-slate-300`}
+    >
+      <span
+        className={hex ? "h-1.5 w-1.5 rounded-full" : `h-1.5 w-1.5 rounded-full ${d.dot}`}
+        style={hex ? { backgroundColor: hex } : undefined}
+      />
+      {label}
+    </span>
+  );
+}
+
+function SectionHeading({ eyebrow, title, subtitle }) {
+  return (
+    <div className="mb-10 sm:mb-14">
+      <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-3">
+        {eyebrow}
+      </div>
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-100">
+        {title}
+      </h2>
+      {subtitle && (
+        <p className="mt-4 max-w-2xl text-slate-300 text-sm sm:text-base leading-relaxed">
+          {subtitle}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 280, damping: 40, mass: 0.2 });
+  return (
+    <motion.div
+      style={{ scaleX, zIndex: 60 }}
+      className="fixed top-0 inset-x-0 h-0.5 origin-left bg-gradient-to-r from-cyan-400 via-slate-200 to-emerald-400"
+    />
+  );
+}
+
+/* =========================================================================
+   HEADER
+   ========================================================================= */
+
+const NAV_LINKS = [
+  { label: "Skills", href: "#skills" },
+  { label: "Work", href: "#work" },
+  { label: "Experience", href: "#experience" },
+  { label: "Archive", href: "#archive" },
+  { label: "Contact", href: "#contact" },
+];
+
+function Header() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const go = (href) => {
+    setOpen(false);
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <>
+      <header
+        style={{ backgroundColor: scrolled ? "rgba(11, 15, 25, 0.72)" : "transparent" }}
+        className={`fixed top-0 inset-x-0 z-50 transition-colors duration-300 ${
+          scrolled ? "backdrop-blur-xl border-b border-white/10" : ""
+        }`}
+      >
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
+          <button
+            onClick={() => go("#top")}
+            className="flex items-center gap-2 font-mono text-sm text-slate-200"
+          >
+            <Terminal className="h-4 w-4 text-cyan-400" strokeWidth={1.75} />
+            <span className="tracking-tight">rga<span className="text-cyan-400">.</span>dev</span>
+          </button>
+
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map((l) => (
+              <button
+                key={l.href}
+                onClick={() => go(l.href)}
+                className="px-3.5 py-2 text-xs text-slate-300 hover:text-slate-100 transition-colors rounded-full hover:bg-white/5"
+              >
+                {l.label}
+              </button>
+            ))}
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="ml-2 flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2 text-xs text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+            >
+              <Github className="h-3.5 w-3.5" /> GitHub
+            </a>
+          </nav>
+
+          <button
+            onClick={() => setOpen((o) => !o)}
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-slate-300 active:scale-95 transition-transform"
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        </div>
+      </header>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ backgroundColor: "rgba(5, 7, 12, 0.95)" }}
+            className="fixed inset-0 z-40 backdrop-blur-md md:hidden"
+          >
+            <motion.div
+              initial={{ y: -16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -16, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col pt-24 px-8 gap-1"
+            >
+              {NAV_LINKS.map((l, i) => (
+                <button
+                  key={l.href}
+                  onClick={() => go(l.href)}
+                  className="flex items-center justify-between border-b border-white/10 py-4 text-lg text-slate-200"
+                >
+                  {l.label}
+                  <ChevronRight className="h-4 w-4 text-slate-500" />
+                </button>
+              ))}
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-6 flex items-center justify-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 py-3.5 text-cyan-300"
+              >
+                <Github className="h-4 w-4" /> github.com/death7654
+              </a>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+/* =========================================================================
+   HERO + SKILLS GRID
+   ========================================================================= */
+
+function Hero({ activeDomain, setActiveDomain }) {
+  return (
+    <section id="top" className="relative pt-32 sm:pt-40 pb-20 px-5 sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <motion.div
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
+          }}
+        >
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="font-mono text-xs tracking-widest text-emerald-400/70 uppercase mb-5"
+          >
+            systems &amp; intelligence
+          </motion.div>
+
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-slate-50 leading-tight overflow-hidden">
+            <motion.span
+              className="block"
+              variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Robinson George
+            </motion.span>
+            <motion.span
+              className="block"
+              variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span className="name-shimmer inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-slate-200 to-emerald-300">
+                Arysseril
+              </span>
+            </motion.span>
+          </h1>
+
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="mt-6 max-w-2xl text-slate-300 text-base sm:text-lg leading-relaxed"
+          >
+            I build from the register up and the model down &mdash; bare-metal
+            kernels, cycle-accurate emulators, and NLP pipelines that ship.
+            Currently studying AI &amp; Data Science, permanently in a terminal.
+          </motion.p>
+
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="mt-8 flex flex-wrap items-center gap-3"
+          >
+            <motion.a
+              href="#work"
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector("#work")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-900 px-5 py-3 text-sm font-medium hover:bg-white transition-colors"
+            >
+              View featured work
+              <motion.span
+                animate={{ x: [0, 3, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <ArrowUpRight className="h-3.5 w-3.5" />
+              </motion.span>
+            </motion.a>
+            <motion.a
+              href={`mailto:${EMAIL}`}
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 text-slate-300 px-5 py-3 text-sm hover:border-white/30 hover:text-white transition-colors"
+            >
+              <Mail className="h-3.5 w-3.5" /> Say hello
+            </motion.a>
+          </motion.div>
+        </motion.div>
+
+        {/* Academic strip */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="mt-10 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-mono text-xs text-slate-300"
+        >
+          <GraduationCap className="h-4 w-4 mt-0.5 shrink-0 text-slate-400" />
+          <div>
+            <span className="text-slate-400">student@vjec</span>
+            <span className="text-slate-500">:~$</span> whoami --academic
+            <div className="mt-1 text-slate-300">
+              B.Tech, Artificial Intelligence &amp; Data Science &middot; Minor in Electronics &amp; Communications
+              <span className="text-emerald-400/80"> &middot; CGPA 9.47/10</span>
+              <br className="hidden sm:block" />
+              Vimal Jyothi Engineering College &middot; Sep. 2024 &ndash; May 2028
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Skills grid */}
+        <div id="skills" className="mt-20 scroll-mt-24">
+          <div className="flex items-end justify-between mb-5 flex-wrap gap-3">
+            <h2 className="text-sm font-mono tracking-widest text-slate-400 uppercase">
+              Select a domain
+            </h2>
+            {activeDomain && (
+              <button
+                onClick={() => setActiveDomain(null)}
+                className="text-xs font-mono text-slate-400 hover:text-slate-300 underline underline-offset-4"
+              >
+                clear filter
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {Object.values(DOMAINS).map((d, di) => {
+              const isActive = activeDomain === d.key;
+              const isDimmed = activeDomain && !isActive;
+              const Icon = d.key === "systems" ? Cpu : d.key === "ai" ? Brain : Code2;
+              return (
+                <motion.button
+                  layout
+                  key={d.key}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: isDimmed ? 0.45 : 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.5, delay: di * 0.08, ease: "easeOut" }}
+                  onClick={() => setActiveDomain(isActive ? null : d.key)}
+                  whileHover={{ y: -5, scale: 1.015 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{ boxShadow: isActive ? d.glowShadow : "none" }}
+                  className={`text-left rounded-2xl border ${
+                    isActive ? d.borderStrong : "border-white/10"
+                  } ${isActive ? d.bg : "bg-white/5"} p-5 sm:p-6 transition-colors`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <motion.span whileHover={{ rotate: -8, scale: 1.1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
+                      <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.6} />
+                    </motion.span>
+                    <span className={`h-2 w-2 rounded-full ${d.dot} ${isActive ? "pulse-dot" : ""}`} />
+                  </div>
+                  <div className="font-medium text-slate-100">{d.label}</div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    <AnimatePresence initial={false}>
+                      {SKILLS[d.key].slice(0, isActive ? SKILLS[d.key].length : 5).map((s, si) => (
+                        <motion.span
+                          key={s}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.25, delay: isActive ? si * 0.025 : 0 }}
+                          className="rounded-full border border-white/10 px-2 py-0.5 text-xs font-mono text-slate-300"
+                        >
+                          {s}
+                        </motion.span>
+                      ))}
+                    </AnimatePresence>
+                    {!isActive && SKILLS[d.key].length > 5 && (
+                      <span className="rounded-full px-2 py-0.5 text-xs font-mono text-slate-500">
+                        +{SKILLS[d.key].length - 5} more
+                      </span>
+                    )}
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================================
+   FEATURED PROJECTS
+   ========================================================================= */
+
+function FeaturedProjects({ activeDomain }) {
+  return (
+    <section id="work" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading
+          eyebrow="Featured masterpieces"
+          title="Built from first principles"
+          subtitle="Five projects spanning the register-level and the runtime &mdash; kernels, cartridges, and cabinets, reconstructed from datasheets and reference manuals rather than tutorials."
+        />
+
+        <div className="space-y-4">
+          {FEATURED.map((p, i) => {
+            const d = DOMAINS[p.domain];
+            const dimmed = activeDomain && activeDomain !== p.domain;
+            return (
+              <motion.div
+                layoutId={`feature-${p.id}`}
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                whileHover={{ y: -4, boxShadow: d.glowShadow }}
+                transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
+                className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
+              >
+                <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    whileInView={{ opacity: 0.4, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
+                    className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
+                  >
+                    {p.index}
+                  </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
+                        {p.title}
+                      </h3>
+                      <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
+                    </div>
+                    <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
+                      {p.description}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {p.languages.map((l) => (
+                        <LangBadge key={l} label={l} domain={p.domain} />
+                      ))}
+                    </div>
+                  </div>
+                  <motion.a
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="shrink-0 self-start md:self-center flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 group-hover:text-slate-100 group-hover:border-white/25 transition-colors overflow-hidden"
+                  >
+                    <Code2 className="h-3.5 w-3.5" /> Source
+                    <ArrowUpRight className="h-3.5 w-3.5 -ml-3 opacity-0 -translate-x-1 group-hover:ml-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                  </motion.a>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================================
+   EXPERIENCE
+   ========================================================================= */
+
+function Experience() {
+  return (
+    <section id="experience" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading eyebrow="Track record" title="Experience" />
+        <div className="relative pl-6 sm:pl-10 space-y-12">
+          <motion.div
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            style={{ originY: 0 }}
+            className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-400/50 via-white/10 to-emerald-400/40"
+          />
+          {EXPERIENCE.map((e, i) => {
+            const d = DOMAINS[e.domain];
+            return (
+              <motion.div
+                key={e.role + e.org}
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+                className="relative"
+              >
+                <motion.span
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.4, delay: i * 0.15 + 0.2, ease: "backOut" }}
+                  style={{ boxShadow: "0 0 0 4px #0B0F19" }}
+                  className={`absolute -left-8 sm:-left-11 top-1.5 h-3 w-3 rounded-full ${d.dot}`}
+                />
+                <div className="font-mono text-xs text-slate-400 mb-1">{e.period}</div>
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-100">{e.role}</h3>
+                <div className={`text-sm ${d.text} mb-3`}>{e.org}</div>
+                <ul className="space-y-1.5">
+                  {e.points.map((pt, pi) => (
+                    <motion.li
+                      key={pt}
+                      initial={{ opacity: 0, x: -8 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, margin: "-80px" }}
+                      transition={{ duration: 0.4, delay: i * 0.15 + 0.3 + pi * 0.06 }}
+                      className="flex gap-2 text-sm text-slate-300 leading-relaxed"
+                    >
+                      <span className="text-slate-500 mt-1.5 h-1 w-1 rounded-full bg-slate-500 shrink-0" />
+                      {pt}
+                    </motion.li>
+                  ))}
+                </ul>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================================
+   LIVE GITHUB DATA
+   ========================================================================= */
+
+function useGithubRepos(username) {
+  const [state, setState] = useState({ status: "loading", repos: [], error: null });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      try {
+        let all = [];
+        let page = 1;
+        // GitHub returns up to 100 repos per page. We stop once a page comes back
+        // short (last page) or after a small safety cap of pages.
+        while (page <= 5) {
+          const res = await fetch(
+            `https://api.github.com/users/${username}/repos?type=owner&sort=updated&per_page=100&page=${page}`,
+            { headers: { Accept: "application/vnd.github.v3+json" } }
+          );
+          if (!res.ok) {
+            throw new Error(res.status === 403 ? "rate_limit" : `http_${res.status}`);
+          }
+          const data = await res.json();
+          if (!Array.isArray(data) || data.length === 0) break;
+          all = all.concat(data);
+          if (data.length < 100) break;
+          page += 1;
+        }
+
+        const mapped = all
+          .filter((r) => !r.fork)
+          .map((r) => ({
+            id: r.id,
+            name: r.name,
+            description: r.description || "No description provided.",
+            language: r.language,
+            domain: inferDomain(r.language),
+            stars: r.stargazers_count || 0,
+            forks: r.forks_count || 0,
+            updatedAt: r.updated_at,
+            url: r.html_url,
+          }))
+          .sort(
+            (a, b) => b.stars - a.stars || new Date(b.updatedAt) - new Date(a.updatedAt)
+          );
+
+        if (!cancelled) setState({ status: "ready", repos: mapped, error: null });
+      } catch (err) {
+        if (!cancelled) setState({ status: "error", repos: [], error: err.message });
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [username]);
+
+  return state;
+}
+
+function useGithubProfile(username) {
+  const [state, setState] = useState({ status: "loading", profile: null, error: null });
+
+  useEffect(() => {
+    let cancelled = false;
+    async function run() {
+      try {
+        const res = await fetch(`https://api.github.com/users/${username}`, {
+          headers: { Accept: "application/vnd.github.v3+json" },
+        });
+        if (!res.ok) {
+          throw new Error(res.status === 403 ? "rate_limit" : `http_${res.status}`);
+        }
+        const data = await res.json();
+        if (!cancelled) {
+          setState({
+            status: "ready",
+            profile: { followers: data.followers || 0, publicRepos: data.public_repos || 0 },
+            error: null,
+          });
+        }
+      } catch (err) {
+        if (!cancelled) setState({ status: "error", profile: null, error: err.message });
+      }
+    }
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [username]);
+
+  return state;
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return "today";
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo ago`;
+  return `${Math.floor(months / 12)}y ago`;
+}
+
+function useCountUp(target, active, duration = 1400) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!active || target == null) return;
+    let raf;
+    let start = null;
+    function step(ts) {
+      if (start === null) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(target * eased));
+      if (progress < 1) raf = requestAnimationFrame(step);
+    }
+    raf = requestAnimationFrame(step);
+    return () => raf && cancelAnimationFrame(raf);
+  }, [target, active, duration]);
+  return value;
+}
+
+/* =========================================================================
+   REPO ARCHIVE (live GitHub data)
+   ========================================================================= */
+
+function RepoArchive({ activeDomain, status, repos, error }) {
+  const [query, setQuery] = useState("");
+  const [selectedLangs, setSelectedLangs] = useState([]);
+
+  const allLangs = useMemo(() => {
+    const s = new Set();
+    repos.forEach((r) => r.language && s.add(r.language));
+    return Array.from(s).sort();
+  }, [repos]);
+
+  const toggleLang = (l) =>
+    setSelectedLangs((prev) => (prev.includes(l) ? prev.filter((x) => x !== l) : [...prev, l]));
+
+  const filtered = useMemo(() => {
+    return repos.filter((r) => {
+      if (activeDomain && r.domain !== activeDomain) return false;
+      if (selectedLangs.length && !selectedLangs.includes(r.language)) return false;
+      if (query) {
+        const q = query.toLowerCase();
+        const hay = (r.name + " " + r.description + " " + (r.language || "")).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [repos, activeDomain, selectedLangs, query]);
+
+  return (
+    <section id="archive" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading
+          eyebrow="Live from the GitHub API"
+          title="All open source repositories"
+          subtitle={
+            <>
+              Fetched directly from{" "}
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="text-cyan-300 hover:underline underline-offset-4"
+              >
+                github.com/{GH_USERNAME}
+              </a>{" "}
+              on page load &mdash; search or filter by language and the grid updates live.
+            </>
+          }
+        />
+
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search repositories\u2026"
+              disabled={status !== "ready"}
+              className="w-full rounded-full border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 transition disabled:opacity-50"
+            />
+          </div>
+        </div>
+
+        {status === "ready" && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {allLangs.map((l, li) => {
+              const active = selectedLangs.includes(l);
+              return (
+                <motion.button
+                  key={l}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: li * 0.02 }}
+                  whileHover={{ scale: 1.06, y: -1 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={() => toggleLang(l)}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-mono transition-colors ${
+                    active
+                      ? "border-cyan-400/50 bg-cyan-400/10 text-cyan-300"
+                      : "border-white/10 text-slate-300 hover:border-white/25 hover:text-slate-200"
+                  }`}
+                >
+                  <span
+                    className="h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: LANGUAGE_COLORS[l] || LANGUAGE_FALLBACK_COLOR }}
+                  />
+                  {l}
+                </motion.button>
+              );
+            })}
+            {selectedLangs.length > 0 && (
+              <button
+                onClick={() => setSelectedLangs([])}
+                className="rounded-full px-3 py-1.5 text-xs font-mono text-slate-500 hover:text-slate-300 underline underline-offset-4"
+              >
+                reset
+              </button>
+            )}
+          </div>
+        )}
+
+        {status === "loading" && (
+          <div className="flex items-center gap-2.5 mb-6 font-mono text-xs text-cyan-300/80">
+            <span className="h-3 w-3 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" />
+            fetching public repositories from github&hellip;
+          </div>
+        )}
+
+        {status === "ready" && (
+          <div className="text-xs font-mono text-slate-500 mb-4">
+            {filtered.length} {filtered.length === 1 ? "repository" : "repositories"}
+          </div>
+        )}
+
+        {/* Loading skeletons */}
+        {status === "loading" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse rounded-xl border border-white/10 bg-white/5 p-5 h-32"
+              >
+                <div className="h-3.5 w-2/3 rounded bg-white/10 mb-3" />
+                <div className="h-2.5 w-full rounded bg-white/5 mb-2" />
+                <div className="h-2.5 w-4/5 rounded bg-white/5 mb-4" />
+                <div className="h-4 w-16 rounded-full bg-white/10" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Error state */}
+        {status === "error" && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 py-14 px-6 text-center">
+            <div className="font-mono text-xs text-slate-400 leading-relaxed">
+              {error === "rate_limit"
+                ? "GitHub's public API rate limit was hit (60 requests / hour for unauthenticated calls). Try again shortly."
+                : "Couldn't reach the GitHub API from here."}
+            </div>
+            <a
+              href={`${GITHUB_URL}?tab=repositories`}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-xs text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+            >
+              <Github className="h-3.5 w-3.5" /> View repositories on GitHub
+            </a>
+          </div>
+        )}
+
+        {/* Live grid */}
+        {status === "ready" && (
+          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <AnimatePresence mode="popLayout">
+              {filtered.map((r, ri) => {
+                const d = DOMAINS[r.domain];
+                const langColor = r.language ? LANGUAGE_COLORS[r.language] || LANGUAGE_FALLBACK_COLOR : null;
+                return (
+                  <motion.a
+                    layout
+                    key={r.id}
+                    href={r.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    whileHover={{ y: -4, scale: 1.015 }}
+                    whileTap={{ scale: 0.99 }}
+                    transition={{ duration: 0.3, delay: Math.min(ri, 8) * 0.03, ease: "easeOut" }}
+                    className={`group block rounded-xl border ${d.border} bg-white/5 hover:bg-white/10 p-5 transition-colors border-l-2 ${d.borderStrong}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-sm font-medium text-slate-100 leading-snug">
+                        {r.name}
+                      </h3>
+                      <ExternalLink className="h-3.5 w-3.5 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5" />
+                    </div>
+                    <p className="mt-2 text-xs text-slate-400 leading-relaxed line-clamp-2">
+                      {r.description}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      {langColor ? (
+                        <LangBadge label={r.language} hex={langColor} />
+                      ) : (
+                        <span className="text-xs font-mono text-slate-500">&mdash;</span>
+                      )}
+                      <div className="flex items-center gap-3 text-xs font-mono text-slate-500 shrink-0">
+                        <span className="inline-flex items-center gap-1">
+                          <Star className="h-3 w-3" /> {r.stars}
+                        </span>
+                        <span className="hidden sm:inline">{timeAgo(r.updatedAt)}</span>
+                      </div>
+                    </div>
+                  </motion.a>
+                );
+              })}
+            </AnimatePresence>
+          </motion.div>
+        )}
+
+        {status === "ready" && filtered.length === 0 && (
+          <div className="text-center py-16 text-slate-500 font-mono text-sm">
+            no repositories match this query &mdash; try clearing a filter
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================================
+   STATS STRIP (live GitHub totals)
+   ========================================================================= */
+
+function StatCard({ icon: Icon, label, value, domainKey, ready, delay }) {
+  const [inView, setInView] = useState(false);
+  const d = DOMAINS[domainKey];
+  const count = useCountUp(value, ready && inView);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      onViewportEnter={() => setInView(true)}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      className={`rounded-2xl border ${d.border} bg-white/5 p-5 sm:p-6 text-center`}
+    >
+      <Icon className={`h-4 w-4 ${d.text} mx-auto mb-3`} strokeWidth={1.75} />
+      <div className="font-mono text-3xl sm:text-4xl font-semibold text-slate-100 tabular-nums">
+        {ready ? count.toLocaleString() : (
+          <span className="inline-block h-8 w-16 rounded bg-white/10 animate-pulse align-middle" />
+        )}
+      </div>
+      <div className="mt-2 text-xs font-mono tracking-widest text-slate-400 uppercase">
+        {label}
+      </div>
+    </motion.div>
+  );
+}
+
+function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
+  const ready = repoStatus === "ready" && profileStatus === "ready";
+  const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
+  const totalForks = repos.reduce((sum, r) => sum + r.forks, 0);
+  const followers = profile ? profile.followers : 0;
+
+  return (
+    <section className="relative px-5 sm:px-8 -mt-6 sm:-mt-8 mb-4">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="systems" ready={ready} delay={0} />
+          <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.08} />
+          <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.16} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================================
+   CONTACT / FOOTER
+   ========================================================================= */
+
+function Contact() {
+  return (
+    <section id="contact" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
+      <div className="mx-auto max-w-6xl">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-8 sm:p-14 text-center"
+        >
+          <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-4">
+            uplink established
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-slate-50">
+            Let&rsquo;s build something
+            <br className="hidden sm:block" /> that ships.
+          </h2>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <motion.a
+              href={`mailto:${EMAIL}`}
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-900 px-5 py-3 text-sm font-medium hover:bg-white transition-colors"
+            >
+              <Mail className="h-4 w-4" /> {EMAIL}
+            </motion.a>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <motion.a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
+            >
+              <Github className="h-3.5 w-3.5" /> github.com/death7654
+            </motion.a>
+            <motion.a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
+            >
+              <Linkedin className="h-3.5 w-3.5" /> linkedin.com/in/robinsonarysseril
+            </motion.a>
+          </div>
+        </motion.div>
+
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-slate-500">
+          <span>&copy; {new Date().getFullYear()} Robinson George Arysseril</span>
+          <span>Built with React &middot; Tailwind &middot; Framer Motion</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================================
+   APP
+   ========================================================================= */
+
+export default function Portfolio() {
+  const [booting, setBooting] = useState(true);
+  const [activeDomain, setActiveDomain] = useState(null);
+  const doneRef = useRef(false);
+
+  const { status: repoStatus, repos, error: repoError } = useGithubRepos(GH_USERNAME);
+  const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
+
+  const handleDone = () => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    setBooting(false);
+  };
+
+  return (
+    <div
+      style={{ backgroundColor: "#0B0F19" }}
+      className="min-h-screen w-full text-slate-200 antialiased selection:bg-cyan-400/30 selection:text-white"
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+        * { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+        .font-mono, code, pre { font-family: 'JetBrains Mono', ui-monospace, monospace !important; }
+        html { scroll-behavior: smooth; }
+        .name-shimmer {
+          background-size: 200% auto;
+          animation: shimmer 7s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+          0% { background-position: 0% center; }
+          50% { background-position: 100% center; }
+          100% { background-position: 0% center; }
+        }
+        @keyframes softPulse {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.15); }
+        }
+        .pulse-dot { animation: softPulse 2.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+      `}</style>
+
+      <AnimatePresence>{booting && <BootSequence onDone={handleDone} />}</AnimatePresence>
+
+      {/* ambient background glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <motion.div
+          className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl"
+          animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"
+          animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-slate-400/5 blur-3xl"
+          animate={{ x: [0, 25, 0], y: [0, -20, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
+      <ScrollProgress />
+
+      <div className="relative">
+        <Header />
+        <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
+        <StatsStrip
+          repoStatus={repoStatus}
+          repos={repos}
+          profileStatus={profileStatus}
+          profile={profile}
+        />
+        <FeaturedProjects activeDomain={activeDomain} />
+        <Experience />
+        <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
+        <Contact />
+      </div>
+    </div>
+  );
+}
