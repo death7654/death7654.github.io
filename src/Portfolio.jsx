@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useContext, createContext } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   Github,
@@ -205,16 +205,6 @@ function inferDomain(language) {
 }
 
 const GITHUB_URL = `https://github.com/${GH_USERNAME}`;
-
-// The whole site scrolls inside one simulated desktop "window" rather than the
-// document body. This context hands the window's scroll container ref down to
-// every whileInView animation so Framer Motion measures intersection against
-// that window instead of the full browser viewport.
-const ScrollRootContext = createContext(null);
-function useScrollRoot() {
-  return useContext(ScrollRootContext);
-}
-
 const LINKEDIN_URL = "https://linkedin.com/in/robinsonarysseril";
 const EMAIL = "robinsongeorgearysseril301@gmail.com";
 
@@ -305,7 +295,7 @@ function BootSequence({ onDone }) {
   return (
     <motion.div
       style={{ backgroundColor: "#05070C", zIndex: 100 }}
-      className="absolute inset-0 flex items-center justify-center px-6 cursor-pointer overflow-hidden"
+      className="fixed inset-0 flex items-center justify-center px-6 cursor-pointer overflow-hidden"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       onClick={() => setSkip(true)}
@@ -382,13 +372,44 @@ function SectionHeading({ eyebrow, title, subtitle }) {
   );
 }
 
-function ScrollProgress({ containerRef }) {
-  const { scrollYProgress } = useScroll({ container: containerRef });
+const WINDOW_ACCENTS = {
+  cyan: "border-cyan-400/25 shadow-cyan-500/10",
+  emerald: "border-emerald-400/25 shadow-emerald-500/10",
+  violet: "border-violet-400/25 shadow-violet-500/10",
+  amber: "border-amber-400/25 shadow-amber-500/10",
+};
+
+// Wraps a section's content so it reads as its own little desktop app window
+// scrolled into view \u2014 titlebar, traffic lights, app name \u2014 reinforcing the
+// "browsing a desktop full of open apps" feel as you scroll down the page.
+function WindowFrame({ title, accent = "cyan", children }) {
+  const ring = WINDOW_ACCENTS[accent] || WINDOW_ACCENTS.cyan;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className={`rounded-2xl border ${ring} bg-white/5 shadow-2xl overflow-hidden`}
+    >
+      <div className="flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 sm:px-5 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+        <span className="ml-2 font-mono text-xs text-slate-400 truncate">{title}</span>
+      </div>
+      <div className="p-5 sm:p-8 md:p-10">{children}</div>
+    </motion.div>
+  );
+}
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 280, damping: 40, mass: 0.2 });
   return (
     <motion.div
-      style={{ scaleX }}
-      className="sticky top-0 inset-x-0 z-30 h-0.5 origin-left bg-gradient-to-r from-cyan-400 via-slate-200 to-emerald-400"
+      style={{ scaleX, zIndex: 60 }}
+      className="fixed top-0 inset-x-0 h-0.5 origin-left bg-gradient-to-r from-cyan-400 via-slate-200 to-emerald-400"
     />
   );
 }
@@ -408,7 +429,14 @@ const NAV_LINKS = [
 
 function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [time, setTime] = useState(() => new Date());
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000 * 15);
@@ -425,17 +453,16 @@ function Header() {
 
   return (
     <>
-      {/* This toolbar is the site's "header" \u2014 it lives INSIDE the window,
-          directly under the titlebar, like a browser/app chrome row rather
-          than a page-spanning navbar. */}
-      <motion.div
-        initial={{ y: -10, opacity: 0 }}
+      <motion.header
+        initial={{ y: -56, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-        style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
-        className="relative z-20 shrink-0 border-b border-white/10"
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{ backgroundColor: scrolled ? "rgba(11, 15, 25, 0.72)" : "transparent" }}
+        className={`fixed top-0 inset-x-0 z-50 transition-colors duration-300 ${
+          scrolled ? "backdrop-blur-xl border-b border-white/10" : ""
+        }`}
       >
-        <div className="px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
           <button
             onClick={() => go("#top")}
             className="flex items-center gap-2 font-mono text-sm text-slate-200"
@@ -480,25 +507,23 @@ function Header() {
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
-      </motion.div>
+      </motion.header>
 
-      {/* mobile nav overlay \u2014 absolutely positioned so it stays clipped to
-          the window/screen it lives inside, instead of covering the whole page */}
       <AnimatePresence>
         {open && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ backgroundColor: "rgba(5, 7, 12, 0.97)" }}
-            className="absolute inset-0 z-40 backdrop-blur-md md:hidden"
+            style={{ backgroundColor: "rgba(5, 7, 12, 0.95)" }}
+            className="fixed inset-0 z-40 backdrop-blur-md md:hidden"
           >
             <motion.div
               initial={{ y: -16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -16, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="flex flex-col pt-16 px-8 gap-1"
+              className="flex flex-col pt-24 px-8 gap-1"
             >
               {NAV_LINKS.map((l, i) => (
                 <button
@@ -531,9 +556,8 @@ function Header() {
    ========================================================================= */
 
 function Hero({ activeDomain, setActiveDomain }) {
-  const scrollRoot = useScrollRoot();
   return (
-    <section id="top" className="relative pt-16 sm:pt-20 pb-20 px-5 sm:px-8">
+    <section id="top" className="relative pt-32 sm:pt-40 pb-20 px-5 sm:px-8">
       <div className="mx-auto max-w-6xl">
         <motion.div
           initial="hidden"
@@ -543,6 +567,19 @@ function Hero({ activeDomain, setActiveDomain }) {
             show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
           }}
         >
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="mb-6 flex items-center gap-2 rounded-t-xl border border-b-0 border-white/10 bg-white/5 px-4 py-2.5 max-w-md"
+          >
+            <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+            <span className="ml-2 font-mono text-xs text-slate-400 truncate">
+              robinson@systems: ~/portfolio
+            </span>
+          </motion.div>
+
           <motion.div
             variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -686,7 +723,7 @@ function Hero({ activeDomain, setActiveDomain }) {
                   key={d.key}
                   initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: isDimmed ? 0.45 : 1, y: 0 }}
-                  viewport={{ root: scrollRoot, once: true, margin: "-60px" }}
+                  viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.5, delay: di * 0.08, ease: "easeOut" }}
                   onClick={() => setActiveDomain(isActive ? null : d.key)}
                   whileHover={{ y: -5, scale: 1.015 }}
@@ -738,10 +775,10 @@ function Hero({ activeDomain, setActiveDomain }) {
    ========================================================================= */
 
 function FeaturedProjects({ activeDomain }) {
-  const scrollRoot = useScrollRoot();
   return (
     <section id="work" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
+        <WindowFrame title="showcase.app — ~/featured" accent="cyan">
           <SectionHeading
             eyebrow="Featured masterpieces"
             title="Built from first principles"
@@ -758,7 +795,7 @@ function FeaturedProjects({ activeDomain }) {
                   key={p.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
-                  viewport={{ root: scrollRoot, once: true, margin: "-80px" }}
+                  viewport={{ once: true, margin: "-80px" }}
                   whileHover={{ y: -4, boxShadow: d.glowShadow }}
                   transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
                   className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
@@ -767,7 +804,7 @@ function FeaturedProjects({ activeDomain }) {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.7 }}
                       whileInView={{ opacity: 0.4, scale: 1 }}
-                      viewport={{ root: scrollRoot, once: true }}
+                      viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
                       className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
                     >
@@ -805,6 +842,7 @@ function FeaturedProjects({ activeDomain }) {
               );
             })}
           </div>
+        </WindowFrame>
       </div>
     </section>
   );
@@ -815,16 +853,16 @@ function FeaturedProjects({ activeDomain }) {
    ========================================================================= */
 
 function Experience() {
-  const scrollRoot = useScrollRoot();
   return (
     <section id="experience" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
+        <WindowFrame title="timeline.app — ~/experience" accent="violet">
           <SectionHeading eyebrow="Track record" title="Experience" />
           <div className="relative pl-6 sm:pl-10 space-y-12">
           <motion.div
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
-            viewport={{ root: scrollRoot, once: true, margin: "-40px" }}
+            viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 1, ease: "easeOut" }}
             style={{ originY: 0 }}
             className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-400/50 via-white/10 to-emerald-400/40"
@@ -836,14 +874,14 @@ function Experience() {
                 key={e.role + e.org}
                 initial={{ opacity: 0, x: -12 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ root: scrollRoot, once: true, margin: "-80px" }}
+                viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.5, delay: i * 0.15 }}
                 className="relative"
               >
                 <motion.span
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
-                  viewport={{ root: scrollRoot, once: true, margin: "-80px" }}
+                  viewport={{ once: true, margin: "-80px" }}
                   transition={{ duration: 0.4, delay: i * 0.15 + 0.2, ease: "backOut" }}
                   style={{ boxShadow: "0 0 0 4px #0B0F19" }}
                   className={`absolute -left-8 sm:-left-11 top-1.5 h-3 w-3 rounded-full ${d.dot}`}
@@ -857,7 +895,7 @@ function Experience() {
                       key={pt}
                       initial={{ opacity: 0, x: -8 }}
                       whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ root: scrollRoot, once: true, margin: "-80px" }}
+                      viewport={{ once: true, margin: "-80px" }}
                       transition={{ duration: 0.4, delay: i * 0.15 + 0.3 + pi * 0.06 }}
                       className="flex gap-2 text-sm text-slate-300 leading-relaxed"
                     >
@@ -870,6 +908,7 @@ function Experience() {
             );
           })}
         </div>
+        </WindowFrame>
       </div>
     </section>
   );
@@ -1034,6 +1073,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
   return (
     <section id="archive" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
+        <WindowFrame title="file-manager.app — ~/repositories" accent="amber">
         <SectionHeading
           eyebrow="Live from the GitHub API"
           title="All open source repositories"
@@ -1209,6 +1249,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
             no repositories match this query &mdash; try clearing a filter
           </div>
         )}
+        </WindowFrame>
       </div>
     </section>
   );
@@ -1219,7 +1260,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
    ========================================================================= */
 
 function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix }) {
-  const scrollRoot = useScrollRoot();
   const [inView, setInView] = useState(false);
   const d = DOMAINS[domainKey];
   const count = useCountUp(value, ready && inView);
@@ -1228,7 +1268,7 @@ function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix })
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ root: scrollRoot, once: true, margin: "-60px" }}
+      viewport={{ once: true, margin: "-60px" }}
       onViewportEnter={() => setInView(true)}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.55, delay, ease: "easeOut" }}
@@ -1264,6 +1304,7 @@ function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
   return (
     <section id="stats" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
+        <WindowFrame title="github-stats.app — live" accent="emerald">
           <SectionHeading
             eyebrow="Synced with GitHub"
             title="Stats, live"
@@ -1274,6 +1315,7 @@ function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
             <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.1} />
             <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
           </div>
+        </WindowFrame>
       </div>
     </section>
   );
@@ -1287,6 +1329,7 @@ function Contact() {
   return (
     <section id="contact" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
+        <WindowFrame title="mail.app — compose" accent="cyan">
           <div className="rounded-2xl bg-gradient-to-br from-white/5 to-transparent px-4 py-6 sm:py-8 text-center">
             <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-4">
               uplink established
@@ -1328,6 +1371,7 @@ function Contact() {
               </motion.a>
             </div>
           </div>
+        </WindowFrame>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-slate-500">
           <span>&copy; {new Date().getFullYear()} Robinson</span>
@@ -1346,7 +1390,6 @@ export default function Portfolio() {
   const [phase, setPhase] = useState("kernel"); // "kernel" -> "ready"
   const [activeDomain, setActiveDomain] = useState(null);
   const kernelDoneRef = useRef(false);
-  const scrollRef = useRef(null);
 
   const { status: repoStatus, repos, error: repoError } = useGithubRepos(GH_USERNAME);
   const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
@@ -1359,18 +1402,15 @@ export default function Portfolio() {
 
   return (
     <div
-      style={{
-        background:
-          "radial-gradient(120% 140% at 50% 0%, #14171d 0%, #0a0b0e 55%, #050506 100%)",
-      }}
-      className="fixed inset-0 w-full h-full text-slate-200 antialiased selection:bg-cyan-400/30 selection:text-white overflow-hidden flex items-center justify-center p-2 sm:p-5 md:p-8"
+      style={{ backgroundColor: "#0B0F19" }}
+      className="min-h-screen w-full text-slate-200 antialiased selection:bg-cyan-400/30 selection:text-white"
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
         * { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
         .font-mono, code, pre { font-family: 'JetBrains Mono', ui-monospace, monospace !important; }
         html { scroll-behavior: smooth; }
-        html, body { scrollbar-width: none; -ms-overflow-style: none; overflow: hidden; height: 100%; }
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
         html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
         *::-webkit-scrollbar { width: 0; height: 0; }
         * { scrollbar-width: none; }
@@ -1393,133 +1433,56 @@ export default function Portfolio() {
         }
       `}</style>
 
-      {/* faint ambient desk glow behind the monitor */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-[8%] -translate-x-1/2 h-[60%] w-[70%] rounded-full bg-cyan-500/[0.07] blur-[110px]" />
-        <div className="absolute left-1/2 bottom-0 -translate-x-1/2 h-[40%] w-[50%] rounded-full bg-emerald-400/[0.05] blur-[110px]" />
+      <AnimatePresence>
+        {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
+      </AnimatePresence>
+
+      {/* ambient background glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <motion.div
+          className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
+          animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
+          animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
+          animate={{ x: [0, 25, 0], y: [0, -20, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
       </div>
 
-      {/* ============================= MONITOR ============================= */}
-      <div className="relative z-10 w-full h-full max-w-[1680px] flex flex-col items-center">
-        {/* bezel */}
-        <div
-          style={{
-            background: "linear-gradient(180deg, #21252d 0%, #14161b 55%, #0c0d10 100%)",
-          }}
-          className="relative flex-1 min-h-0 w-full rounded-[20px] sm:rounded-[30px] p-[9px] sm:p-[15px] md:p-[19px] shadow-[0_50px_120px_-30px_rgba(0,0,0,0.9)] ring-1 ring-black/70 border border-white/[0.06]"
+      <ScrollProgress />
+
+      {/* Main site only mounts once the "desktop" has finished loading, so every
+          section's own entrance animation plays fresh \u2014 like a DE finishing
+          startup and windows fading/opening into place. Opacity-only (no scale)
+          so it doesn't distort viewport measurements for child scroll animations. */}
+      {phase === "ready" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="relative"
         >
-          {/* top bezel camera */}
-          <div className="hidden sm:block absolute top-2 md:top-2.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-black ring-1 ring-white/10" />
-          {/* bottom bezel brand etch */}
-          <div className="hidden sm:block absolute bottom-1.5 md:bottom-2 left-1/2 -translate-x-1/2 font-mono text-[8px] md:text-[9px] tracking-[0.35em] text-white/[0.09] uppercase select-none">
-            r.g.a.&nbsp;display
-          </div>
-
-          {/* screen */}
-          <div className="relative h-full w-full rounded-[12px] sm:rounded-[18px] overflow-hidden bg-[#05070C] ring-1 ring-black">
-            {/* wallpaper, lives on the "desktop" behind the window */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <motion.div
-                className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
-                animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
-                transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <motion.div
-                className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
-                animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
-                transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <motion.div
-                className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
-                animate={{ x: [0, 25, 0], y: [0, -20, 0] }}
-                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-              />
-            </div>
-
-            <AnimatePresence>
-              {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
-            </AnimatePresence>
-
-            {/* The whole site lives inside ONE simulated desktop window with its
-                own internal scrolling \u2014 titlebar, header/toolbar, and the
-                page content all inside that single window, like a little
-                embedded desktop environment shown on the monitor's screen. */}
-            {phase === "ready" && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="relative z-10 h-full w-full flex items-center justify-center px-1.5 sm:px-5 py-1.5 sm:py-4"
-              >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.97, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ backgroundColor: "rgba(11, 15, 25, 0.97)" }}
-                  className="relative flex flex-col w-full h-full max-w-6xl min-h-0 rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
-                >
-                  {/* window titlebar */}
-                  <div className="shrink-0 flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 sm:px-5 py-2.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
-                    <span className="ml-2 font-mono text-xs text-slate-400 truncate">
-                      robinson@systems: ~/portfolio
-                    </span>
-                  </div>
-
-                  {/* header now lives inside the window, right under the titlebar */}
-                  <Header />
-
-                  {/* scrollable window body \u2014 this is the one window everything lives in */}
-                  <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-                    <ScrollRootContext.Provider value={scrollRef}>
-                      <ScrollProgress containerRef={scrollRef} />
-                      <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
-                      <StatsStrip
-                        repoStatus={repoStatus}
-                        repos={repos}
-                        profileStatus={profileStatus}
-                        profile={profile}
-                      />
-                      <FeaturedProjects activeDomain={activeDomain} />
-                      <Experience />
-                      <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
-                      <Contact />
-                    </ScrollRootContext.Provider>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-
-            {/* glass screen effect \u2014 subtle glare + CRT vignette, sits above
-                everything else on the screen */}
-            <div className="pointer-events-none absolute inset-0 z-30 bg-gradient-to-br from-white/[0.05] via-transparent to-transparent" />
-            <div
-              className="pointer-events-none absolute inset-0 z-30"
-              style={{ boxShadow: "inset 0 0 90px 18px rgba(0,0,0,0.55)" }}
-            />
-          </div>
-        </div>
-
-        {/* stand */}
-        <div className="hidden sm:flex flex-col items-center shrink-0">
-          <div
-            className="h-5 md:h-7 w-14 md:w-16"
-            style={{
-              background: "linear-gradient(180deg, #22262e, #0d0f13)",
-              clipPath: "polygon(38% 0, 62% 0, 78% 100%, 22% 100%)",
-            }}
+          <Header />
+          <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
+          <StatsStrip
+            repoStatus={repoStatus}
+            repos={repos}
+            profileStatus={profileStatus}
+            profile={profile}
           />
-          <div
-            className="h-2.5 md:h-3 w-36 md:w-44 rounded-full"
-            style={{
-              background: "linear-gradient(180deg, #282c35, #0b0d11)",
-              boxShadow: "0 10px 24px -8px rgba(0,0,0,0.75)",
-            }}
-          />
-        </div>
-      </div>
+          <FeaturedProjects activeDomain={activeDomain} />
+          <Experience />
+          <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
+          <Contact />
+        </motion.div>
+      )}
     </div>
   );
 }
