@@ -620,14 +620,16 @@ function Hero({ activeDomain, setActiveDomain }) {
                 transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
               />
             </motion.div>
-
+            <h1 className="relative z-10 text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-tight">
+              Robinson George
+            </h1>
             <h1 className="relative z-10 text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-tight">
               <motion.span
                 className="name-shimmer inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-emerald-300"
                 variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}
                 transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               >
-                Robinson
+              Arysseril
               </motion.span>
             </h1>
           </div>
