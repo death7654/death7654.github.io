@@ -31,9 +31,9 @@ const DOMAINS = {
     short: "Systems / Emulation",
     hex: "#22D3EE",
     text: "text-cyan-300",
-    borderStrong: "border-cyan-400/60",
-    border: "border-cyan-400/20",
-    bg: "bg-cyan-400/10",
+    borderStrong: "border-cyan-400/70",
+    border: "border-cyan-400/25",
+    bg: "bg-cyan-400/15",
     dot: "bg-cyan-400",
     glowShadow: "0 0 40px -8px rgba(34,211,238,0.35)",
   },
@@ -43,9 +43,9 @@ const DOMAINS = {
     short: "AI / ML",
     hex: "#34D399",
     text: "text-emerald-300",
-    borderStrong: "border-emerald-400/60",
-    border: "border-emerald-400/20",
-    bg: "bg-emerald-400/10",
+    borderStrong: "border-emerald-400/70",
+    border: "border-emerald-400/25",
+    bg: "bg-emerald-400/15",
     dot: "bg-emerald-400",
     glowShadow: "0 0 40px -8px rgba(52,211,153,0.35)",
   },
@@ -55,9 +55,9 @@ const DOMAINS = {
     short: "Web / Tooling",
     hex: "#CBD5E1",
     text: "text-slate-300",
-    borderStrong: "border-slate-300/60",
-    border: "border-slate-300/20",
-    bg: "bg-slate-300/10",
+    borderStrong: "border-slate-300/70",
+    border: "border-slate-300/25",
+    bg: "bg-slate-300/15",
     dot: "bg-slate-300",
     glowShadow: "0 0 40px -8px rgba(203,213,225,0.25)",
   },
@@ -334,91 +334,6 @@ function BootSequence({ onDone }) {
   );
 }
 
-const DESKTOP_STATUS_LINES = [
-  "Starting Wayland compositor\u2026",
-  "Loading window manager\u2026",
-  "Mounting user session\u2026",
-  "Initializing status panel\u2026",
-  "Restoring workspace\u2026",
-  "Welcome, robinson.",
-];
-
-function DesktopSplash({ onDone }) {
-  const [statusIndex, setStatusIndex] = useState(0);
-  const [skip, setSkip] = useState(false);
-  const pct = useCountUp(100, true, 1500);
-
-  useEffect(() => {
-    const reduced =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      onDone();
-      return;
-    }
-    const t = setTimeout(onDone, 1650);
-    return () => clearTimeout(t);
-  }, [onDone]);
-
-  useEffect(() => {
-    if (statusIndex >= DESKTOP_STATUS_LINES.length - 1) return;
-    const t = setTimeout(() => setStatusIndex((i) => i + 1), 260);
-    return () => clearTimeout(t);
-  }, [statusIndex]);
-
-  useEffect(() => {
-    if (skip) onDone();
-  }, [skip, onDone]);
-
-  return (
-    <motion.div
-      style={{ backgroundColor: "#05070C", zIndex: 99 }}
-      className="fixed inset-0 flex flex-col items-center justify-center px-6 cursor-pointer"
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
-      onClick={() => setSkip(true)}
-    >
-      <div className="relative flex h-20 w-20 items-center justify-center mb-8">
-        <motion.span
-          className="absolute inset-0 rounded-full border-2 border-cyan-400/20 border-t-cyan-400"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.1, repeat: Infinity, ease: "linear" }}
-        />
-        <Terminal className="h-7 w-7 text-cyan-300" strokeWidth={1.5} />
-      </div>
-
-      <div className="font-mono text-xs tracking-widest text-slate-500 uppercase mb-2">
-        R.G.A. Desktop Environment
-      </div>
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={statusIndex}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.25 }}
-          className="font-mono text-sm text-slate-200 h-5"
-        >
-          {DESKTOP_STATUS_LINES[statusIndex]}
-        </motion.div>
-      </AnimatePresence>
-
-      <div className="mt-8 h-0.5 w-48 rounded-full bg-white/10 overflow-hidden">
-        <div
-          className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-
-      <div className="mt-10 text-xs tracking-widest text-slate-600 uppercase">
-        tap anywhere to skip
-      </div>
-    </motion.div>
-  );
-}
-
 /* =========================================================================
    SHARED BITS
    ========================================================================= */
@@ -454,6 +369,37 @@ function SectionHeading({ eyebrow, title, subtitle }) {
         </p>
       )}
     </div>
+  );
+}
+
+const WINDOW_ACCENTS = {
+  cyan: "border-cyan-400/25 shadow-cyan-500/10",
+  emerald: "border-emerald-400/25 shadow-emerald-500/10",
+  violet: "border-violet-400/25 shadow-violet-500/10",
+  amber: "border-amber-400/25 shadow-amber-500/10",
+};
+
+// Wraps a section's content so it reads as its own little desktop app window
+// scrolled into view \u2014 titlebar, traffic lights, app name \u2014 reinforcing the
+// "browsing a desktop full of open apps" feel as you scroll down the page.
+function WindowFrame({ title, accent = "cyan", children }) {
+  const ring = WINDOW_ACCENTS[accent] || WINDOW_ACCENTS.cyan;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className={`rounded-2xl border ${ring} bg-white/5 shadow-2xl overflow-hidden`}
+    >
+      <div className="flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 sm:px-5 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+        <span className="ml-2 font-mono text-xs text-slate-400 truncate">{title}</span>
+      </div>
+      <div className="p-5 sm:p-8 md:p-10">{children}</div>
+    </motion.div>
   );
 }
 
@@ -643,52 +589,45 @@ function Hero({ activeDomain, setActiveDomain }) {
           </motion.div>
 
           <div className="relative">
-            <div
+            <motion.div
+              variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
+              transition={{ duration: 1.1, ease: "easeOut" }}
               className="pointer-events-none absolute -inset-x-10 -inset-y-16 sm:-inset-y-24 -z-10 overflow-hidden"
               aria-hidden="true"
             >
               <motion.div
-                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-cyan-400/30 blur-3xl mix-blend-screen"
+                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-cyan-400/50 blur-3xl mix-blend-screen"
                 style={{ left: "2%", top: "8%" }}
                 animate={{ x: [0, 60, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.15, 0.95, 1] }}
                 transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-emerald-400/25 blur-3xl mix-blend-screen"
+                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-emerald-400/45 blur-3xl mix-blend-screen"
                 style={{ right: "6%", top: "0%" }}
                 animate={{ x: [0, -50, 30, 0], y: [0, 40, -20, 0], scale: [1, 0.9, 1.1, 1] }}
                 transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute h-48 w-48 sm:h-64 sm:w-64 rounded-full bg-violet-400/20 blur-3xl mix-blend-screen"
+                className="absolute h-48 w-48 sm:h-64 sm:w-64 rounded-full bg-violet-400/40 blur-3xl mix-blend-screen"
                 style={{ left: "32%", bottom: "-15%" }}
                 animate={{ x: [0, 30, -40, 0], y: [0, -20, 30, 0], scale: [1, 1.1, 0.9, 1] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute h-40 w-40 sm:h-56 sm:w-56 rounded-full bg-pink-400/15 blur-3xl mix-blend-screen"
+                className="absolute h-40 w-40 sm:h-56 sm:w-56 rounded-full bg-pink-400/35 blur-3xl mix-blend-screen"
                 style={{ right: "22%", bottom: "-20%" }}
                 animate={{ x: [0, -25, 15, 0], y: [0, 25, -15, 0], scale: [1, 0.95, 1.1, 1] }}
                 transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
               />
-            </div>
+            </motion.div>
 
-            <h1 className="relative z-10 text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-slate-50 leading-tight overflow-hidden">
+            <h1 className="relative z-10 text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-tight">
               <motion.span
-                className="block"
-                variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
-                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="name-shimmer inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-emerald-300"
+                variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               >
-                Robinson George
-              </motion.span>
-              <motion.span
-                className="block"
-                variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
-                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <span className="name-shimmer inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-slate-200 to-emerald-300">
-                  Arysseril
-                </span>
+                Robinson
               </motion.span>
             </h1>
           </div>
@@ -839,69 +778,71 @@ function FeaturedProjects({ activeDomain }) {
   return (
     <section id="work" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          eyebrow="Featured masterpieces"
-          title="Built from first principles"
-          subtitle="Five projects spanning the register-level and the runtime &mdash; kernels, cartridges, and cabinets, reconstructed from datasheets and reference manuals rather than tutorials."
-        />
+        <WindowFrame title="showcase.app — ~/featured" accent="cyan">
+          <SectionHeading
+            eyebrow="Featured masterpieces"
+            title="Built from first principles"
+            subtitle="Five projects spanning the register-level and the runtime &mdash; kernels, cartridges, and cabinets, reconstructed from datasheets and reference manuals rather than tutorials."
+          />
 
-        <div className="space-y-4">
-          {FEATURED.map((p, i) => {
-            const d = DOMAINS[p.domain];
-            const dimmed = activeDomain && activeDomain !== p.domain;
-            return (
-              <motion.div
-                layoutId={`feature-${p.id}`}
-                key={p.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                whileHover={{ y: -4, boxShadow: d.glowShadow }}
-                transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
-                className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
-              >
-                <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    whileInView={{ opacity: 0.4, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
-                    className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
-                  >
-                    {p.index}
-                  </motion.div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
-                        {p.title}
-                      </h3>
-                      <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
+          <div className="space-y-4">
+            {FEATURED.map((p, i) => {
+              const d = DOMAINS[p.domain];
+              const dimmed = activeDomain && activeDomain !== p.domain;
+              return (
+                <motion.div
+                  layoutId={`feature-${p.id}`}
+                  key={p.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  whileHover={{ y: -4, boxShadow: d.glowShadow }}
+                  transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
+                  className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
+                >
+                  <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.7 }}
+                      whileInView={{ opacity: 0.4, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
+                      className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
+                    >
+                      {p.index}
+                    </motion.div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
+                          {p.title}
+                        </h3>
+                        <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
+                      </div>
+                      <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
+                        {p.description}
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {p.languages.map((l) => (
+                          <LangBadge key={l} label={l} domain={p.domain} />
+                        ))}
+                      </div>
                     </div>
-                    <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
-                      {p.description}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {p.languages.map((l) => (
-                        <LangBadge key={l} label={l} domain={p.domain} />
-                      ))}
-                    </div>
+                    <motion.a
+                      href={p.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="shrink-0 self-start md:self-center flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 group-hover:text-slate-100 group-hover:border-white/25 transition-colors overflow-hidden"
+                    >
+                      <Code2 className="h-3.5 w-3.5" /> Source
+                      <ArrowUpRight className="h-3.5 w-3.5 -ml-3 opacity-0 -translate-x-1 group-hover:ml-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                    </motion.a>
                   </div>
-                  <motion.a
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="shrink-0 self-start md:self-center flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 group-hover:text-slate-100 group-hover:border-white/25 transition-colors overflow-hidden"
-                  >
-                    <Code2 className="h-3.5 w-3.5" /> Source
-                    <ArrowUpRight className="h-3.5 w-3.5 -ml-3 opacity-0 -translate-x-1 group-hover:ml-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                  </motion.a>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </WindowFrame>
       </div>
     </section>
   );
@@ -915,8 +856,9 @@ function Experience() {
   return (
     <section id="experience" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <SectionHeading eyebrow="Track record" title="Experience" />
-        <div className="relative pl-6 sm:pl-10 space-y-12">
+        <WindowFrame title="timeline.app — ~/experience" accent="violet">
+          <SectionHeading eyebrow="Track record" title="Experience" />
+          <div className="relative pl-6 sm:pl-10 space-y-12">
           <motion.div
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
@@ -966,6 +908,7 @@ function Experience() {
             );
           })}
         </div>
+        </WindowFrame>
       </div>
     </section>
   );
@@ -1130,6 +1073,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
   return (
     <section id="archive" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
+        <WindowFrame title="file-manager.app — ~/repositories" accent="amber">
         <SectionHeading
           eyebrow="Live from the GitHub API"
           title="All open source repositories"
@@ -1305,6 +1249,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
             no repositories match this query &mdash; try clearing a filter
           </div>
         )}
+        </WindowFrame>
       </div>
     </section>
   );
@@ -1359,16 +1304,18 @@ function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
   return (
     <section id="stats" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          eyebrow="Synced with GitHub"
-          title="Stats, live"
-          subtitle="Pulled straight from the GitHub API on page load — no manually updated numbers."
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-          <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="systems" ready={ready} delay={0} />
-          <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.1} />
-          <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
-        </div>
+        <WindowFrame title="github-stats.app — live" accent="emerald">
+          <SectionHeading
+            eyebrow="Synced with GitHub"
+            title="Stats, live"
+            subtitle="Pulled straight from the GitHub API on page load — no manually updated numbers."
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="systems" ready={ready} delay={0} />
+            <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.1} />
+            <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
+          </div>
+        </WindowFrame>
       </div>
     </section>
   );
@@ -1382,56 +1329,52 @@ function Contact() {
   return (
     <section id="contact" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-8 sm:p-14 text-center"
-        >
-          <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-4">
-            uplink established
+        <WindowFrame title="mail.app — compose" accent="cyan">
+          <div className="rounded-2xl bg-gradient-to-br from-white/5 to-transparent px-4 py-6 sm:py-8 text-center">
+            <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-4">
+              uplink established
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-slate-50">
+              Let&rsquo;s build something
+              <br className="hidden sm:block" /> that ships.
+            </h2>
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+              <motion.a
+                href={`mailto:${EMAIL}`}
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-900 px-5 py-3 text-sm font-medium hover:bg-white transition-colors"
+              >
+                <Mail className="h-4 w-4" /> {EMAIL}
+              </motion.a>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <motion.a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
+              >
+                <Github className="h-3.5 w-3.5" /> github.com/death7654
+              </motion.a>
+              <motion.a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noreferrer"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
+              >
+                <Linkedin className="h-3.5 w-3.5" /> linkedin.com/in/robinsonarysseril
+              </motion.a>
+            </div>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-slate-50">
-            Let&rsquo;s build something
-            <br className="hidden sm:block" /> that ships.
-          </h2>
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <motion.a
-              href={`mailto:${EMAIL}`}
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-900 px-5 py-3 text-sm font-medium hover:bg-white transition-colors"
-            >
-              <Mail className="h-4 w-4" /> {EMAIL}
-            </motion.a>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <motion.a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noreferrer"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.96 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
-            >
-              <Github className="h-3.5 w-3.5" /> github.com/death7654
-            </motion.a>
-            <motion.a
-              href={LINKEDIN_URL}
-              target="_blank"
-              rel="noreferrer"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.96 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
-            >
-              <Linkedin className="h-3.5 w-3.5" /> linkedin.com/in/robinsonarysseril
-            </motion.a>
-          </div>
-        </motion.div>
+        </WindowFrame>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-slate-500">
-          <span>&copy; {new Date().getFullYear()} Robinson George Arysseril</span>
+          <span>&copy; {new Date().getFullYear()} Robinson</span>
           <span>Built with React &middot; Tailwind &middot; Framer Motion</span>
         </div>
       </div>
@@ -1444,10 +1387,9 @@ function Contact() {
    ========================================================================= */
 
 export default function Portfolio() {
-  const [phase, setPhase] = useState("kernel"); // "kernel" -> "desktop" -> "ready"
+  const [phase, setPhase] = useState("kernel"); // "kernel" -> "ready"
   const [activeDomain, setActiveDomain] = useState(null);
   const kernelDoneRef = useRef(false);
-  const desktopDoneRef = useRef(false);
 
   const { status: repoStatus, repos, error: repoError } = useGithubRepos(GH_USERNAME);
   const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
@@ -1455,12 +1397,6 @@ export default function Portfolio() {
   const handleKernelDone = () => {
     if (kernelDoneRef.current) return;
     kernelDoneRef.current = true;
-    setPhase("desktop");
-  };
-
-  const handleDesktopDone = () => {
-    if (desktopDoneRef.current) return;
-    desktopDoneRef.current = true;
     setPhase("ready");
   };
 
@@ -1498,24 +1434,23 @@ export default function Portfolio() {
       `}</style>
 
       <AnimatePresence>
-        {phase === "kernel" && <BootSequence onDone={handleKernelDone} />}
-        {phase === "desktop" && <DesktopSplash onDone={handleDesktopDone} />}
+        {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
       </AnimatePresence>
 
       {/* ambient background glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl"
+          className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
           animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"
+          className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
           animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-slate-400/5 blur-3xl"
+          className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
           animate={{ x: [0, 25, 0], y: [0, -20, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -1525,12 +1460,13 @@ export default function Portfolio() {
 
       {/* Main site only mounts once the "desktop" has finished loading, so every
           section's own entrance animation plays fresh \u2014 like a DE finishing
-          startup and windows fading/opening into place. */}
+          startup and windows fading/opening into place. Opacity-only (no scale)
+          so it doesn't distort viewport measurements for child scroll animations. */}
       {phase === "ready" && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.985 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
           className="relative"
         >
           <Header />
