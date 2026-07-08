@@ -305,7 +305,7 @@ function BootSequence({ onDone }) {
   return (
     <motion.div
       style={{ backgroundColor: "#05070C", zIndex: 100 }}
-      className="fixed inset-0 flex items-center justify-center px-6 cursor-pointer overflow-hidden"
+      className="absolute inset-0 flex items-center justify-center px-6 cursor-pointer overflow-hidden"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       onClick={() => setSkip(true)}
@@ -425,14 +425,17 @@ function Header() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
+      {/* This toolbar is the site's "header" \u2014 it lives INSIDE the window,
+          directly under the titlebar, like a browser/app chrome row rather
+          than a page-spanning navbar. */}
+      <motion.div
+        initial={{ y: -10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        style={{ backgroundColor: "rgba(11, 15, 25, 0.9)" }}
-        className="relative z-20 shrink-0 border-b border-white/10 backdrop-blur-xl"
+        transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+        className="relative z-20 shrink-0 border-b border-white/10"
       >
-        <div className="mx-auto max-w-6xl px-5 sm:px-8 h-14 flex items-center justify-between">
+        <div className="px-4 sm:px-6 h-14 flex items-center justify-between">
           <button
             onClick={() => go("#top")}
             className="flex items-center gap-2 font-mono text-sm text-slate-200"
@@ -477,23 +480,25 @@ function Header() {
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
-      </motion.header>
+      </motion.div>
 
+      {/* mobile nav overlay \u2014 absolutely positioned so it stays clipped to
+          the window/screen it lives inside, instead of covering the whole page */}
       <AnimatePresence>
         {open && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ backgroundColor: "rgba(5, 7, 12, 0.95)" }}
-            className="fixed inset-0 z-40 backdrop-blur-md md:hidden"
+            style={{ backgroundColor: "rgba(5, 7, 12, 0.97)" }}
+            className="absolute inset-0 z-40 backdrop-blur-md md:hidden"
           >
             <motion.div
               initial={{ y: -16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -16, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="flex flex-col pt-24 px-8 gap-1"
+              className="flex flex-col pt-16 px-8 gap-1"
             >
               {NAV_LINKS.map((l, i) => (
                 <button
@@ -1354,8 +1359,11 @@ export default function Portfolio() {
 
   return (
     <div
-      style={{ backgroundColor: "#05070C" }}
-      className="fixed inset-0 w-full text-slate-200 antialiased selection:bg-cyan-400/30 selection:text-white overflow-hidden"
+      style={{
+        background:
+          "radial-gradient(120% 140% at 50% 0%, #14171d 0%, #0a0b0e 55%, #050506 100%)",
+      }}
+      className="fixed inset-0 w-full h-full text-slate-200 antialiased selection:bg-cyan-400/30 selection:text-white overflow-hidden flex items-center justify-center p-2 sm:p-5 md:p-8"
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
@@ -1385,80 +1393,133 @@ export default function Portfolio() {
         }
       `}</style>
 
-      <AnimatePresence>
-        {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
-      </AnimatePresence>
-
-      {/* wallpaper */}
+      {/* faint ambient desk glow behind the monitor */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
-          animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
-          animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
-          animate={{ x: [0, 25, 0], y: [0, -20, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <div className="absolute left-1/2 top-[8%] -translate-x-1/2 h-[60%] w-[70%] rounded-full bg-cyan-500/[0.07] blur-[110px]" />
+        <div className="absolute left-1/2 bottom-0 -translate-x-1/2 h-[40%] w-[50%] rounded-full bg-emerald-400/[0.05] blur-[110px]" />
       </div>
 
-      {/* The whole site lives inside ONE simulated desktop window with its own
-          internal scrolling \u2014 a taskbar up top, one app window below it that
-          you scroll around inside, like a little embedded desktop environment. */}
-      {phase === "ready" && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative z-10 h-full flex flex-col"
+      {/* ============================= MONITOR ============================= */}
+      <div className="relative z-10 w-full h-full max-w-[1680px] flex flex-col items-center">
+        {/* bezel */}
+        <div
+          style={{
+            background: "linear-gradient(180deg, #21252d 0%, #14161b 55%, #0c0d10 100%)",
+          }}
+          className="relative flex-1 min-h-0 w-full rounded-[20px] sm:rounded-[30px] p-[9px] sm:p-[15px] md:p-[19px] shadow-[0_50px_120px_-30px_rgba(0,0,0,0.9)] ring-1 ring-black/70 border border-white/[0.06]"
         >
-          <Header />
-
-          <div className="relative flex-1 min-h-0 flex justify-center px-2 sm:px-6 pb-2 sm:pb-6 pt-2 sm:pt-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.97, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-              style={{ backgroundColor: "rgba(11, 15, 25, 0.97)" }}
-              className="relative flex flex-col w-full max-w-6xl min-h-0 rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
-            >
-              {/* window titlebar */}
-              <div className="shrink-0 flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 sm:px-5 py-3">
-                <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
-                <span className="ml-2 font-mono text-xs text-slate-400 truncate">
-                  robinson@systems: ~/portfolio
-                </span>
-              </div>
-
-              {/* scrollable window body \u2014 this is the one window everything lives in */}
-              <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-                <ScrollRootContext.Provider value={scrollRef}>
-                  <ScrollProgress containerRef={scrollRef} />
-                  <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
-                  <StatsStrip
-                    repoStatus={repoStatus}
-                    repos={repos}
-                    profileStatus={profileStatus}
-                    profile={profile}
-                  />
-                  <FeaturedProjects activeDomain={activeDomain} />
-                  <Experience />
-                  <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
-                  <Contact />
-                </ScrollRootContext.Provider>
-              </div>
-            </motion.div>
+          {/* top bezel camera */}
+          <div className="hidden sm:block absolute top-2 md:top-2.5 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-black ring-1 ring-white/10" />
+          {/* bottom bezel brand etch */}
+          <div className="hidden sm:block absolute bottom-1.5 md:bottom-2 left-1/2 -translate-x-1/2 font-mono text-[8px] md:text-[9px] tracking-[0.35em] text-white/[0.09] uppercase select-none">
+            r.g.a.&nbsp;display
           </div>
-        </motion.div>
-      )}
+
+          {/* screen */}
+          <div className="relative h-full w-full rounded-[12px] sm:rounded-[18px] overflow-hidden bg-[#05070C] ring-1 ring-black">
+            {/* wallpaper, lives on the "desktop" behind the window */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <motion.div
+                className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
+                animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+                transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
+                animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
+                transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
+                animate={{ x: [0, 25, 0], y: [0, -20, 0] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+
+            <AnimatePresence>
+              {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
+            </AnimatePresence>
+
+            {/* The whole site lives inside ONE simulated desktop window with its
+                own internal scrolling \u2014 titlebar, header/toolbar, and the
+                page content all inside that single window, like a little
+                embedded desktop environment shown on the monitor's screen. */}
+            {phase === "ready" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="relative z-10 h-full w-full flex items-center justify-center px-1.5 sm:px-5 py-1.5 sm:py-4"
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.97, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ backgroundColor: "rgba(11, 15, 25, 0.97)" }}
+                  className="relative flex flex-col w-full h-full max-w-6xl min-h-0 rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+                >
+                  {/* window titlebar */}
+                  <div className="shrink-0 flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 sm:px-5 py-2.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+                    <span className="ml-2 font-mono text-xs text-slate-400 truncate">
+                      robinson@systems: ~/portfolio
+                    </span>
+                  </div>
+
+                  {/* header now lives inside the window, right under the titlebar */}
+                  <Header />
+
+                  {/* scrollable window body \u2014 this is the one window everything lives in */}
+                  <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                    <ScrollRootContext.Provider value={scrollRef}>
+                      <ScrollProgress containerRef={scrollRef} />
+                      <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
+                      <StatsStrip
+                        repoStatus={repoStatus}
+                        repos={repos}
+                        profileStatus={profileStatus}
+                        profile={profile}
+                      />
+                      <FeaturedProjects activeDomain={activeDomain} />
+                      <Experience />
+                      <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
+                      <Contact />
+                    </ScrollRootContext.Provider>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+
+            {/* glass screen effect \u2014 subtle glare + CRT vignette, sits above
+                everything else on the screen */}
+            <div className="pointer-events-none absolute inset-0 z-30 bg-gradient-to-br from-white/[0.05] via-transparent to-transparent" />
+            <div
+              className="pointer-events-none absolute inset-0 z-30"
+              style={{ boxShadow: "inset 0 0 90px 18px rgba(0,0,0,0.55)" }}
+            />
+          </div>
+        </div>
+
+        {/* stand */}
+        <div className="hidden sm:flex flex-col items-center shrink-0">
+          <div
+            className="h-5 md:h-7 w-14 md:w-16"
+            style={{
+              background: "linear-gradient(180deg, #22262e, #0d0f13)",
+              clipPath: "polygon(38% 0, 62% 0, 78% 100%, 22% 100%)",
+            }}
+          />
+          <div
+            className="h-2.5 md:h-3 w-36 md:w-44 rounded-full"
+            style={{
+              background: "linear-gradient(180deg, #282c35, #0b0d11)",
+              boxShadow: "0 10px 24px -8px rgba(0,0,0,0.75)",
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
