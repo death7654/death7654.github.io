@@ -165,7 +165,6 @@ const EXPERIENCE = [
 
 const GH_USERNAME = "death7654";
 
-// Real GitHub language colors (subset covering this profile's stack, with a gray fallback)
 const LANGUAGE_COLORS = {
   C: "#555555",
   "C++": "#f34b7d",
@@ -189,9 +188,6 @@ const LANGUAGE_COLORS = {
 };
 const LANGUAGE_FALLBACK_COLOR = "#8b949e";
 
-// Best-effort mapping from a repo's primary language to one of our three domains,
-// so live-fetched repos still slot into the same Systems / AI / Web filter as the
-// hand-written featured projects.
 const SYSTEMS_LANGS = new Set([
   "C", "C++", "Rust", "Zig", "Assembly", "Makefile", "Shell", "Dockerfile", "Nix",
 ]);
@@ -300,7 +296,6 @@ function BootSequence({ onDone }) {
       transition={{ duration: 0.5 }}
       onClick={() => setSkip(true)}
     >
-      {/* CRT scanline overlay */}
       <div
         className="pointer-events-none absolute inset-0 mix-blend-screen"
         style={{
@@ -354,9 +349,14 @@ function LangBadge({ label, domain, hex, size = "sm" }) {
   );
 }
 
-function SectionHeading({ eyebrow, title, subtitle }) {
+function SectionHeading({ eyebrow, title, subtitle, quirk }) {
   return (
-    <div className="mb-10 sm:mb-14">
+    <div className="mb-10 sm:mb-14 relative group">
+      {quirk && (
+        <div className="absolute right-0 top-0 hidden lg:block font-mono text-[10px] text-slate-600 border border-white/5 bg-white/5 rounded px-2 py-0.5 select-none">
+          {quirk}
+        </div>
+      )}
       <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-3">
         {eyebrow}
       </div>
@@ -369,37 +369,6 @@ function SectionHeading({ eyebrow, title, subtitle }) {
         </p>
       )}
     </div>
-  );
-}
-
-const WINDOW_ACCENTS = {
-  cyan: "border-cyan-400/25 shadow-cyan-500/10",
-  emerald: "border-emerald-400/25 shadow-emerald-500/10",
-  violet: "border-violet-400/25 shadow-violet-500/10",
-  amber: "border-amber-400/25 shadow-amber-500/10",
-};
-
-// Wraps a section's content so it reads as its own little desktop app window
-// scrolled into view \u2014 titlebar, traffic lights, app name \u2014 reinforcing the
-// "browsing a desktop full of open apps" feel as you scroll down the page.
-function WindowFrame({ title, accent = "cyan", children }) {
-  const ring = WINDOW_ACCENTS[accent] || WINDOW_ACCENTS.cyan;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`rounded-2xl border ${ring} bg-white/5 shadow-2xl overflow-hidden`}
-    >
-      <div className="flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 sm:px-5 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
-        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
-        <span className="ml-2 font-mono text-xs text-slate-400 truncate">{title}</span>
-      </div>
-      <div className="p-5 sm:p-8 md:p-10">{children}</div>
-    </motion.div>
   );
 }
 
@@ -420,8 +389,8 @@ function ScrollProgress() {
 
 const NAV_LINKS = [
   { label: "Skills", href: "#skills" },
-  { label: "Work", href: "#work" },
   { label: "Stats", href: "#stats" },
+  { label: "Work", href: "#work" },
   { label: "Experience", href: "#experience" },
   { label: "Archive", href: "#archive" },
   { label: "Contact", href: "#contact" },
@@ -491,7 +460,6 @@ function Header() {
             </a>
           </nav>
 
-          {/* systray-style status widget \u2014 desktop-panel flavor */}
           <div className="hidden md:flex items-center gap-2.5 ml-3 pl-3 border-l border-white/10 font-mono text-xs text-slate-400">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 pulse-dot" />
@@ -567,6 +535,7 @@ function Hero({ activeDomain, setActiveDomain }) {
             show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
           }}
         >
+          {/* THE INITIAL WINDOW: This container remains preserved intact */}
           <motion.div
             variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -678,7 +647,6 @@ function Hero({ activeDomain, setActiveDomain }) {
           </motion.div>
         </motion.div>
 
-        {/* Academic strip */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -698,7 +666,6 @@ function Hero({ activeDomain, setActiveDomain }) {
           </div>
         </motion.div>
 
-        {/* Skills grid */}
         <div id="skills" className="mt-20 scroll-mt-24">
           <div className="flex items-end justify-between mb-5 flex-wrap gap-3">
             <h2 className="text-sm font-mono tracking-widest text-slate-400 uppercase">
@@ -773,6 +740,71 @@ function Hero({ activeDomain, setActiveDomain }) {
 }
 
 /* =========================================================================
+   STATS STRIP (live GitHub totals)
+   ========================================================================= */
+
+function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix }) {
+  const [inView, setInView] = useState(false);
+  const d = DOMAINS[domainKey];
+  const count = useCountUp(value, ready && inView);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      onViewportEnter={() => setInView(true)}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.55, delay, ease: "easeOut" }}
+      style={{ boxShadow: "none" }}
+      className={`relative overflow-hidden rounded-2xl border ${d.border} ${d.bg} p-7 sm:p-9 text-center`}
+    >
+      <div className={`mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
+        <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
+      </div>
+      <div className="font-mono text-4xl sm:text-5xl font-semibold text-slate-100 tabular-nums">
+        {ready ? (
+          <>
+            {count.toLocaleString()}
+            {suffix ? <span className={`ml-0.5 ${d.text}`}>{suffix}</span> : null}
+          </>
+        ) : (
+          <span className="inline-block h-10 w-20 rounded bg-white/10 animate-pulse align-middle" />
+        )}
+      </div>
+      <div className="mt-3 text-xs font-mono tracking-widest text-slate-400 uppercase">
+        {label}
+      </div>
+    </motion.div>
+  );
+}
+
+function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
+  const ready = repoStatus === "ready" && profileStatus === "ready";
+  const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
+  const totalForks = repos.reduce((sum, r) => sum + r.forks, 0);
+  const followers = profile ? profile.followers : 0;
+
+  return (
+    <section id="stats" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading
+          eyebrow="Synced with GitHub"
+          title="Stats, live"
+          subtitle="Pulled straight from the GitHub API on page load — no manually updated numbers."
+          quirk="curl -X GET /v3/users/death7654/stats"
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+          <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="systems" ready={ready} delay={0} />
+          <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.1} />
+          <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================================
    FEATURED PROJECTS
    ========================================================================= */
 
@@ -780,71 +812,70 @@ function FeaturedProjects({ activeDomain }) {
   return (
     <section id="work" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <WindowFrame title="showcase.app — ~/featured" accent="cyan">
-          <SectionHeading
-            eyebrow="Featured masterpieces"
-            title="Built from first principles"
-            subtitle="Five projects spanning the register-level and the runtime &mdash; kernels, cartridges, and cabinets, reconstructed from datasheets and reference manuals rather than tutorials."
-          />
+        <SectionHeading
+          eyebrow="Featured masterpieces"
+          title="Built from first principles"
+          subtitle="Five projects spanning the register-level and the runtime &mdash; kernels, cartridges, and cabinets, reconstructed from datasheets and reference manuals rather than tutorials."
+          quirk="ls -la ~/featured/production/"
+        />
 
-          <div className="space-y-4">
-            {FEATURED.map((p, i) => {
-              const d = DOMAINS[p.domain];
-              const dimmed = activeDomain && activeDomain !== p.domain;
-              return (
-                <motion.div
-                  layoutId={`feature-${p.id}`}
-                  key={p.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
-                  viewport={{ once: true, margin: "-80px" }}
-                  whileHover={{ y: -4, boxShadow: d.glowShadow }}
-                  transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
-                  className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
-                >
-                  <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.7 }}
-                      whileInView={{ opacity: 0.4, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
-                      className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
-                    >
-                      {p.index}
-                    </motion.div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
-                          {p.title}
-                        </h3>
-                        <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
-                      </div>
-                      <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
-                        {p.description}
-                      </p>
-                      <div className="mt-4 flex flex-wrap gap-1.5">
-                        {p.languages.map((l) => (
-                          <LangBadge key={l} label={l} domain={p.domain} />
-                        ))}
-                      </div>
+        <div className="space-y-4">
+          {FEATURED.map((p, i) => {
+            const d = DOMAINS[p.domain];
+            const dimmed = activeDomain && activeDomain !== p.domain;
+            return (
+              <motion.div
+                layoutId={`feature-${p.id}`}
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                whileHover={{ y: -4, boxShadow: d.glowShadow }}
+                transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
+                className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
+              >
+                <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    whileInView={{ opacity: 0.4, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
+                    className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
+                  >
+                    {p.index}
+                  </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
+                        {p.title}
+                      </h3>
+                      <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
                     </div>
-                    <motion.a
-                      href={p.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="shrink-0 self-start md:self-center flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 group-hover:text-slate-100 group-hover:border-white/25 transition-colors overflow-hidden"
-                    >
-                      <Code2 className="h-3.5 w-3.5" /> Source
-                      <ArrowUpRight className="h-3.5 w-3.5 -ml-3 opacity-0 -translate-x-1 group-hover:ml-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                    </motion.a>
+                    <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
+                      {p.description}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {p.languages.map((l) => (
+                        <LangBadge key={l} label={l} domain={p.domain} />
+                      ))}
+                    </div>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </WindowFrame>
+                  <motion.a
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="shrink-0 self-start md:self-center flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 group-hover:text-slate-100 group-hover:border-white/25 transition-colors overflow-hidden"
+                  >
+                    <Code2 className="h-3.5 w-3.5" /> Source
+                    <ArrowUpRight className="h-3.5 w-3.5 -ml-3 opacity-0 -translate-x-1 group-hover:ml-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                  </motion.a>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
@@ -858,9 +889,12 @@ function Experience() {
   return (
     <section id="experience" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <WindowFrame title="timeline.app — ~/experience" accent="violet">
-          <SectionHeading eyebrow="Track record" title="Experience" />
-          <div className="relative pl-6 sm:pl-10 space-y-12">
+        <SectionHeading 
+          eyebrow="Track record" 
+          title="Experience" 
+          quirk="history | grep -E 'intern|contributor'"
+        />
+        <div className="relative pl-6 sm:pl-10 space-y-12">
           <motion.div
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
@@ -871,6 +905,8 @@ function Experience() {
           />
           {EXPERIENCE.map((e, i) => {
             const d = DOMAINS[e.domain];
+            // Quirk: Hex Address pointer simulator
+            const hexAddress = `[0x00A${(i * 4 + 7).toString(16).toUpperCase()}FC]`;
             return (
               <motion.div
                 key={e.role + e.org}
@@ -888,7 +924,10 @@ function Experience() {
                   style={{ boxShadow: "0 0 0 4px #0B0F19" }}
                   className={`absolute -left-8 sm:-left-11 top-1.5 h-3 w-3 rounded-full ${d.dot}`}
                 />
-                <div className="font-mono text-xs text-slate-400 mb-1">{e.period}</div>
+                <div className="font-mono text-xs text-slate-500 mb-1 flex items-center gap-2">
+                  <span className="text-slate-600">{hexAddress}</span>
+                  <span>{e.period}</span>
+                </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-slate-100">{e.role}</h3>
                 <div className={`text-sm ${d.text} mb-3`}>{e.org}</div>
                 <ul className="space-y-1.5">
@@ -910,14 +949,13 @@ function Experience() {
             );
           })}
         </div>
-        </WindowFrame>
       </div>
     </section>
   );
 }
 
 /* =========================================================================
-   LIVE GITHUB DATA
+   LIVE GITHUB DATA HOOKS & UTILS
    ========================================================================= */
 
 function useGithubRepos(username) {
@@ -925,13 +963,10 @@ function useGithubRepos(username) {
 
   useEffect(() => {
     let cancelled = false;
-
     async function run() {
       try {
         let all = [];
         let page = 1;
-        // GitHub returns up to 100 repos per page. We stop once a page comes back
-        // short (last page) or after a small safety cap of pages.
         while (page <= 5) {
           const res = await fetch(
             `https://api.github.com/users/${username}/repos?type=owner&sort=updated&per_page=100&page=${page}`,
@@ -969,11 +1004,8 @@ function useGithubRepos(username) {
         if (!cancelled) setState({ status: "error", repos: [], error: err.message });
       }
     }
-
     run();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [username]);
 
   return state;
@@ -1005,9 +1037,7 @@ function useGithubProfile(username) {
       }
     }
     run();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [username]);
 
   return state;
@@ -1075,7 +1105,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
   return (
     <section id="archive" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <WindowFrame title="file-manager.app — ~/repositories" accent="amber">
         <SectionHeading
           eyebrow="Live from the GitHub API"
           title="All open source repositories"
@@ -1093,6 +1122,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
               on page load &mdash; search or filter by language and the grid updates live.
             </>
           }
+          quirk={`df -h /dev/github/${GH_USERNAME}`}
         />
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -1159,7 +1189,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
           </div>
         )}
 
-        {/* Loading skeletons */}
         {status === "loading" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -1176,7 +1205,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
           </div>
         )}
 
-        {/* Error state */}
         {status === "error" && (
           <div className="rounded-2xl border border-white/10 bg-white/5 py-14 px-6 text-center">
             <div className="font-mono text-xs text-slate-400 leading-relaxed">
@@ -1195,7 +1223,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
           </div>
         )}
 
-        {/* Live grid */}
         {status === "ready" && (
           <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <AnimatePresence mode="popLayout">
@@ -1251,73 +1278,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
             no repositories match this query &mdash; try clearing a filter
           </div>
         )}
-        </WindowFrame>
-      </div>
-    </section>
-  );
-}
-
-/* =========================================================================
-   STATS STRIP (live GitHub totals)
-   ========================================================================= */
-
-function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix }) {
-  const [inView, setInView] = useState(false);
-  const d = DOMAINS[domainKey];
-  const count = useCountUp(value, ready && inView);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      onViewportEnter={() => setInView(true)}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.55, delay, ease: "easeOut" }}
-      style={{ boxShadow: "none" }}
-      className={`relative overflow-hidden rounded-2xl border ${d.border} ${d.bg} p-7 sm:p-9 text-center`}
-    >
-      <div className={`mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
-        <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
-      </div>
-      <div className="font-mono text-4xl sm:text-5xl font-semibold text-slate-100 tabular-nums">
-        {ready ? (
-          <>
-            {count.toLocaleString()}
-            {suffix ? <span className={`ml-0.5 ${d.text}`}>{suffix}</span> : null}
-          </>
-        ) : (
-          <span className="inline-block h-10 w-20 rounded bg-white/10 animate-pulse align-middle" />
-        )}
-      </div>
-      <div className="mt-3 text-xs font-mono tracking-widest text-slate-400 uppercase">
-        {label}
-      </div>
-    </motion.div>
-  );
-}
-
-function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
-  const ready = repoStatus === "ready" && profileStatus === "ready";
-  const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
-  const totalForks = repos.reduce((sum, r) => sum + r.forks, 0);
-  const followers = profile ? profile.followers : 0;
-
-  return (
-    <section id="stats" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
-      <div className="mx-auto max-w-6xl">
-        <WindowFrame title="github-stats.app — live" accent="emerald">
-          <SectionHeading
-            eyebrow="Synced with GitHub"
-            title="Stats, live"
-            subtitle="Pulled straight from the GitHub API on page load — no manually updated numbers."
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-            <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="systems" ready={ready} delay={0} />
-            <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.1} />
-            <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
-          </div>
-        </WindowFrame>
       </div>
     </section>
   );
@@ -1331,16 +1291,21 @@ function Contact() {
   return (
     <section id="contact" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <WindowFrame title="mail.app — compose" accent="cyan">
-          <div className="rounded-2xl bg-gradient-to-br from-white/5 to-transparent px-4 py-6 sm:py-8 text-center">
-            <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-4">
-              uplink established
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-slate-50">
-              Let&rsquo;s build something
-              <br className="hidden sm:block" /> that ships.
-            </h2>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent px-4 py-12 sm:py-16 text-center relative overflow-hidden group">
+          {/* Quirk: Background matrix packet stream telemetry lines */}
+          <div className="absolute left-4 top-4 font-mono text-[9px] text-slate-700 select-none hidden md:block text-left">
+            PING rga.dev (127.0.0.1) 56(84) bytes of data.<br/>
+            64 bytes from localhost: icmp_seq=1 ttl=64 time=0.031 ms
+          </div>
+          
+          <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-4">
+            uplink established
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-slate-50">
+            Let&rsquo;s build something
+            <br className="hidden sm:block" /> that ships.
+          </h2>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <motion.a
               href={`mailto:${EMAIL}`}
               whileHover={{ scale: 1.04, y: -2 }}
@@ -1348,40 +1313,34 @@ function Contact() {
               className="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-900 px-5 py-3 text-sm font-medium hover:bg-white transition-colors"
             >
               <Mail className="h-6 w-4 shrink-0" /> 
-              
-              {/* max-w-[140px]: Caps the width heavily on mobile screens
-                sm:max-w-xs: Bumps the max width up once the screen hits 640px (tablet/desktop)
-                sm:overflow-visible: Removes the truncation hiding logic on larger screens if desired
-              */}
               <span className="truncate max-w-[140px] sm:max-w-xs">
                 {EMAIL}
               </span>
             </motion.a>
           </div>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <motion.a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noreferrer"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.96 }}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
-              >
-                <Github className="h-3.5 w-3.5" /> github.com/death7654
-              </motion.a>
-              <motion.a
-                href={LINKEDIN_URL}
-                target="_blank"
-                rel="noreferrer"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.96 }}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
-              >
-                <Linkedin className="h-3.5 w-3.5" /> linkedin.com/in/robinsonarysseril
-              </motion.a>
-            </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <motion.a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
+            >
+              <Github className="h-3.5 w-3.5" /> github.com/death7654
+            </motion.a>
+            <motion.a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
+            >
+              <Linkedin className="h-3.5 w-3.5" /> linkedin.com/in/robinsonarysseril
+            </motion.a>
           </div>
-        </WindowFrame>
+        </div>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-slate-500">
           <span>&copy; {new Date().getFullYear()} Robinson</span>
@@ -1397,7 +1356,7 @@ function Contact() {
    ========================================================================= */
 
 export default function Portfolio() {
-  const [phase, setPhase] = useState("kernel"); // "kernel" -> "ready"
+  const [phase, setPhase] = useState("kernel");
   const [activeDomain, setActiveDomain] = useState(null);
   const kernelDoneRef = useRef(false);
 
@@ -1447,7 +1406,6 @@ export default function Portfolio() {
         {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
       </AnimatePresence>
 
-      {/* ambient background glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <motion.div
           className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
@@ -1468,10 +1426,6 @@ export default function Portfolio() {
 
       <ScrollProgress />
 
-      {/* Main site only mounts once the "desktop" has finished loading, so every
-          section's own entrance animation plays fresh \u2014 like a DE finishing
-          startup and windows fading/opening into place. Opacity-only (no scale)
-          so it doesn't distort viewport measurements for child scroll animations. */}
       {phase === "ready" && (
         <motion.div
           initial={{ opacity: 0 }}
