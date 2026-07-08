@@ -214,14 +214,56 @@ const EMAIL = "robinsongeorgearysseril301@gmail.com";
    ========================================================================= */
 
 const BOOT_LINES = [
-  "[ OK ] initializing kernel image \u2026",
-  "[ OK ] mounting root filesystem (FAT32) \u2026",
-  "[ OK ] loading modules: rust, pytorch, xtensa-gcc \u2026",
-  "[ OK ] enumerating devices on SPI / UART bus \u2026",
-  "[ OK ] establishing uplink \u2026",
-  "> whoami",
-  "robinson_george_arysseril",
+  { text: "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510", tag: "art", delay: 35 },
+  { text: "\u2502          R . G . A .   S Y S T E M S          \u2502", tag: "art", delay: 35 },
+  { text: "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518", tag: "art", delay: 60 },
+  { text: "", tag: "blank", delay: 90 },
+  { text: "robinson_os v2.6.0-arysseril (rustc 1.79.0, xtensa-gcc 12.2)", tag: "info", delay: 110 },
+  { text: "Copyright (c) 2024\u20132026 R.G.A. Systems. All rights reserved.", tag: "muted", delay: 90 },
+  { text: "", tag: "blank", delay: 70 },
+  { text: "[    0.000000] Booting kernel \u2026", tag: "ok", delay: 130 },
+  { text: "[    0.014221] CPU0: dual-core detected \u2014 LR35902 + Xtensa LX6", tag: "ok", delay: 140 },
+  { text: "[    0.032108] Initializing SPI0, UART1, GPIO bank A/B \u2026", tag: "ok", delay: 140 },
+  { text: "[    0.048873] Mounting root filesystem (FAT32) \u2026 done", tag: "ok", delay: 140 },
+  { text: "[    0.066932] Probing memory-mapped I/O regions", tag: "ok", delay: 130 },
+  { text: "[    0.081410] DMA controller: 4 channels online", tag: "ok", delay: 130 },
+  { text: "[    0.093003] Loading kernel modules:", tag: "info", delay: 110 },
+  { text: "  rustc  pytorch  tensorflow  xtensa-gcc  scikit-learn", tag: "progress", delay: 900 },
+  { text: "[    1.021552] all modules loaded ok", tag: "ok", delay: 130 },
+  { text: "[    1.048887] uplink to github.com/death7654 \u2026 connected", tag: "ok", delay: 160 },
+  { text: "[    1.069213] auth robinson_george_arysseril \u2026 granted", tag: "ok", delay: 160 },
+  { text: "", tag: "blank", delay: 90 },
+  { text: "> whoami", tag: "prompt", delay: 100 },
+  { text: "robinson_george_arysseril", tag: "muted", delay: 120 },
+  { text: "> uname -a", tag: "prompt", delay: 100 },
+  { text: "SystemsAndIntelligence 5.4.7-terminal x86_64 GNU/Linux", tag: "muted", delay: 150 },
+  { text: "", tag: "blank", delay: 80 },
+  { text: "welcome back, robinson.", tag: "final", delay: 550 },
 ];
+
+const LINE_TAG_STYLES = {
+  art: "text-slate-600",
+  info: "text-cyan-300/80",
+  ok: "text-slate-400",
+  muted: "text-slate-500",
+  prompt: "text-cyan-300 font-semibold",
+  final: "text-emerald-300 font-semibold mt-2",
+  blank: "h-3",
+};
+
+function BootProgress({ active }) {
+  const pct = useCountUp(100, active, 750);
+  const blocks = Math.min(20, Math.round((pct / 100) * 20));
+  return (
+    <div className="text-cyan-300/90">
+      {"  rustc  pytorch  tensorflow  xtensa-gcc  scikit-learn  "}
+      <span className="text-slate-500">[</span>
+      <span className="text-emerald-400">{"\u2588".repeat(blocks)}</span>
+      <span className="text-slate-700">{"\u2591".repeat(20 - blocks)}</span>
+      <span className="text-slate-500">{`] ${pct}%`}</span>
+    </div>
+  );
+}
 
 function BootSequence({ onDone }) {
   const [visibleLines, setVisibleLines] = useState(0);
@@ -237,10 +279,11 @@ function BootSequence({ onDone }) {
       return;
     }
     if (visibleLines < BOOT_LINES.length) {
-      const t = setTimeout(() => setVisibleLines((v) => v + 1), 220);
+      const delay = BOOT_LINES[visibleLines].delay ?? 130;
+      const t = setTimeout(() => setVisibleLines((v) => v + 1), delay);
       return () => clearTimeout(t);
     }
-    const t = setTimeout(onDone, 550);
+    const t = setTimeout(onDone, 600);
     return () => clearTimeout(t);
   }, [visibleLines, onDone]);
 
@@ -252,21 +295,125 @@ function BootSequence({ onDone }) {
   return (
     <motion.div
       style={{ backgroundColor: "#05070C", zIndex: 100 }}
-      className="fixed inset-0 flex items-center justify-center px-6 cursor-pointer"
+      className="fixed inset-0 flex items-center justify-center px-6 cursor-pointer overflow-hidden"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       onClick={() => setSkip(true)}
     >
-      <div className="w-full max-w-lg font-mono text-xs leading-relaxed text-cyan-300/90">
-        {BOOT_LINES.slice(0, visibleLines).map((line, i) => (
-          <div key={i} className={i === BOOT_LINES.length - 1 ? "text-emerald-300 mt-2" : "text-slate-300"}>
-            {line}
-          </div>
-        ))}
+      {/* CRT scanline overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 mix-blend-screen"
+        style={{
+          opacity: 0.06,
+          backgroundImage:
+            "repeating-linear-gradient(0deg, #22D3EE 0px, transparent 1px, transparent 3px)",
+        }}
+      />
+      <motion.div
+        className="pointer-events-none absolute inset-x-0 h-24 bg-cyan-400/10 blur-2xl"
+        animate={{ y: ["-10%", "110%"] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }}
+      />
+
+      <div className="relative w-full max-w-lg font-mono text-xs sm:text-sm leading-relaxed">
+        {BOOT_LINES.slice(0, visibleLines).map((line, i) => {
+          if (line.tag === "blank") return <div key={i} className={LINE_TAG_STYLES.blank} />;
+          if (line.tag === "progress") return <BootProgress key={i} active />;
+          return (
+            <div key={i} className={LINE_TAG_STYLES[line.tag] || "text-slate-300"}>
+              {line.text}
+            </div>
+          );
+        })}
         <span className="inline-block w-2 h-3.5 align-middle bg-cyan-300 animate-pulse ml-0.5" />
         <div className="mt-8 text-xs tracking-widest text-slate-500 uppercase">
           tap anywhere to skip
         </div>
+      </div>
+    </motion.div>
+  );
+}
+
+const DESKTOP_STATUS_LINES = [
+  "Starting Wayland compositor\u2026",
+  "Loading window manager\u2026",
+  "Mounting user session\u2026",
+  "Initializing status panel\u2026",
+  "Restoring workspace\u2026",
+  "Welcome, robinson.",
+];
+
+function DesktopSplash({ onDone }) {
+  const [statusIndex, setStatusIndex] = useState(0);
+  const [skip, setSkip] = useState(false);
+  const pct = useCountUp(100, true, 1500);
+
+  useEffect(() => {
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      onDone();
+      return;
+    }
+    const t = setTimeout(onDone, 1650);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  useEffect(() => {
+    if (statusIndex >= DESKTOP_STATUS_LINES.length - 1) return;
+    const t = setTimeout(() => setStatusIndex((i) => i + 1), 260);
+    return () => clearTimeout(t);
+  }, [statusIndex]);
+
+  useEffect(() => {
+    if (skip) onDone();
+  }, [skip, onDone]);
+
+  return (
+    <motion.div
+      style={{ backgroundColor: "#05070C", zIndex: 99 }}
+      className="fixed inset-0 flex flex-col items-center justify-center px-6 cursor-pointer"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      onClick={() => setSkip(true)}
+    >
+      <div className="relative flex h-20 w-20 items-center justify-center mb-8">
+        <motion.span
+          className="absolute inset-0 rounded-full border-2 border-cyan-400/20 border-t-cyan-400"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.1, repeat: Infinity, ease: "linear" }}
+        />
+        <Terminal className="h-7 w-7 text-cyan-300" strokeWidth={1.5} />
+      </div>
+
+      <div className="font-mono text-xs tracking-widest text-slate-500 uppercase mb-2">
+        R.G.A. Desktop Environment
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={statusIndex}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.25 }}
+          className="font-mono text-sm text-slate-200 h-5"
+        >
+          {DESKTOP_STATUS_LINES[statusIndex]}
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="mt-8 h-0.5 w-48 rounded-full bg-white/10 overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+
+      <div className="mt-10 text-xs tracking-widest text-slate-600 uppercase">
+        tap anywhere to skip
       </div>
     </motion.div>
   );
@@ -328,6 +475,7 @@ function ScrollProgress() {
 const NAV_LINKS = [
   { label: "Skills", href: "#skills" },
   { label: "Work", href: "#work" },
+  { label: "Stats", href: "#stats" },
   { label: "Experience", href: "#experience" },
   { label: "Archive", href: "#archive" },
   { label: "Contact", href: "#contact" },
@@ -336,11 +484,17 @@ const NAV_LINKS = [
 function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [time, setTime] = useState(() => new Date());
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setTime(new Date()), 1000 * 15);
+    return () => clearInterval(t);
   }, []);
 
   const go = (href) => {
@@ -349,9 +503,14 @@ function Header() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const clock = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
   return (
     <>
-      <header
+      <motion.header
+        initial={{ y: -56, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         style={{ backgroundColor: scrolled ? "rgba(11, 15, 25, 0.72)" : "transparent" }}
         className={`fixed top-0 inset-x-0 z-50 transition-colors duration-300 ${
           scrolled ? "backdrop-blur-xl border-b border-white/10" : ""
@@ -386,6 +545,14 @@ function Header() {
             </a>
           </nav>
 
+          {/* systray-style status widget \u2014 desktop-panel flavor */}
+          <div className="hidden md:flex items-center gap-2.5 ml-3 pl-3 border-l border-white/10 font-mono text-xs text-slate-400">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 pulse-dot" />
+            </span>
+            <span className="tabular-nums">{clock}</span>
+          </div>
+
           <button
             onClick={() => setOpen((o) => !o)}
             className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-slate-300 active:scale-95 transition-transform"
@@ -394,7 +561,7 @@ function Header() {
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
-      </header>
+      </motion.header>
 
       <AnimatePresence>
         {open && (
@@ -457,29 +624,74 @@ function Hero({ activeDomain, setActiveDomain }) {
           <motion.div
             variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
             transition={{ duration: 0.5, ease: "easeOut" }}
+            className="mb-6 flex items-center gap-2 rounded-t-xl border border-b-0 border-white/10 bg-white/5 px-4 py-2.5 max-w-md"
+          >
+            <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+            <span className="ml-2 font-mono text-xs text-slate-400 truncate">
+              robinson@systems: ~/portfolio
+            </span>
+          </motion.div>
+
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="font-mono text-xs tracking-widest text-emerald-400/70 uppercase mb-5"
           >
             systems &amp; intelligence
           </motion.div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-slate-50 leading-tight overflow-hidden">
-            <motion.span
-              className="block"
-              variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
-              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          <div className="relative">
+            <div
+              className="pointer-events-none absolute -inset-x-10 -inset-y-16 sm:-inset-y-24 -z-10 overflow-hidden"
+              aria-hidden="true"
             >
-              Robinson George
-            </motion.span>
-            <motion.span
-              className="block"
-              variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
-              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <span className="name-shimmer inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-slate-200 to-emerald-300">
-                Arysseril
-              </span>
-            </motion.span>
-          </h1>
+              <motion.div
+                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-cyan-400/30 blur-3xl mix-blend-screen"
+                style={{ left: "2%", top: "8%" }}
+                animate={{ x: [0, 60, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.15, 0.95, 1] }}
+                transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-emerald-400/25 blur-3xl mix-blend-screen"
+                style={{ right: "6%", top: "0%" }}
+                animate={{ x: [0, -50, 30, 0], y: [0, 40, -20, 0], scale: [1, 0.9, 1.1, 1] }}
+                transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute h-48 w-48 sm:h-64 sm:w-64 rounded-full bg-violet-400/20 blur-3xl mix-blend-screen"
+                style={{ left: "32%", bottom: "-15%" }}
+                animate={{ x: [0, 30, -40, 0], y: [0, -20, 30, 0], scale: [1, 1.1, 0.9, 1] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute h-40 w-40 sm:h-56 sm:w-56 rounded-full bg-pink-400/15 blur-3xl mix-blend-screen"
+                style={{ right: "22%", bottom: "-20%" }}
+                animate={{ x: [0, -25, 15, 0], y: [0, 25, -15, 0], scale: [1, 0.95, 1.1, 1] }}
+                transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+
+            <h1 className="relative z-10 text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-slate-50 leading-tight overflow-hidden">
+              <motion.span
+                className="block"
+                variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              >
+                Robinson George
+              </motion.span>
+              <motion.span
+                className="block"
+                variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <span className="name-shimmer inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-slate-200 to-emerald-300">
+                  Arysseril
+                </span>
+              </motion.span>
+            </h1>
+          </div>
 
           <motion.p
             variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
@@ -1102,27 +1314,36 @@ function RepoArchive({ activeDomain, status, repos, error }) {
    STATS STRIP (live GitHub totals)
    ========================================================================= */
 
-function StatCard({ icon: Icon, label, value, domainKey, ready, delay }) {
+function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix }) {
   const [inView, setInView] = useState(false);
   const d = DOMAINS[domainKey];
   const count = useCountUp(value, ready && inView);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       onViewportEnter={() => setInView(true)}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
-      className={`rounded-2xl border ${d.border} bg-white/5 p-5 sm:p-6 text-center`}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.55, delay, ease: "easeOut" }}
+      style={{ boxShadow: "none" }}
+      className={`relative overflow-hidden rounded-2xl border ${d.border} ${d.bg} p-7 sm:p-9 text-center`}
     >
-      <Icon className={`h-4 w-4 ${d.text} mx-auto mb-3`} strokeWidth={1.75} />
-      <div className="font-mono text-3xl sm:text-4xl font-semibold text-slate-100 tabular-nums">
-        {ready ? count.toLocaleString() : (
-          <span className="inline-block h-8 w-16 rounded bg-white/10 animate-pulse align-middle" />
+      <div className={`mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
+        <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
+      </div>
+      <div className="font-mono text-4xl sm:text-5xl font-semibold text-slate-100 tabular-nums">
+        {ready ? (
+          <>
+            {count.toLocaleString()}
+            {suffix ? <span className={`ml-0.5 ${d.text}`}>{suffix}</span> : null}
+          </>
+        ) : (
+          <span className="inline-block h-10 w-20 rounded bg-white/10 animate-pulse align-middle" />
         )}
       </div>
-      <div className="mt-2 text-xs font-mono tracking-widest text-slate-400 uppercase">
+      <div className="mt-3 text-xs font-mono tracking-widest text-slate-400 uppercase">
         {label}
       </div>
     </motion.div>
@@ -1136,12 +1357,17 @@ function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
   const followers = profile ? profile.followers : 0;
 
   return (
-    <section className="relative px-5 sm:px-8 -mt-6 sm:-mt-8 mb-4">
+    <section id="stats" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        <SectionHeading
+          eyebrow="Synced with GitHub"
+          title="Stats, live"
+          subtitle="Pulled straight from the GitHub API on page load — no manually updated numbers."
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
           <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="systems" ready={ready} delay={0} />
-          <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.08} />
-          <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.16} />
+          <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.1} />
+          <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
         </div>
       </div>
     </section>
@@ -1218,17 +1444,24 @@ function Contact() {
    ========================================================================= */
 
 export default function Portfolio() {
-  const [booting, setBooting] = useState(true);
+  const [phase, setPhase] = useState("kernel"); // "kernel" -> "desktop" -> "ready"
   const [activeDomain, setActiveDomain] = useState(null);
-  const doneRef = useRef(false);
+  const kernelDoneRef = useRef(false);
+  const desktopDoneRef = useRef(false);
 
   const { status: repoStatus, repos, error: repoError } = useGithubRepos(GH_USERNAME);
   const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
 
-  const handleDone = () => {
-    if (doneRef.current) return;
-    doneRef.current = true;
-    setBooting(false);
+  const handleKernelDone = () => {
+    if (kernelDoneRef.current) return;
+    kernelDoneRef.current = true;
+    setPhase("desktop");
+  };
+
+  const handleDesktopDone = () => {
+    if (desktopDoneRef.current) return;
+    desktopDoneRef.current = true;
+    setPhase("ready");
   };
 
   return (
@@ -1241,6 +1474,10 @@ export default function Portfolio() {
         * { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
         .font-mono, code, pre { font-family: 'JetBrains Mono', ui-monospace, monospace !important; }
         html { scroll-behavior: smooth; }
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+        *::-webkit-scrollbar { width: 0; height: 0; }
+        * { scrollbar-width: none; }
         .name-shimmer {
           background-size: 200% auto;
           animation: shimmer 7s ease-in-out infinite;
@@ -1260,7 +1497,10 @@ export default function Portfolio() {
         }
       `}</style>
 
-      <AnimatePresence>{booting && <BootSequence onDone={handleDone} />}</AnimatePresence>
+      <AnimatePresence>
+        {phase === "kernel" && <BootSequence onDone={handleKernelDone} />}
+        {phase === "desktop" && <DesktopSplash onDone={handleDesktopDone} />}
+      </AnimatePresence>
 
       {/* ambient background glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -1283,20 +1523,30 @@ export default function Portfolio() {
 
       <ScrollProgress />
 
-      <div className="relative">
-        <Header />
-        <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
-        <StatsStrip
-          repoStatus={repoStatus}
-          repos={repos}
-          profileStatus={profileStatus}
-          profile={profile}
-        />
-        <FeaturedProjects activeDomain={activeDomain} />
-        <Experience />
-        <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
-        <Contact />
-      </div>
+      {/* Main site only mounts once the "desktop" has finished loading, so every
+          section's own entrance animation plays fresh \u2014 like a DE finishing
+          startup and windows fading/opening into place. */}
+      {phase === "ready" && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="relative"
+        >
+          <Header />
+          <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
+          <StatsStrip
+            repoStatus={repoStatus}
+            repos={repos}
+            profileStatus={profileStatus}
+            profile={profile}
+          />
+          <FeaturedProjects activeDomain={activeDomain} />
+          <Experience />
+          <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
+          <Contact />
+        </motion.div>
+      )}
     </div>
   );
 }
