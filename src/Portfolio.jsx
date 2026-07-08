@@ -1341,15 +1341,23 @@ function Contact() {
               <br className="hidden sm:block" /> that ships.
             </h2>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <motion.a
-                href={`mailto:${EMAIL}`}
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-900 px-5 py-3 text-sm font-medium hover:bg-white transition-colors"
-              >
-                <Mail className="h-4 w-4" /> {EMAIL}
-              </motion.a>
-            </div>
+            <motion.a
+              href={`mailto:${EMAIL}`}
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-100 text-slate-900 px-5 py-3 text-sm font-medium hover:bg-white transition-colors"
+            >
+              <Mail className="h-6 w-4 shrink-0" /> 
+              
+              {/* max-w-[140px]: Caps the width heavily on mobile screens
+                sm:max-w-xs: Bumps the max width up once the screen hits 640px (tablet/desktop)
+                sm:overflow-visible: Removes the truncation hiding logic on larger screens if desired
+              */}
+              <span className="truncate max-w-[140px] sm:max-w-xs">
+                {EMAIL}
+              </span>
+            </motion.a>
+          </div>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <motion.a
                 href={GITHUB_URL}
