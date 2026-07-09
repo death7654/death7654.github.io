@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   motion,
   AnimatePresence,
@@ -28,6 +28,8 @@ import {
   Users,
   Download,
   ArrowUp,
+  ArrowLeft,
+  FileText,
 } from "lucide-react";
 
 /* =========================================================================
@@ -213,8 +215,46 @@ function inferDomain(language) {
 const GITHUB_URL = `https://github.com/${GH_USERNAME}`;
 const LINKEDIN_URL = "https://linkedin.com/in/robinsonarysseril";
 const EMAIL = "robinsongeorgearysseril301@gmail.com";
-// Place a PDF at this path (e.g. /public/resume.pdf) for the resume download link to work.
-const RESUME_URL = "/resume.pdf";
+// Four role-tailored resumes. Place each PDF at the matching path below (e.g. in /public/resumes/)
+// for the download buttons on the /resume page to work.
+const RESUME_VARIANTS = [
+  {
+    key: "systems",
+    label: "Systems & Embedded",
+    domain: "systems",
+    description:
+      "Bare-metal kernels, register-level drivers, and cycle-accurate emulators — for embedded, firmware, and low-level systems roles.",
+    fileName: "Robinson-Arysseril-Resume-Systems.pdf",
+    url: "/resumes/RobinsonResumeSystems.pdf",
+  },
+  {
+    key: "ml",
+    label: "Machine Learning & AI",
+    domain: "ai",
+    description:
+      "NLP bias-classification research, contrastive representation learning, and applied ML — for AI/ML research and engineering roles.",
+    fileName: "Robinson-Arysseril-Resume-ML.pdf",
+    url: "/resumes/RobinsonResumeML.pdf",
+  },
+  {
+    key: "data-science",
+    label: "Data Science",
+    domain: "ai",
+    description:
+      "Forecasting pipelines, statistical modeling, and data engineering — for data science and analytics roles.",
+    fileName: "Robinson-Arysseril-Resume-DataScience.pdf",
+    url: "/resumes/RobinsonResumeDataScience.pdf",
+  },
+  {
+    key: "frontend",
+    label: "Frontend & Fullstack",
+    domain: "web",
+    description:
+      "Tauri/Angular desktop apps and full-stack tooling — for frontend and product engineering roles.",
+    fileName: "Robinson-Arysseril-Resume-Frontend.pdf",
+    url: "/resumes/RobinsonResumeFrontEnd.pdf",
+  },
+];
 
 /* =========================================================================
    LOCAL CACHE (stale-while-revalidate for GitHub API calls)
@@ -276,11 +316,15 @@ function setMetaTag(attr, key, content) {
   el.setAttribute("content", content);
 }
 
-function useDocumentMeta() {
+function useDocumentMeta(route) {
   useEffect(() => {
-    const title = "Robinson George Arysseril — Systems & Intelligence";
-    const description =
-      "Portfolio of Robinson George Arysseril: bare-metal kernels, cycle-accurate emulators, and NLP research, built from the register up and the model down.";
+    const isResume = route === "resume";
+    const title = isResume
+      ? "Resume — Robinson George Arysseril"
+      : "Robinson George Arysseril — Systems & Intelligence";
+    const description = isResume
+      ? "Download a role-tailored resume for Robinson George Arysseril: systems & embedded, machine learning, data science, or frontend & fullstack."
+      : "Portfolio of Robinson George Arysseril: bare-metal kernels, cycle-accurate emulators, and NLP research, built from the register up and the model down.";
 
     document.title = title;
     setMetaTag("name", "description", description);
@@ -307,7 +351,7 @@ function useDocumentMeta() {
       jobTitle: "Systems & AI Engineer",
       alumniOf: "Vimal Jyothi Engineering College",
     });
-  }, []);
+  }, [route]);
 }
 
 /* =========================================================================
@@ -599,7 +643,7 @@ const NAV_LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-function Header() {
+function Header({ onOpenResume }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [time, setTime] = useState(() => new Date());
@@ -662,6 +706,12 @@ function Header() {
               <Github className="h-3.5 w-3.5" /> GitHub
               <NewTabHint />
             </a>
+            <button
+              onClick={onOpenResume}
+              className="ml-2 flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 hover:border-white/25 hover:text-slate-100 transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" /> Resume
+            </button>
           </nav>
 
           <div className="hidden md:flex items-center gap-2.5 ml-3 pl-3 border-l border-white/10 font-mono text-xs text-slate-400">
@@ -716,6 +766,15 @@ function Header() {
                 <Github className="h-4 w-4" /> github.com/death7654
                 <NewTabHint />
               </a>
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onOpenResume();
+                }}
+                className="mt-3 flex items-center justify-center gap-2 rounded-full border border-white/10 py-3.5 text-slate-300"
+              >
+                <FileText className="h-4 w-4" /> View resumes
+              </button>
             </motion.div>
           </motion.div>
         )}
@@ -728,7 +787,7 @@ function Header() {
    HERO + SKILLS GRID
    ========================================================================= */
 
-function Hero({ activeDomain, setActiveDomain }) {
+function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
   const reducedMotion = usePrefersReducedMotion();
   const spotX = useMotionValue(-9999);
   const spotY = useMotionValue(-9999);
@@ -872,6 +931,14 @@ function Hero({ activeDomain, setActiveDomain }) {
             >
               <Mail className="h-3.5 w-3.5" /> Say hello
             </motion.a>
+            <motion.button
+              onClick={onOpenResume}
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 text-slate-300 px-5 py-3 text-sm hover:border-white/30 hover:text-white transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" /> Resume
+            </motion.button>
           </motion.div>
         </motion.div>
 
@@ -1586,7 +1653,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
    CONTACT / FOOTER
    ========================================================================= */
 
-function Contact() {
+function Contact({ onOpenResume }) {
   return (
     <section id="contact" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
       <div className="mx-auto max-w-6xl">
@@ -1619,6 +1686,14 @@ function Contact() {
                 {EMAIL}
               </span>
             </motion.a>
+            <motion.button
+              onClick={onOpenResume}
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 text-slate-300 px-5 py-3 text-sm hover:border-white/30 hover:text-white transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" /> Resume
+            </motion.button>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <motion.a
@@ -1652,6 +1727,103 @@ function Contact() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* =========================================================================
+   RESUME PAGE
+   ========================================================================= */
+
+function ResumeCard({ variant, index }) {
+  const d = DOMAINS[variant.domain];
+  return (
+    <TiltCard maxTilt={4}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+        whileHover={{ y: -4, boxShadow: d.glowShadow }}
+        className={`group relative flex flex-col h-full rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-7`}
+      >
+        <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
+          <FileText className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
+        </div>
+        <h3 className="text-lg font-semibold text-slate-100 tracking-tight">{variant.label}</h3>
+        <p className="mt-2.5 text-sm text-slate-300 leading-relaxed flex-1">{variant.description}</p>
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <span className="font-mono text-[11px] text-slate-500 truncate">{variant.fileName}</span>
+          <motion.a
+            href={variant.url}
+            download={variant.fileName}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border ${d.borderStrong} ${d.bg} px-3.5 py-2 text-xs ${d.text} hover:brightness-110 transition-all`}
+          >
+            <Download className="h-3.5 w-3.5" /> Download
+          </motion.a>
+        </div>
+      </motion.div>
+    </TiltCard>
+  );
+}
+
+function ResumePage({ onBack }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="relative min-h-screen"
+    >
+      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl border-b border-white/10" style={{ backgroundColor: "rgba(11, 15, 25, 0.72)" }}>
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 h-16 flex items-center justify-between">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 font-mono text-sm text-slate-300 hover:text-slate-100 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to portfolio
+          </button>
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 font-mono text-sm text-slate-200"
+          >
+            <Terminal className="h-4 w-4 text-cyan-400" strokeWidth={1.75} />
+            <span className="tracking-tight">rga<span className="text-cyan-400">.</span>dev</span>
+          </button>
+        </div>
+      </header>
+
+      <section className="relative pt-32 sm:pt-40 pb-24 px-5 sm:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-5">
+            select a build target
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-slate-50 max-w-3xl">
+            Four resumes, one engineer.
+          </h1>
+          <p className="mt-5 max-w-2xl text-slate-300 text-base leading-relaxed">
+            Same experience, weighted differently depending on the role. Pick whichever
+            matches what you&rsquo;re hiring for, or grab them all.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {RESUME_VARIANTS.map((variant, i) => (
+              <ResumeCard key={variant.key} variant={variant} index={i} />
+            ))}
+          </div>
+
+          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-mono text-xs text-slate-400 leading-relaxed">
+            Not sure which one? Reach out at{" "}
+            <a href={`mailto:${EMAIL}`} className="text-cyan-300 hover:underline underline-offset-4">
+              {EMAIL}
+            </a>{" "}
+            and I&rsquo;ll send the right one directly.
+          </div>
+        </div>
+      </section>
+    </motion.div>
   );
 }
 
@@ -1706,7 +1878,49 @@ export default function Portfolio() {
   const [activeDomain, setActiveDomain] = useState(null);
   const kernelDoneRef = useRef(false);
 
-  useDocumentMeta();
+  // Minimal client-side routing — just enough to give the resume picker its own page/URL
+  // without pulling in a router dependency.
+  const [route, setRoute] = useState(() => {
+    try {
+      return window.location.pathname.replace(/\/+$/, "") === "/resume" ? "resume" : "home";
+    } catch {
+      return "home";
+    }
+  });
+
+  useEffect(() => {
+    const onPopState = () => {
+      setRoute(window.location.pathname.replace(/\/+$/, "") === "/resume" ? "resume" : "home");
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  const goToResume = useCallback(() => {
+    if (window.location.pathname !== "/resume") {
+      window.history.pushState({}, "", "/resume");
+    }
+    setRoute("resume");
+    window.scrollTo(0, 0);
+    // Landing straight on the resume picker shouldn't force the boot sequence later.
+    try {
+      window.sessionStorage.setItem("rga_booted", "1");
+    } catch {
+      // ignore
+    }
+    kernelDoneRef.current = true;
+    setPhase("ready");
+  }, []);
+
+  const goHome = useCallback(() => {
+    if (window.location.pathname !== "/") {
+      window.history.pushState({}, "", "/");
+    }
+    setRoute("home");
+    window.scrollTo(0, 0);
+  }, []);
+
+  useDocumentMeta(route);
 
   const { status: repoStatus, repos, error: repoError } = useGithubRepos(GH_USERNAME);
   const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
@@ -1770,37 +1984,45 @@ export default function Portfolio() {
         }
       `}</style>
 
-      <AnimatePresence>
-        {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
-      </AnimatePresence>
-
       <ParallaxBackdrop />
 
-      <ScrollProgress />
+      {route === "resume" ? (
+        <AnimatePresence mode="wait">
+          <ResumePage key="resume" onBack={goHome} />
+        </AnimatePresence>
+      ) : (
+        <>
+          <AnimatePresence>
+            {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
+          </AnimatePresence>
 
-      {phase === "ready" && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative"
-        >
-          <Header />
-          <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} />
-          <StatsStrip
-            repoStatus={repoStatus}
-            repos={repos}
-            profileStatus={profileStatus}
-            profile={profile}
-          />
-          <SkillsMarquee />
-          <FeaturedProjects activeDomain={activeDomain} />
-          <Experience />
-          <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
-          <Contact />
-        </motion.div>
+          <ScrollProgress />
+
+          {phase === "ready" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="relative"
+            >
+              <Header onOpenResume={goToResume} />
+              <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} onOpenResume={goToResume} />
+              <StatsStrip
+                repoStatus={repoStatus}
+                repos={repos}
+                profileStatus={profileStatus}
+                profile={profile}
+              />
+              <SkillsMarquee />
+              <FeaturedProjects activeDomain={activeDomain} />
+              <Experience />
+              <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
+              <Contact onOpenResume={goToResume} />
+            </motion.div>
+          )}
+          <BackToTop />
+        </>
       )}
-      <BackToTop />
     </div>
   );
 }
