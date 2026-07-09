@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useSpring,
+  useMotionValue,
+  useTransform,
+  useMotionTemplate,
+} from "framer-motion";
 import {
   Github,
   Linkedin,
@@ -18,6 +26,8 @@ import {
   Star,
   GitFork,
   Users,
+  Download,
+  ArrowUp,
 } from "lucide-react";
 
 /* =========================================================================
@@ -203,7 +213,102 @@ function inferDomain(language) {
 const GITHUB_URL = `https://github.com/${GH_USERNAME}`;
 const LINKEDIN_URL = "https://linkedin.com/in/robinsonarysseril";
 const EMAIL = "robinsongeorgearysseril301@gmail.com";
+// Place a PDF at this path (e.g. /public/resume.pdf) for the resume download link to work.
+const RESUME_URL = "/resume.pdf";
 
+/* =========================================================================
+   LOCAL CACHE (stale-while-revalidate for GitHub API calls)
+   ========================================================================= */
+
+const CACHE_TTL_MS = 20 * 60 * 1000; // 20 minutes
+
+function readCache(key) {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.savedAt !== "number") return null;
+    return { data: parsed.data, isStale: Date.now() - parsed.savedAt > CACHE_TTL_MS };
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(key, data) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify({ data, savedAt: Date.now() }));
+  } catch {
+    // localStorage unavailable (private mode, quota, etc.) — fail silently, cache is a nice-to-have.
+  }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = (e) => setReduced(e.matches);
+    mq.addEventListener ? mq.addEventListener("change", onChange) : mq.addListener(onChange);
+    return () =>
+      mq.removeEventListener ? mq.removeEventListener("change", onChange) : mq.removeListener(onChange);
+  }, []);
+  return reduced;
+}
+
+
+/* =========================================================================
+   SEO / DOCUMENT META
+   ========================================================================= */
+
+function setMetaTag(attr, key, content) {
+  if (typeof document === "undefined") return;
+  let el = document.querySelector(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function useDocumentMeta() {
+  useEffect(() => {
+    const title = "Robinson George Arysseril — Systems & Intelligence";
+    const description =
+      "Portfolio of Robinson George Arysseril: bare-metal kernels, cycle-accurate emulators, and NLP research, built from the register up and the model down.";
+
+    document.title = title;
+    setMetaTag("name", "description", description);
+    setMetaTag("property", "og:title", title);
+    setMetaTag("property", "og:description", description);
+    setMetaTag("property", "og:type", "website");
+    setMetaTag("name", "twitter:card", "summary_large_image");
+    setMetaTag("name", "twitter:title", title);
+    setMetaTag("name", "twitter:description", description);
+
+    let ld = document.getElementById("rga-person-ld");
+    if (!ld) {
+      ld = document.createElement("script");
+      ld.type = "application/ld+json";
+      ld.id = "rga-person-ld";
+      document.head.appendChild(ld);
+    }
+    ld.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Robinson George Arysseril",
+      url: GITHUB_URL,
+      sameAs: [GITHUB_URL, LINKEDIN_URL],
+      jobTitle: "Systems & AI Engineer",
+      alumniOf: "Vimal Jyothi Engineering College",
+    });
+  }, []);
+}
 
 /* =========================================================================
    BOOT SEQUENCE
@@ -353,15 +458,27 @@ function SectionHeading({ eyebrow, title, subtitle, quirk }) {
   return (
     <div className="mb-10 sm:mb-14 relative group">
       {quirk && (
-        <div className="absolute right-0 top-0 hidden lg:block font-mono text-[10px] text-slate-600 border border-white/5 bg-white/5 rounded px-2 py-0.5 select-none">
+        <div
+          aria-hidden="true"
+          className="absolute right-0 top-0 hidden lg:block font-mono text-[10px] text-slate-600 border border-white/5 bg-white/5 rounded px-2 py-0.5 select-none"
+        >
           {quirk}
         </div>
       )}
       <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-3">
         {eyebrow}
       </div>
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-100">
+      <h2 className="relative inline-block text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-100">
         {title}
+        <motion.span
+          aria-hidden="true"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          style={{ originX: 0 }}
+          className="absolute -bottom-2 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-cyan-400 via-slate-200 to-emerald-400"
+        />
       </h2>
       {subtitle && (
         <p className="mt-4 max-w-2xl text-slate-300 text-sm sm:text-base leading-relaxed">
@@ -369,6 +486,47 @@ function SectionHeading({ eyebrow, title, subtitle, quirk }) {
         </p>
       )}
     </div>
+  );
+}
+
+// Screen-reader-only note appended to links that open in a new tab.
+function NewTabHint() {
+  return <span className="sr-only"> (opens in a new tab)</span>;
+}
+
+// Wraps children in a subtle mouse-tracked 3D tilt. No-ops under prefers-reduced-motion.
+function TiltCard({ children, className = "", maxTilt = 8 }) {
+  const ref = useRef(null);
+  const reducedMotion = usePrefersReducedMotion();
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const springX = useSpring(rotateX, { stiffness: 220, damping: 22, mass: 0.4 });
+  const springY = useSpring(rotateY, { stiffness: 220, damping: 22, mass: 0.4 });
+
+  const onMouseMove = (e) => {
+    if (reducedMotion || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    rotateY.set(px * maxTilt * 2);
+    rotateX.set(-py * maxTilt * 2);
+  };
+
+  const onMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={{ rotateX: springX, rotateY: springY, transformPerspective: 800 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
   );
 }
 
@@ -380,6 +538,51 @@ function ScrollProgress() {
       style={{ scaleX, zIndex: 60 }}
       className="fixed top-0 inset-x-0 h-0.5 origin-left bg-gradient-to-r from-cyan-400 via-slate-200 to-emerald-400"
     />
+  );
+}
+
+// Fixed ambient blobs: gentle infinite drift plus scroll-linked parallax for depth.
+// Fully static (no motion, no parallax) under prefers-reduced-motion.
+function ParallaxBackdrop() {
+  const reducedMotion = usePrefersReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const yA = useTransform(scrollYProgress, [0, 1], [0, reducedMotion ? 0 : -220]);
+  const yB = useTransform(scrollYProgress, [0, 1], [0, reducedMotion ? 0 : 260]);
+  const yC = useTransform(scrollYProgress, [0, 1], [0, reducedMotion ? 0 : -160]);
+
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+      <motion.div
+        style={{ y: yA }}
+        className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
+      >
+        <motion.div
+          className="h-full w-full rounded-full"
+          animate={reducedMotion ? undefined : { x: [0, 40, 0], y: [0, 30, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
+      <motion.div
+        style={{ y: yB }}
+        className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
+      >
+        <motion.div
+          className="h-full w-full rounded-full"
+          animate={reducedMotion ? undefined : { x: [0, -30, 0], y: [0, -40, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
+      <motion.div
+        style={{ y: yC }}
+        className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
+      >
+        <motion.div
+          className="h-full w-full rounded-full"
+          animate={reducedMotion ? undefined : { x: [0, 25, 0], y: [0, -20, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
+    </div>
   );
 }
 
@@ -457,6 +660,7 @@ function Header() {
               className="ml-2 flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2 text-xs text-cyan-300 hover:bg-cyan-400/20 transition-colors"
             >
               <Github className="h-3.5 w-3.5" /> GitHub
+              <NewTabHint />
             </a>
           </nav>
 
@@ -510,6 +714,7 @@ function Header() {
                 className="mt-6 flex items-center justify-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 py-3.5 text-cyan-300"
               >
                 <Github className="h-4 w-4" /> github.com/death7654
+                <NewTabHint />
               </a>
             </motion.div>
           </motion.div>
@@ -524,8 +729,31 @@ function Header() {
    ========================================================================= */
 
 function Hero({ activeDomain, setActiveDomain }) {
+  const reducedMotion = usePrefersReducedMotion();
+  const spotX = useMotionValue(-9999);
+  const spotY = useMotionValue(-9999);
+  const spotBackground = useMotionTemplate`radial-gradient(480px circle at ${spotX}px ${spotY}px, rgba(34,211,238,0.10), transparent 65%)`;
+
+  const onPointerMove = (e) => {
+    if (reducedMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    spotX.set(e.clientX - rect.left);
+    spotY.set(e.clientY - rect.top);
+  };
+
   return (
-    <section id="top" className="relative pt-32 sm:pt-40 pb-20 px-5 sm:px-8">
+    <section
+      id="top"
+      onMouseMove={onPointerMove}
+      className="relative pt-32 sm:pt-40 pb-20 px-5 sm:px-8"
+    >
+      {!reducedMotion && (
+        <motion.div
+          aria-hidden="true"
+          style={{ background: spotBackground }}
+          className="pointer-events-none absolute inset-0 -z-10"
+        />
+      )}
       <div className="mx-auto max-w-6xl">
         <motion.div
           initial="hidden"
@@ -567,25 +795,25 @@ function Hero({ activeDomain, setActiveDomain }) {
               <motion.div
                 className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-cyan-400/50 blur-3xl mix-blend-screen"
                 style={{ left: "2%", top: "8%" }}
-                animate={{ x: [0, 60, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.15, 0.95, 1] }}
+                animate={reducedMotion ? undefined : { x: [0, 60, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.15, 0.95, 1] }}
                 transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
                 className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-emerald-400/45 blur-3xl mix-blend-screen"
                 style={{ right: "6%", top: "0%" }}
-                animate={{ x: [0, -50, 30, 0], y: [0, 40, -20, 0], scale: [1, 0.9, 1.1, 1] }}
+                animate={reducedMotion ? undefined : { x: [0, -50, 30, 0], y: [0, 40, -20, 0], scale: [1, 0.9, 1.1, 1] }}
                 transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
                 className="absolute h-48 w-48 sm:h-64 sm:w-64 rounded-full bg-violet-400/40 blur-3xl mix-blend-screen"
                 style={{ left: "32%", bottom: "-15%" }}
-                animate={{ x: [0, 30, -40, 0], y: [0, -20, 30, 0], scale: [1, 1.1, 0.9, 1] }}
+                animate={reducedMotion ? undefined : { x: [0, 30, -40, 0], y: [0, -20, 30, 0], scale: [1, 1.1, 0.9, 1] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
                 className="absolute h-40 w-40 sm:h-56 sm:w-56 rounded-full bg-pink-400/35 blur-3xl mix-blend-screen"
                 style={{ right: "22%", bottom: "-20%" }}
-                animate={{ x: [0, -25, 15, 0], y: [0, 25, -15, 0], scale: [1, 0.95, 1.1, 1] }}
+                animate={reducedMotion ? undefined : { x: [0, -25, 15, 0], y: [0, 25, -15, 0], scale: [1, 0.95, 1.1, 1] }}
                 transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
               />
             </motion.div>
@@ -697,6 +925,8 @@ function Hero({ activeDomain, setActiveDomain }) {
                   onClick={() => setActiveDomain(isActive ? null : d.key)}
                   whileHover={{ y: -5, scale: 1.015 }}
                   whileTap={{ scale: 0.98 }}
+                  aria-pressed={isActive}
+                  aria-label={`Filter by ${d.label}${isActive ? " (active, click to clear)" : ""}`}
                   style={{ boxShadow: isActive ? d.glowShadow : "none" }}
                   className={`text-left rounded-2xl border ${
                     isActive ? d.borderStrong : "border-white/10"
@@ -740,6 +970,39 @@ function Hero({ activeDomain, setActiveDomain }) {
 }
 
 /* =========================================================================
+   SKILLS MARQUEE (ambient ticker strip)
+   ========================================================================= */
+
+function SkillsMarquee() {
+  const items = useMemo(
+    () => [...SKILLS.systems, ...SKILLS.ai, ...SKILLS.web],
+    []
+  );
+  // Duplicate the list once so the -50% translateX loop is seamless.
+  const track = [...items, ...items];
+
+  return (
+    <div
+      className="marquee-row relative py-6 border-y border-white/5 overflow-hidden"
+      aria-hidden="true"
+    >
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-[#0B0F19] to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-[#0B0F19] to-transparent z-10" />
+      <div className="marquee-track flex w-max items-center gap-3">
+        {track.map((s, i) => (
+          <span
+            key={`${s}-${i}`}
+            className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-mono text-slate-400"
+          >
+            {s}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
    STATS STRIP (live GitHub totals)
    ========================================================================= */
 
@@ -749,33 +1012,35 @@ function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix })
   const count = useCountUp(value, ready && inView);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      onViewportEnter={() => setInView(true)}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.55, delay, ease: "easeOut" }}
-      style={{ boxShadow: "none" }}
-      className={`relative overflow-hidden rounded-2xl border ${d.border} ${d.bg} p-7 sm:p-9 text-center`}
-    >
-      <div className={`mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
-        <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
-      </div>
-      <div className="font-mono text-4xl sm:text-5xl font-semibold text-slate-100 tabular-nums">
-        {ready ? (
-          <>
-            {count.toLocaleString()}
-            {suffix ? <span className={`ml-0.5 ${d.text}`}>{suffix}</span> : null}
-          </>
-        ) : (
-          <span className="inline-block h-10 w-20 rounded bg-white/10 animate-pulse align-middle" />
-        )}
-      </div>
-      <div className="mt-3 text-xs font-mono tracking-widest text-slate-400 uppercase">
-        {label}
-      </div>
-    </motion.div>
+    <TiltCard maxTilt={6}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        onViewportEnter={() => setInView(true)}
+        whileHover={{ y: -5 }}
+        transition={{ duration: 0.55, delay, ease: "easeOut" }}
+        style={{ boxShadow: "none" }}
+        className={`relative overflow-hidden rounded-2xl border ${d.border} ${d.bg} p-7 sm:p-9 text-center`}
+      >
+        <div className={`mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
+          <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
+        </div>
+        <div className="font-mono text-4xl sm:text-5xl font-semibold text-slate-100 tabular-nums">
+          {ready ? (
+            <>
+              {count.toLocaleString()}
+              {suffix ? <span className={`ml-0.5 ${d.text}`}>{suffix}</span> : null}
+            </>
+          ) : (
+            <span className="inline-block h-10 w-20 rounded bg-white/10 animate-pulse align-middle" />
+          )}
+        </div>
+        <div className="mt-3 text-xs font-mono tracking-widest text-slate-400 uppercase">
+          {label}
+        </div>
+      </motion.div>
+    </TiltCard>
   );
 }
 
@@ -824,55 +1089,58 @@ function FeaturedProjects({ activeDomain }) {
             const d = DOMAINS[p.domain];
             const dimmed = activeDomain && activeDomain !== p.domain;
             return (
-              <motion.div
-                layoutId={`feature-${p.id}`}
-                key={p.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                whileHover={{ y: -4, boxShadow: d.glowShadow }}
-                transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
-                className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
-              >
-                <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    whileInView={{ opacity: 0.4, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
-                    className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
-                  >
-                    {p.index}
-                  </motion.div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
-                        {p.title}
-                      </h3>
-                      <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
+              <TiltCard key={p.id} maxTilt={3}>
+                <motion.div
+                  layoutId={`feature-${p.id}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  whileHover={{ y: -4, boxShadow: d.glowShadow }}
+                  transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
+                  className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
+                >
+                  <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
+                    <motion.div
+                      aria-hidden="true"
+                      initial={{ opacity: 0, scale: 0.7 }}
+                      whileInView={{ opacity: 0.4, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
+                      className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
+                    >
+                      {p.index}
+                    </motion.div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
+                          {p.title}
+                        </h3>
+                        <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
+                      </div>
+                      <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
+                        {p.description}
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {p.languages.map((l) => (
+                          <LangBadge key={l} label={l} domain={p.domain} />
+                        ))}
+                      </div>
                     </div>
-                    <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
-                      {p.description}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {p.languages.map((l) => (
-                        <LangBadge key={l} label={l} domain={p.domain} />
-                      ))}
-                    </div>
+                    <motion.a
+                      href={p.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="shrink-0 self-start md:self-center flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 group-hover:text-slate-100 group-hover:border-white/25 transition-colors overflow-hidden"
+                    >
+                      <Code2 className="h-3.5 w-3.5" /> Source
+                      <ArrowUpRight className="h-3.5 w-3.5 -ml-3 opacity-0 -translate-x-1 group-hover:ml-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                      <NewTabHint />
+                    </motion.a>
                   </div>
-                  <motion.a
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="shrink-0 self-start md:self-center flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-2 text-xs text-slate-300 group-hover:text-slate-100 group-hover:border-white/25 transition-colors overflow-hidden"
-                  >
-                    <Code2 className="h-3.5 w-3.5" /> Source
-                    <ArrowUpRight className="h-3.5 w-3.5 -ml-3 opacity-0 -translate-x-1 group-hover:ml-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                  </motion.a>
-                </div>
-              </motion.div>
+                </motion.div>
+              </TiltCard>
             );
           })}
         </div>
@@ -925,7 +1193,7 @@ function Experience() {
                   className={`absolute -left-8 sm:-left-11 top-1.5 h-3 w-3 rounded-full ${d.dot}`}
                 />
                 <div className="font-mono text-xs text-slate-500 mb-1 flex items-center gap-2">
-                  <span className="text-slate-600">{hexAddress}</span>
+                  <span aria-hidden="true" className="text-slate-600">{hexAddress}</span>
                   <span>{e.period}</span>
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-slate-100">{e.role}</h3>
@@ -959,7 +1227,11 @@ function Experience() {
    ========================================================================= */
 
 function useGithubRepos(username) {
-  const [state, setState] = useState({ status: "loading", repos: [], error: null });
+  const cacheKey = `rga:repos:${username}`;
+  const cached = useMemo(() => readCache(cacheKey), [cacheKey]);
+  const [state, setState] = useState(() =>
+    cached ? { status: "ready", repos: cached.data, error: null } : { status: "loading", repos: [], error: null }
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -999,11 +1271,22 @@ function useGithubRepos(username) {
             (a, b) => b.stars - a.stars || new Date(b.updatedAt) - new Date(a.updatedAt)
           );
 
-        if (!cancelled) setState({ status: "ready", repos: mapped, error: null });
+        if (!cancelled) {
+          setState({ status: "ready", repos: mapped, error: null });
+          writeCache(cacheKey, mapped);
+        }
       } catch (err) {
-        if (!cancelled) setState({ status: "error", repos: [], error: err.message });
+        if (cancelled) return;
+        // Rate-limited or offline: serve the cached copy (even if stale) rather than an empty error state.
+        if (cached) {
+          setState({ status: "ready", repos: cached.data, error: null });
+        } else {
+          setState({ status: "error", repos: [], error: err.message });
+        }
       }
     }
+    // Skip the network round-trip entirely if we have a fresh cache.
+    if (cached && !cached.isStale) return;
     run();
     return () => { cancelled = true; };
   }, [username]);
@@ -1012,7 +1295,13 @@ function useGithubRepos(username) {
 }
 
 function useGithubProfile(username) {
-  const [state, setState] = useState({ status: "loading", profile: null, error: null });
+  const cacheKey = `rga:profile:${username}`;
+  const cached = useMemo(() => readCache(cacheKey), [cacheKey]);
+  const [state, setState] = useState(() =>
+    cached
+      ? { status: "ready", profile: cached.data, error: null }
+      : { status: "loading", profile: null, error: null }
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -1025,17 +1314,21 @@ function useGithubProfile(username) {
           throw new Error(res.status === 403 ? "rate_limit" : `http_${res.status}`);
         }
         const data = await res.json();
+        const profile = { followers: data.followers || 0, publicRepos: data.public_repos || 0 };
         if (!cancelled) {
-          setState({
-            status: "ready",
-            profile: { followers: data.followers || 0, publicRepos: data.public_repos || 0 },
-            error: null,
-          });
+          setState({ status: "ready", profile, error: null });
+          writeCache(cacheKey, profile);
         }
       } catch (err) {
-        if (!cancelled) setState({ status: "error", profile: null, error: err.message });
+        if (cancelled) return;
+        if (cached) {
+          setState({ status: "ready", profile: cached.data, error: null });
+        } else {
+          setState({ status: "error", profile: null, error: err.message });
+        }
       }
     }
+    if (cached && !cached.isStale) return;
     run();
     return () => { cancelled = true; };
   }, [username]);
@@ -1118,6 +1411,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                 className="text-cyan-300 hover:underline underline-offset-4"
               >
                 github.com/{GH_USERNAME}
+                <NewTabHint />
               </a>{" "}
               on page load &mdash; search or filter by language and the grid updates live.
             </>
@@ -1132,6 +1426,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search repositories\u2026"
+              aria-label="Search repositories"
               disabled={status !== "ready"}
               className="w-full rounded-full border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 transition disabled:opacity-50"
             />
@@ -1151,6 +1446,8 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                   whileHover={{ scale: 1.06, y: -1 }}
                   whileTap={{ scale: 0.94 }}
                   onClick={() => toggleLang(l)}
+                  aria-pressed={active}
+                  aria-label={`Filter by ${l}`}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-mono transition-colors ${
                     active
                       ? "border-cyan-400/50 bg-cyan-400/10 text-cyan-300"
@@ -1219,6 +1516,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
               className="mt-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-xs text-cyan-300 hover:bg-cyan-400/20 transition-colors"
             >
               <Github className="h-3.5 w-3.5" /> View repositories on GitHub
+              <NewTabHint />
             </a>
           </div>
         )}
@@ -1249,6 +1547,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                         {r.name}
                       </h3>
                       <ExternalLink className="h-3.5 w-3.5 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5" />
+                      <NewTabHint />
                     </div>
                     <p className="mt-2 text-xs text-slate-400 leading-relaxed line-clamp-2">
                       {r.description}
@@ -1293,7 +1592,10 @@ function Contact() {
       <div className="mx-auto max-w-6xl">
         <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-white/5 to-transparent px-4 py-12 sm:py-16 text-center relative overflow-hidden group">
           {/* Quirk: Background matrix packet stream telemetry lines */}
-          <div className="absolute left-4 top-4 font-mono text-[9px] text-slate-700 select-none hidden md:block text-left">
+          <div
+            aria-hidden="true"
+            className="absolute left-4 top-4 font-mono text-[9px] text-slate-700 select-none hidden md:block text-left"
+          >
             PING rga.dev (127.0.0.1) 56(84) bytes of data.<br/>
             64 bytes from localhost: icmp_seq=1 ttl=64 time=0.031 ms
           </div>
@@ -1328,6 +1630,7 @@ function Contact() {
               className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
             >
               <Github className="h-3.5 w-3.5" /> github.com/death7654
+              <NewTabHint />
             </motion.a>
             <motion.a
               href={LINKEDIN_URL}
@@ -1338,6 +1641,7 @@ function Contact() {
               className="inline-flex items-center gap-2 rounded-full border border-white/10 text-slate-300 px-4 py-2.5 text-sm hover:text-slate-100 hover:border-white/25 transition-colors"
             >
               <Linkedin className="h-3.5 w-3.5" /> linkedin.com/in/robinsonarysseril
+              <NewTabHint />
             </motion.a>
           </div>
         </div>
@@ -1352,13 +1656,57 @@ function Contact() {
 }
 
 /* =========================================================================
+   BACK TO TOP
+   ========================================================================= */
+
+function BackToTop() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          initial={{ opacity: 0, y: 12, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 12, scale: 0.9 }}
+          whileHover={{ y: -3, scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          onClick={() => document.querySelector("#top")?.scrollIntoView({ behavior: "smooth" })}
+          aria-label="Back to top"
+          style={{ zIndex: 55 }}
+          className="fixed bottom-6 right-5 sm:right-8 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-[#0B0F19]/90 backdrop-blur text-slate-300 shadow-lg hover:text-cyan-300 hover:border-cyan-400/40 transition-colors"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* =========================================================================
    APP
    ========================================================================= */
 
 export default function Portfolio() {
-  const [phase, setPhase] = useState("kernel");
+  // Only play the boot sequence once per browser session — repeat visits skip straight to content.
+  const [phase, setPhase] = useState(() => {
+    try {
+      return window.sessionStorage.getItem("rga_booted") === "1" ? "ready" : "kernel";
+    } catch {
+      return "kernel";
+    }
+  });
   const [activeDomain, setActiveDomain] = useState(null);
   const kernelDoneRef = useRef(false);
+
+  useDocumentMeta();
 
   const { status: repoStatus, repos, error: repoError } = useGithubRepos(GH_USERNAME);
   const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
@@ -1366,6 +1714,11 @@ export default function Portfolio() {
   const handleKernelDone = () => {
     if (kernelDoneRef.current) return;
     kernelDoneRef.current = true;
+    try {
+      window.sessionStorage.setItem("rga_booted", "1");
+    } catch {
+      // sessionStorage unavailable — boot sequence will just replay next time, no big deal.
+    }
     setPhase("ready");
   };
 
@@ -1397,6 +1750,21 @@ export default function Portfolio() {
           50% { opacity: 1; transform: scale(1.15); }
         }
         .pulse-dot { animation: softPulse 2.2s ease-in-out infinite; }
+        :focus-visible {
+          outline: 2px solid #22D3EE;
+          outline-offset: 2px;
+          border-radius: 4px;
+        }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          animation: marquee 32s linear infinite;
+        }
+        .marquee-row:hover .marquee-track {
+          animation-play-state: paused;
+        }
         @media (prefers-reduced-motion: reduce) {
           * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
         }
@@ -1406,23 +1774,7 @@ export default function Portfolio() {
         {phase === "kernel" && <BootSequence key="kernel" onDone={handleKernelDone} />}
       </AnimatePresence>
 
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
-          animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
-          animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
-          animate={{ x: [0, 25, 0], y: [0, -20, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+      <ParallaxBackdrop />
 
       <ScrollProgress />
 
@@ -1441,12 +1793,14 @@ export default function Portfolio() {
             profileStatus={profileStatus}
             profile={profile}
           />
+          <SkillsMarquee />
           <FeaturedProjects activeDomain={activeDomain} />
           <Experience />
           <RepoArchive activeDomain={activeDomain} status={repoStatus} repos={repos} error={repoError} />
           <Contact />
         </motion.div>
       )}
+      <BackToTop />
     </div>
   );
 }
