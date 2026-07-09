@@ -214,7 +214,7 @@ function inferDomain(language) {
 
 const GITHUB_URL = `https://github.com/${GH_USERNAME}`;
 const LINKEDIN_URL = "https://linkedin.com/in/robinsonarysseril";
-const EMAIL = "robinsonarysseril@gmail.com";
+const EMAIL = "robinsongeorgearysseril301@gmail.com";
 // Four role-tailored resumes. Place each PDF at the matching path below (e.g. in /public/resumes/)
 // for the download buttons on the /resume page to work.
 const RESUME_VARIANTS = [
@@ -954,7 +954,7 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
             <span className="text-slate-500">:~$</span> whoami --academic
             <div className="mt-1 text-slate-300">
               B.Tech, Artificial Intelligence &amp; Data Science &middot; Minor in Electronics &amp; Communications
-              <span className="text-emerald-400/80"> &middot; CGPA 9.46/10</span>
+              <span className="text-emerald-400/80"> &middot; CGPA 9.47/10</span>
               <br className="hidden sm:block" />
               Vimal Jyothi Engineering College &middot; Sep. 2024 &ndash; May 2028
             </div>
@@ -1867,14 +1867,7 @@ function BackToTop() {
    ========================================================================= */
 
 export default function Portfolio() {
-  // Only play the boot sequence once per browser session — repeat visits skip straight to content.
-  const [phase, setPhase] = useState(() => {
-    try {
-      return window.sessionStorage.getItem("rga_booted") === "1" ? "ready" : "kernel";
-    } catch {
-      return "kernel";
-    }
-  });
+  const [phase, setPhase] = useState("kernel");
   const [activeDomain, setActiveDomain] = useState(null);
   const kernelDoneRef = useRef(false);
 
@@ -1902,12 +1895,6 @@ export default function Portfolio() {
     }
     setRoute("resume");
     window.scrollTo(0, 0);
-    // Landing straight on the resume picker shouldn't force the boot sequence later.
-    try {
-      window.sessionStorage.setItem("rga_booted", "1");
-    } catch {
-      // ignore
-    }
     kernelDoneRef.current = true;
     setPhase("ready");
   }, []);
@@ -1928,11 +1915,6 @@ export default function Portfolio() {
   const handleKernelDone = () => {
     if (kernelDoneRef.current) return;
     kernelDoneRef.current = true;
-    try {
-      window.sessionStorage.setItem("rga_booted", "1");
-    } catch {
-      // sessionStorage unavailable — boot sequence will just replay next time, no big deal.
-    }
     setPhase("ready");
   };
 
