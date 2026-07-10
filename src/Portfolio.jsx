@@ -225,7 +225,7 @@ const RESUME_VARIANTS = [
     description:
       "Bare-metal kernels, register-level drivers, and cycle-accurate emulators — for embedded, firmware, and low-level systems roles.",
     fileName: "Robinson-Arysseril-Resume-Systems.pdf",
-    url: "/resumes/RobinsonResumeSystems.pdf",
+    url: "src/assets/resumes/RobinsonResumeSystems.pdf",
   },
   {
     key: "ml",
@@ -234,7 +234,7 @@ const RESUME_VARIANTS = [
     description:
       "NLP bias-classification research, contrastive representation learning, and applied ML — for AI/ML research and engineering roles.",
     fileName: "Robinson-Arysseril-Resume-ML.pdf",
-    url: "/resumes/RobinsonResumeML.pdf",
+    url: "src/assets/resumes/RobinsonResumeML.pdf",
   },
   {
     key: "data-science",
@@ -243,7 +243,7 @@ const RESUME_VARIANTS = [
     description:
       "Forecasting pipelines, statistical modeling, and data engineering — for data science and analytics roles.",
     fileName: "Robinson-Arysseril-Resume-DataScience.pdf",
-    url: "/resumes/RobinsonResumeDataScience.pdf",
+    url: "src/assets/resumes/RobinsonResumeDataScience.pdf",
   },
   {
     key: "frontend",
@@ -252,7 +252,7 @@ const RESUME_VARIANTS = [
     description:
       "Tauri/Angular desktop apps and full-stack tooling — for frontend and product engineering roles.",
     fileName: "Robinson-Arysseril-Resume-Frontend.pdf",
-    url: "/resumes/RobinsonResumeFrontEnd.pdf",
+    url: "src/assets/resumes/RobinsonResumeFrontEnd.pdf",
   },
 ];
 
