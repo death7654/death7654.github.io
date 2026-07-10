@@ -214,7 +214,7 @@ function inferDomain(language) {
 
 const GITHUB_URL = `https://github.com/${GH_USERNAME}`;
 const LINKEDIN_URL = "https://linkedin.com/in/robinsonarysseril";
-const EMAIL = "robinsongeorgearysseril301@gmail.com";
+const EMAIL = "robinsonarysseril@gmail.com";
 // Four role-tailored resumes. Place each PDF at the matching path below (e.g. in /public/resumes/)
 // for the download buttons on the /resume page to work.
 const RESUME_VARIANTS = [
