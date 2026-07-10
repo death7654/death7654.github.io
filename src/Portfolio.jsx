@@ -122,7 +122,7 @@ const FEATURED = [
     title: "Bare Metal ESP32 Kernel",
     languages: ["C", "Python", "Make", "Xtensa Assembly"],
     stat: "Built from the TRM up",
-    url: "https://github.com/death7654/ESP32-Bare-Metal-Kernel",
+    url: "https://github.com/death7654/null32",
     description:
       "A two-stage bootloader and kernel for the ESP32, built entirely from the Technical Reference Manual. Features a custom Xtensa assembly trampoline transferring a kernel binary from DRAM to IRAM, a register-level SPI/SD card driver, a FAT32 filesystem driver traversing cluster chains, and an interactive kernel shell running a domain-specific script interpreter for runtime reprogramming.",
   },
