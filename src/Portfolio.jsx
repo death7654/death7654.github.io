@@ -951,7 +951,7 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
           <GraduationCap className="h-4 w-4 mt-0.5 shrink-0 text-slate-400" />
           <div>
             <span className="text-slate-400">student@vjec</span>
-            <span className="text-slate-500">:~$</span> whoami --academic
+            <span className="text-slate-500">:~$</span> whoami --all
             <div className="mt-1 text-slate-300">
               B.Tech, Artificial Intelligence &amp; Data Science &middot; Minor in Electronics &amp; Communications
               <span className="text-emerald-400/80"> &middot; CGPA 9.47/10</span>
