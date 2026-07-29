@@ -953,8 +953,8 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
             <span className="text-slate-400">student@vjec</span>
             <span className="text-slate-500">:~$</span> whoami --all
             <div className="mt-1 text-slate-300">
-              B.Tech, Artificial Intelligence &amp; Data Science &middot; Minor in Electronics &amp; Communications
-              <span className="text-emerald-400/80"> &middot; CGPA 9.47/10</span>
+              B.Tech, Artificial Intelligence &amp; Data Science
+              <span className="text-emerald-400/80"> &middot; CGPA 9.46/10</span>
               <br className="hidden sm:block" />
               Vimal Jyothi Engineering College &middot; Sep. 2024 &ndash; May 2028
             </div>
