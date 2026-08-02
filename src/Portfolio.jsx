@@ -25,6 +25,7 @@ import {
   ArrowUpRight,
   Star,
   GitFork,
+  GitPullRequest,
   Users,
   Download,
   ArrowUp,
@@ -79,16 +80,16 @@ const SKILLS = {
   systems: [
     "C/C++", "Rust", "Zig", "Xtensa Assembly", "SPI", "UART", "GPIO",
     "FAT32", "MBR", "Memory-Mapped I/O", "Boot Stages", "DMA",
-    "Interrupt Handling", "Make",
+    "Interrupt Handling", "Make", "Git",
   ],
   ai: [
     "PyTorch", "TensorFlow", "Transformers", "Sentence-Transformers",
     "Scikit-Learn", "Pandas", "NumPy", "Matplotlib", "SciPy", "LSTM",
-    "MinMax Scaling", "Prompt Engineering",
+    "MinMax Scaling", "Prompt Engineering", "yfinance",
   ],
   web: [
     "Python", "Java", "JavaScript", "TypeScript", "MySQL", "SQL", "JSON",
-    "REST APIs", "Tauri", "Angular", "Bootstrap", "HTML/CSS",
+    "REST APIs", "Tauri", "Angular", "Bootstrap", "HTML/CSS", "Database Design",
   ],
 };
 
@@ -105,19 +106,8 @@ const FEATURED = [
       "Restores lost functionality and adds powerful new features to all Chromebooks running Windows, Linux, and macOS. Cross-platform and actively maintained, serving a large community. Features direct hardware access via a Rust backend, low-latency sensor polling, and fan curve calculations exposed over IPC to a polished frontend.",
   },
   {
-    id: "driver-installer",
-    index: "02",
-    domain: "systems",
-    title: "Chromebook Driver Installer",
-    languages: ["Rust", "JSON", "SQL"],
-    stat: "5,000+ downloads",
-    url: "https://github.com/death7654/Chromebook-Driver-Installer",
-    description:
-      "Automated driver installation system for Chromebook users. Combines a high-performance Rust CLI tool with a structured backend database cataloging 200+ models, built with a dynamic update mechanism that fetches metadata at runtime to eliminate application rebuilds.",
-  },
-  {
     id: "esp32-kernel",
-    index: "03",
+    index: "02",
     domain: "systems",
     title: "Bare Metal ESP32 Kernel",
     languages: ["C", "Python", "Make", "Xtensa Assembly"],
@@ -125,6 +115,17 @@ const FEATURED = [
     url: "https://github.com/death7654/null32",
     description:
       "A two-stage bootloader and kernel for the ESP32, built entirely from the Technical Reference Manual. Features a custom Xtensa assembly trampoline transferring a kernel binary from DRAM to IRAM, a register-level SPI/SD card driver, a FAT32 filesystem driver traversing cluster chains, and an interactive kernel shell running a domain-specific script interpreter for runtime reprogramming.",
+  },
+  {
+    id: "nes-emulator",
+    index: "03",
+    domain: "systems",
+    title: "NES Emulator",
+    languages: ["Rust"],
+    stat: "Full core, ~48 hours",
+    url: "https://github.com/death7654/NES-Emulator-Rust",
+    description:
+      "A from-scratch Nintendo Entertainment System emulator built in Rust. Implements hardware-accurate 6502 opcode decoding via aaa/bbb/cc bit-group instruction grouping, a shared CPU/PPU bus architecture, and MMC1 mapper support, with scanline-accurate PPU timing reconstructed directly against real cartridge behavior.",
   },
   {
     id: "gameboy",
@@ -138,15 +139,26 @@ const FEATURED = [
       "A cycle-accurate Game Boy (DMG) emulator built from scratch. Implements accurate Sharp LR35902 CPU emulation, a pixel processing unit pipeline with scanline-based rendering, tile caching, sprite compositing, custom memory bank controllers (MBC1/MBC3), and exact OAM DMA timing.",
   },
   {
-    id: "8080",
+    id: "rumbleguard",
     index: "05",
-    domain: "systems",
-    title: "Space Invaders / Intel 8080",
-    languages: ["C++"],
-    stat: "1978 cabinet, faithfully",
-    url: "https://github.com/death7654/Intel-8080-Emulator",
+    domain: "web",
+    title: "RumbleGuard",
+    languages: ["Rust", "TypeScript", "Angular"],
+    stat: "Real-time audio DSP, on Android",
+    url: "https://github.com/death7654/RumbleGuard",
     description:
-      "A faithful emulation of the classic 1978 arcade cabinet hardware. Implements a complete Intel 8080 instruction set with accurate flag arithmetic, memory-mapped I/O, bitwise shift registers, and hardware-driven interrupt loops synchronized tightly to cycle counts to reproduce alternating VBLANK intervals.",
+      "A cross-platform application that turns a phone's microphone into a real-time cabin noise canceller. Built with a Tauri/Rust core performing live FFT analysis and adaptive EQ compensation, wrapped in an Angular frontend and shipped to Android. Originated as a hackathon build and grew into a fully working signal-processing pipeline.",
+  },
+  {
+    id: "news-bias-classifier",
+    index: "06",
+    domain: "ai",
+    title: "News Bias Classifier",
+    languages: ["Python", "Jupyter Notebook"],
+    stat: "94% accuracy, BART-large-MNLI",
+    url: "https://github.com/death7654/News-Bias-Classifier",
+    description:
+      "A research pipeline for detecting linguistic bias in news headlines using the BABE dataset, built during an AI research internship at Amrita School of Artificial Intelligence. Progressed through eight modeling stages, from a TextBlob baseline to a fine-tuned facebook/bart-large-mnli model reaching 94% accuracy, benchmarked against Qwen2 and DeBERTa and a zero-shot SmolLM2 pipeline.",
   },
 ];
 
@@ -205,8 +217,84 @@ const SYSTEMS_LANGS = new Set([
 ]);
 const AI_LANGS = new Set(["Python", "Jupyter Notebook", "R", "MATLAB"]);
 
-function inferDomain(language) {
-  if (!language) return "web";
+// Manually classified domain for every known repo (keys are lowercase repo
+// names). This is checked first and wins outright. Any repo NOT in this table
+// (i.e. a new one pushed to GitHub) falls through to the keyword-based
+// inferDomain() algorithm below, so new projects auto-categorize without
+// needing this list touched.
+const STATIC_REPO_DOMAINS = {
+  "chrultrabook-tools": "systems",
+  "chromebook-driver-installer": "systems",
+  "chromebookdatabase": "systems",
+  "rumbleguard": "web",
+  "ml-algorithms": "ai",
+  "null32": "systems",
+  "death7654.github.io": "web",
+  "nes-emulator-rust": "systems",
+  "death7654": "web",
+  "stock-market-predictor-ml-model": "ai",
+  "chip8-emulator-rust": "systems",
+  "chip8-emulator-cpp": "systems",
+  "xo-chip-emulator-zig": "systems",
+  "intel-8080-emulator": "systems",
+  "gameboy-emulator-rust": "systems",
+  "news-bias-classifier": "ai",
+  "fat32-reader-windows": "systems",
+  "binancetradingbot": "ai",
+  "cherry-labs": "web",
+  "chromium-tools": "systems",
+  "croskb4-config-generator": "systems",
+  "movie-ticket-booking-system": "web",
+  "openvoice-openbee": "ai",
+  "tools_list_rust": "systems",
+  "stock-market-predictor-frontend": "web",
+  "driver-installer-links": "systems",
+  "antipop-for-chromebooks": "systems",
+};
+
+// Fallback only: infers domain from what an unclassified project actually IS
+// (its name, description, and GitHub topics), not its primary language — a
+// systems tool with a TypeScript/Angular frontend is still a systems project.
+const DOMAIN_KEYWORDS = {
+  systems: [
+    "emulator", "kernel", "os", "bootloader", "firmware", "driver", "esp32",
+    "embedded", "chip8", "chip-8", "gameboy", "game-boy", "nes", "cpu",
+    "bare-metal", "baremetal", "xtensa", "assembly", "chromebook", "mapper",
+    "bios", "hardware", "interrupt", "fat32", "filesystem", "8080", "xo-chip",
+    "rtos", "microcontroller", "spi", "uart", "gpio",
+  ],
+  ai: [
+    "ml", "ai", "model", "classifier", "classification", "predictor",
+    "prediction", "neural", "nlp", "bias", "lstm", "dataset", "bert",
+    "machine-learning", "sentiment", "transformer", "embedding", "pytorch",
+    "tensorflow", "forecast", "llm",
+  ],
+  web: [
+    "web", "webapp", "frontend", "front-end", "react", "angular", "website",
+    "portfolio", "api", "tool", "cli", "installer", "database", "bot",
+    "ticket", "booking", "voice", "config", "generator", "fullstack",
+    "full-stack", "ui",
+  ],
+};
+
+function scoreDomain(text, keywords) {
+  return keywords.reduce((score, kw) => (text.includes(kw) ? score + 1 : score), 0);
+}
+
+function inferDomain({ name, description, topics, language }) {
+  const known = STATIC_REPO_DOMAINS[(name || "").toLowerCase()];
+  if (known) return known;
+
+  const text = [name, description, ...(topics || [])].filter(Boolean).join(" ").toLowerCase();
+  const scores = {
+    systems: scoreDomain(text, DOMAIN_KEYWORDS.systems),
+    ai: scoreDomain(text, DOMAIN_KEYWORDS.ai),
+    web: scoreDomain(text, DOMAIN_KEYWORDS.web),
+  };
+  const [topDomain, topScore] = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+  if (topScore > 0) return topDomain;
+
+  // No keyword signal at all (e.g. an undescribed repo) — fall back to language.
   if (SYSTEMS_LANGS.has(language)) return "systems";
   if (AI_LANGS.has(language)) return "ai";
   return "web";
@@ -1147,7 +1235,7 @@ function FeaturedProjects({ activeDomain }) {
         <SectionHeading
           eyebrow="Featured masterpieces"
           title="Built from first principles"
-          subtitle="Five projects spanning the register-level and the runtime &mdash; kernels, cartridges, and cabinets, reconstructed from datasheets and reference manuals rather than tutorials."
+          subtitle="Six projects spanning the register-level and the runtime &mdash; kernels, cartridges, real-time signal pipelines, and trained models, built from datasheets, technical manuals, and research papers rather than tutorials."
           quirk="ls -la ~/featured/production/"
         />
 
@@ -1328,9 +1416,15 @@ function useGithubRepos(username) {
             name: r.name,
             description: r.description || "No description provided.",
             language: r.language,
-            domain: inferDomain(r.language),
+            domain: inferDomain({
+              name: r.name,
+              description: r.description,
+              topics: r.topics,
+              language: r.language,
+            }),
             stars: r.stargazers_count || 0,
             forks: r.forks_count || 0,
+            openIssues: r.open_issues_count || 0,
             updatedAt: r.updated_at,
             url: r.html_url,
           }))
@@ -1439,6 +1533,9 @@ function useCountUp(target, active, duration = 1400) {
 function RepoArchive({ activeDomain, status, repos, error }) {
   const [query, setQuery] = useState("");
   const [selectedLangs, setSelectedLangs] = useState([]);
+  const [expanded, setExpanded] = useState(() =>
+    Object.fromEntries(Object.keys(DOMAINS).map((k) => [k, true]))
+  );
 
   const allLangs = useMemo(() => {
     const s = new Set();
@@ -1448,6 +1545,9 @@ function RepoArchive({ activeDomain, status, repos, error }) {
 
   const toggleLang = (l) =>
     setSelectedLangs((prev) => (prev.includes(l) ? prev.filter((x) => x !== l) : [...prev, l]));
+
+  const toggleExpanded = (key) =>
+    setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const filtered = useMemo(() => {
     return repos.filter((r) => {
@@ -1461,6 +1561,12 @@ function RepoArchive({ activeDomain, status, repos, error }) {
       return true;
     });
   }, [repos, activeDomain, selectedLangs, query]);
+
+  const domainGroups = useMemo(() => {
+    return Object.values(DOMAINS)
+      .map((d) => ({ domain: d, repos: filtered.filter((r) => r.domain === d.key) }))
+      .filter((g) => g.repos.length > 0);
+  }, [filtered]);
 
   return (
     <section id="archive" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
@@ -1480,10 +1586,11 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                 github.com/{GH_USERNAME}
                 <NewTabHint />
               </a>{" "}
-              on page load &mdash; search or filter by language and the grid updates live.
+              on page load, sorted into a directory tree by domain &mdash; search, filter by
+              language, or collapse a branch and the tree updates live.
             </>
           }
-          quirk={`df -h /dev/github/${GH_USERNAME}`}
+          quirk={`tree ~/${GH_USERNAME} -L 2 --dirsfirst`}
         />
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -1554,16 +1661,18 @@ function RepoArchive({ activeDomain, status, repos, error }) {
         )}
 
         {status === "loading" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8 font-mono text-sm space-y-3">
+            {Array.from({ length: 7 }).map((_, i) => (
               <div
                 key={i}
-                className="animate-pulse rounded-xl border border-white/10 bg-white/5 p-5 h-32"
+                className="animate-pulse flex items-center gap-2"
+                style={{ marginLeft: i === 0 || i === 3 ? 0 : 24 }}
               >
-                <div className="h-3.5 w-2/3 rounded bg-white/10 mb-3" />
-                <div className="h-2.5 w-full rounded bg-white/5 mb-2" />
-                <div className="h-2.5 w-4/5 rounded bg-white/5 mb-4" />
-                <div className="h-4 w-16 rounded-full bg-white/10" />
+                <span className="text-slate-700">{i === 0 || i === 3 ? "├──" : "│  ├──"}</span>
+                <div
+                  className="h-3 rounded bg-white/10"
+                  style={{ width: 60 + ((i * 37) % 140) }}
+                />
               </div>
             ))}
           </div>
@@ -1588,55 +1697,114 @@ function RepoArchive({ activeDomain, status, repos, error }) {
           </div>
         )}
 
-        {status === "ready" && (
-          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AnimatePresence mode="popLayout">
-              {filtered.map((r, ri) => {
-                const d = DOMAINS[r.domain];
-                const langColor = r.language ? LANGUAGE_COLORS[r.language] || LANGUAGE_FALLBACK_COLOR : null;
-                return (
-                  <motion.a
-                    layout
-                    key={r.id}
-                    href={r.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    initial={{ opacity: 0, scale: 0.96, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    whileHover={{ y: -4, scale: 1.015 }}
-                    whileTap={{ scale: 0.99 }}
-                    transition={{ duration: 0.3, delay: Math.min(ri, 8) * 0.03, ease: "easeOut" }}
-                    className={`group block rounded-xl border ${d.border} bg-white/5 hover:bg-white/10 p-5 transition-colors border-l-2 ${d.borderStrong}`}
+        {status === "ready" && domainGroups.length > 0 && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-8 font-mono text-sm overflow-x-auto">
+            <div className="text-slate-600 mb-4 whitespace-nowrap">
+              <span className="text-emerald-400/70">student@vjec</span>
+              <span className="text-slate-600">:~$</span> tree ./{GH_USERNAME} -L 2
+            </div>
+            <div className="text-slate-300 mb-1 whitespace-nowrap">{GH_USERNAME}/</div>
+
+            {domainGroups.map(({ domain: d, repos: domainRepos }, di) => {
+              const isLastDomain = di === domainGroups.length - 1;
+              const isOpen = expanded[d.key];
+              const Icon = d.key === "systems" ? Cpu : d.key === "ai" ? Brain : Code2;
+              return (
+                <div key={d.key} className="min-w-max">
+                  <motion.button
+                    onClick={() => toggleExpanded(d.key)}
+                    whileHover={{ x: 2 }}
+                    aria-expanded={isOpen}
+                    className={`flex items-center gap-2 py-1 pr-3 rounded transition-colors hover:bg-white/5 ${d.text}`}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-sm font-medium text-slate-100 leading-snug">
-                        {r.name}
-                      </h3>
-                      <ExternalLink className="h-3.5 w-3.5 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 mt-0.5" />
-                      <NewTabHint />
-                    </div>
-                    <p className="mt-2 text-xs text-slate-400 leading-relaxed line-clamp-2">
-                      {r.description}
-                    </p>
-                    <div className="mt-3 flex items-center justify-between gap-2">
-                      {langColor ? (
-                        <LangBadge label={r.language} hex={langColor} />
-                      ) : (
-                        <span className="text-xs font-mono text-slate-500">&mdash;</span>
-                      )}
-                      <div className="flex items-center gap-3 text-xs font-mono text-slate-500 shrink-0">
-                        <span className="inline-flex items-center gap-1">
-                          <Star className="h-3 w-3" /> {r.stars}
-                        </span>
-                        <span className="hidden sm:inline">{timeAgo(r.updatedAt)}</span>
-                      </div>
-                    </div>
-                  </motion.a>
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
+                    <span className="text-slate-600">{isLastDomain ? "└──" : "├──"}</span>
+                    <motion.span
+                      animate={{ rotate: isOpen ? 90 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-slate-500"
+                    >
+                      <ChevronRight className="h-3 w-3" />
+                    </motion.span>
+                    <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+                    <span className="font-medium">{d.key}/</span>
+                    <span className="text-slate-600 text-xs">
+                      {domainRepos.length} {domainRepos.length === 1 ? "repo" : "repos"}
+                    </span>
+                  </motion.button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        className="overflow-hidden relative"
+                      >
+                        {!isLastDomain && (
+                          <div className="absolute left-[7px] top-0 bottom-0 w-px bg-white/10" />
+                        )}
+                        <div className="pl-6">
+                          {domainRepos.map((r, ri) => {
+                            const isLastRepo = ri === domainRepos.length - 1;
+                            const langColor = r.language
+                              ? LANGUAGE_COLORS[r.language] || LANGUAGE_FALLBACK_COLOR
+                              : null;
+                            return (
+                              <motion.a
+                                key={r.id}
+                                href={r.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                initial={{ opacity: 0, x: -6 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.2, delay: Math.min(ri, 10) * 0.02 }}
+                                className="group grid grid-cols-[1.1rem_0.65rem_minmax(0,1fr)_3rem_3rem_4.75rem_0.9rem] items-center gap-x-2 py-1 pr-2 rounded hover:bg-white/5 transition-colors"
+                              >
+                                <span className="text-slate-700 shrink-0">
+                                  {isLastRepo ? "└──" : "├──"}
+                                </span>
+                                {langColor ? (
+                                  <span
+                                    className="h-1.5 w-1.5 rounded-full shrink-0"
+                                    style={{ backgroundColor: langColor }}
+                                  />
+                                ) : (
+                                  <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-slate-600" />
+                                )}
+                                <span className="min-w-0 flex items-baseline gap-2.5 overflow-hidden">
+                                  <span className="text-slate-200 group-hover:text-cyan-300 transition-colors shrink-0">
+                                    {r.name}
+                                  </span>
+                                  <span className="hidden md:inline text-slate-500 text-xs truncate">
+                                    {r.description}
+                                  </span>
+                                </span>
+                                <span className="inline-flex items-center justify-end gap-1 text-xs text-slate-500 tabular-nums">
+                                  <Star className="h-3 w-3 shrink-0" /> {r.stars}
+                                </span>
+                                <span
+                                  title="Open pull requests + issues"
+                                  className="inline-flex items-center justify-end gap-1 text-xs text-slate-500 tabular-nums"
+                                >
+                                  <GitPullRequest className="h-3 w-3 shrink-0" /> {r.openIssues}
+                                </span>
+                                <span className="hidden sm:inline text-right text-xs text-slate-500 tabular-nums">
+                                  {timeAgo(r.updatedAt)}
+                                </span>
+                                <ExternalLink className="h-3 w-3 justify-self-end opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <NewTabHint />
+                              </motion.a>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
         )}
 
         {status === "ready" && filtered.length === 0 && (
