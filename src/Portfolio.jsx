@@ -313,7 +313,16 @@ const RESUME_VARIANTS = [
     description:
       "Bare-metal kernels, register-level drivers, and cycle-accurate emulators — for embedded, firmware, and low-level systems roles.",
     fileName: "Robinson-Arysseril-Resume-Systems.pdf",
-    url: "/resumes/RobinsonResumeSystems.pdf", 
+    url: "/resumes/RobinsonResumeSystems.pdf",
+  },
+  {
+    key: "swe",
+    label: "Software Engineering",
+    domain: "systems",
+    description:
+      "Cycle-accurate emulators and cross-platform tooling shipped to 47,000+ users, plus a bare-metal kernel built from the reference manual up — for general SWE and backend roles.",
+    fileName: "Robinson-Arysseril-Resume-SWE.pdf",
+    url: "/resumes/RobinsonResumeSWE.pdf",
   },
   {
     key: "ml",
@@ -332,15 +341,6 @@ const RESUME_VARIANTS = [
       "Forecasting pipelines, statistical modeling, and data engineering — for data science and analytics roles.",
     fileName: "Robinson-Arysseril-Resume-DataScience.pdf",
     url: "/resumes/RobinsonResumeDataScience.pdf",
-  },
-  {
-    key: "frontend",
-    label: "Frontend & Fullstack",
-    domain: "web",
-    description:
-      "Tauri/Angular desktop apps and full-stack tooling — for frontend and product engineering roles.",
-    fileName: "Robinson-Arysseril-Resume-Frontend.pdf",
-    url: "/resumes/RobinsonResumeFrontEnd.pdf",
   },
 ];
 
