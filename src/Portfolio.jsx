@@ -62,7 +62,7 @@ const DOMAINS = {
   compilers: {
     key: "compilers",
     label: "Compilers & JIT Engines",
-    short: "Compilers",
+    short: "Compilers & JIT Engines",
     hex: "#A78BFA",
     Icon: Cog,
     text: "text-violet-300",
@@ -75,7 +75,7 @@ const DOMAINS = {
   os: {
     key: "os",
     label: "Operating Systems & Low-Level",
-    short: "OS / Kernel",
+    short: "OS/Kernel",
     hex: "#38BDF8",
     Icon: HardDrive,
     text: "text-sky-300",
@@ -101,7 +101,7 @@ const DOMAINS = {
   ml: {
     key: "ml",
     label: "Machine Learning & AI",
-    short: "ML / AI",
+    short: "ML/AI",
     hex: "#34D399",
     Icon: Brain,
     text: "text-emerald-300",
@@ -159,7 +159,7 @@ const ALL_SKILLS = [
   "MBR", "Interrupt Handling", "DMA", "LLVM", "PyTorch", "TensorFlow",
   "Transformers", "Scikit-Learn", "Pandas", "NumPy", "LSTM",
   "Prompt Engineering", "Python", "Java", "JavaScript", "TypeScript",
-  "MySQL", "REST APIs", "Tauri", "Angular", "Kafka", "PySpark",
+  "MySQL", "REST APIs", "Tauri", "Angular", "Kafka", "PySpark", "Just In Time Compilers",
 ];
 
 const FEATURED = [
@@ -169,7 +169,7 @@ const FEATURED = [
     domain: "chromebook",
     title: "Chrultrabook Tools",
     languages: ["TypeScript", "Rust", "HTML", "SCSS", "Nix", "Shell"],
-    stat: "45,000+ downloads",
+    stat: "47,000+ downloads",
     url: "https://github.com/death7654/Chrultrabook-Tools",
     description:
       "Restores lost functionality and adds powerful new features to all Chromebooks running Windows, Linux, and macOS. Cross-platform and actively maintained, serving a large community. Features direct hardware access via a Rust backend, low-latency sensor polling, and fan curve calculations exposed over IPC to a polished frontend.",
@@ -320,7 +320,7 @@ const STATIC_REPO_DOMAINS = {
   "binancetradingbot": "finance",
   "sentineldefi": "finance",
   "cherry-labs": "web",
-  "movie-ticket-booking-system": "web",
+  "movie-ticket-booking-system": "os",
   "openvoice-openbox": "misc",
   "todo_list_rust": "os",
   "stock-market-predictor-frontend": "finance",
