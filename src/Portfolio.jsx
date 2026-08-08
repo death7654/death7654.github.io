@@ -21,10 +21,15 @@ import {
   Cpu,
   Brain,
   Code2,
+  Cog,
+  HardDrive,
+  Laptop,
+  TrendingUp,
+  Globe,
+  Rocket,
   GraduationCap,
   ArrowUpRight,
   Star,
-  GitFork,
   GitPullRequest,
   Users,
   Download,
@@ -37,12 +42,16 @@ import {
    DATA
    ========================================================================= */
 
+// Eight project categories, each carrying its own icon + color tokens so
+// every consumer (hero filter, featured cards, archive tree, resume cards)
+// can pull from one source instead of re-deriving an icon/color per usage.
 const DOMAINS = {
-  systems: {
-    key: "systems",
-    label: "Low-Level & Embedded",
-    short: "Systems / Emulation",
+  emu: {
+    key: "emu",
+    label: "Emulators & Virtual Machines",
+    short: "Emulation",
     hex: "#22D3EE",
+    Icon: Cpu,
     text: "text-cyan-300",
     borderStrong: "border-cyan-400/70",
     border: "border-cyan-400/25",
@@ -50,11 +59,51 @@ const DOMAINS = {
     dot: "bg-cyan-400",
     glowShadow: "0 0 40px -8px rgba(34,211,238,0.35)",
   },
-  ai: {
-    key: "ai",
+  compilers: {
+    key: "compilers",
+    label: "Compilers & JIT Engines",
+    short: "Compilers",
+    hex: "#A78BFA",
+    Icon: Cog,
+    text: "text-violet-300",
+    borderStrong: "border-violet-400/70",
+    border: "border-violet-400/25",
+    bg: "bg-violet-400/15",
+    dot: "bg-violet-400",
+    glowShadow: "0 0 40px -8px rgba(167,139,250,0.35)",
+  },
+  os: {
+    key: "os",
+    label: "Operating Systems & Low-Level",
+    short: "OS / Kernel",
+    hex: "#38BDF8",
+    Icon: HardDrive,
+    text: "text-sky-300",
+    borderStrong: "border-sky-400/70",
+    border: "border-sky-400/25",
+    bg: "bg-sky-400/15",
+    dot: "bg-sky-400",
+    glowShadow: "0 0 40px -8px rgba(56,189,248,0.35)",
+  },
+  chromebook: {
+    key: "chromebook",
+    label: "Chromebook Ecosystem Tools",
+    short: "Chromebook",
+    hex: "#FBBF24",
+    Icon: Laptop,
+    text: "text-amber-300",
+    borderStrong: "border-amber-400/70",
+    border: "border-amber-400/25",
+    bg: "bg-amber-400/15",
+    dot: "bg-amber-400",
+    glowShadow: "0 0 40px -8px rgba(251,191,36,0.35)",
+  },
+  ml: {
+    key: "ml",
     label: "Machine Learning & AI",
-    short: "AI / ML",
+    short: "ML / AI",
     hex: "#34D399",
+    Icon: Brain,
     text: "text-emerald-300",
     borderStrong: "border-emerald-400/70",
     border: "border-emerald-400/25",
@@ -62,42 +111,62 @@ const DOMAINS = {
     dot: "bg-emerald-400",
     glowShadow: "0 0 40px -8px rgba(52,211,153,0.35)",
   },
+  finance: {
+    key: "finance",
+    label: "Finance & Trading",
+    short: "Finance",
+    hex: "#A3E635",
+    Icon: TrendingUp,
+    text: "text-lime-300",
+    borderStrong: "border-lime-400/70",
+    border: "border-lime-400/25",
+    bg: "bg-lime-400/15",
+    dot: "bg-lime-400",
+    glowShadow: "0 0 40px -8px rgba(163,230,53,0.35)",
+  },
   web: {
     key: "web",
-    label: "Fullstack & Systems Tooling",
-    short: "Web / Tooling",
-    hex: "#CBD5E1",
-    text: "text-slate-300",
-    borderStrong: "border-slate-300/70",
-    border: "border-slate-300/25",
-    bg: "bg-slate-300/15",
-    dot: "bg-slate-300",
-    glowShadow: "0 0 40px -8px rgba(203,213,225,0.25)",
+    label: "Web Applications & Frontends",
+    short: "Web",
+    hex: "#E879F9",
+    Icon: Globe,
+    text: "text-fuchsia-300",
+    borderStrong: "border-fuchsia-400/70",
+    border: "border-fuchsia-400/25",
+    bg: "bg-fuchsia-400/15",
+    dot: "bg-fuchsia-400",
+    glowShadow: "0 0 40px -8px rgba(232,121,249,0.35)",
+  },
+  misc: {
+    key: "misc",
+    label: "Hackathon & Misc",
+    short: "Misc",
+    hex: "#FB923C",
+    Icon: Rocket,
+    text: "text-orange-300",
+    borderStrong: "border-orange-400/70",
+    border: "border-orange-400/25",
+    bg: "bg-orange-400/15",
+    dot: "bg-orange-400",
+    glowShadow: "0 0 40px -8px rgba(251,146,60,0.35)",
   },
 };
 
-const SKILLS = {
-  systems: [
-    "C/C++", "Rust", "Zig", "Xtensa Assembly", "SPI", "UART", "GPIO",
-    "FAT32", "MBR", "Memory-Mapped I/O", "Boot Stages", "DMA",
-    "Interrupt Handling", "Make", "Git",
-  ],
-  ai: [
-    "PyTorch", "TensorFlow", "Transformers", "Sentence-Transformers",
-    "Scikit-Learn", "Pandas", "NumPy", "Matplotlib", "SciPy", "LSTM",
-    "MinMax Scaling", "Prompt Engineering", "yfinance",
-  ],
-  web: [
-    "Python", "Java", "JavaScript", "TypeScript", "MySQL", "SQL", "JSON",
-    "REST APIs", "Tauri", "Angular", "Bootstrap", "HTML/CSS", "Database Design",
-  ],
-};
+// Flat ambient skill list for the ticker strip — not tied to a single
+// category since most of these span several of the eight domains above.
+const ALL_SKILLS = [
+  "C/C++", "Rust", "Zig", "Xtensa Assembly", "SPI", "UART", "GPIO", "FAT32",
+  "MBR", "Interrupt Handling", "DMA", "LLVM", "PyTorch", "TensorFlow",
+  "Transformers", "Scikit-Learn", "Pandas", "NumPy", "LSTM",
+  "Prompt Engineering", "Python", "Java", "JavaScript", "TypeScript",
+  "MySQL", "REST APIs", "Tauri", "Angular", "Kafka", "PySpark",
+];
 
 const FEATURED = [
   {
     id: "chrultrabook",
     index: "01",
-    domain: "systems",
+    domain: "chromebook",
     title: "Chrultrabook Tools",
     languages: ["TypeScript", "Rust", "HTML", "SCSS", "Nix", "Shell"],
     stat: "45,000+ downloads",
@@ -108,7 +177,7 @@ const FEATURED = [
   {
     id: "esp32-kernel",
     index: "02",
-    domain: "systems",
+    domain: "os",
     title: "Bare Metal ESP32 Kernel",
     languages: ["C", "Python", "Make", "Xtensa Assembly"],
     stat: "Built from the TRM up",
@@ -119,7 +188,7 @@ const FEATURED = [
   {
     id: "nes-emulator",
     index: "03",
-    domain: "systems",
+    domain: "emu",
     title: "NES Emulator",
     languages: ["Rust"],
     stat: "Full core, ~48 hours",
@@ -130,7 +199,7 @@ const FEATURED = [
   {
     id: "gameboy",
     index: "04",
-    domain: "systems",
+    domain: "emu",
     title: "Game Boy Emulator",
     languages: ["Rust"],
     stat: "Cycle-accurate DMG core",
@@ -152,7 +221,7 @@ const FEATURED = [
   {
     id: "news-bias-classifier",
     index: "06",
-    domain: "ai",
+    domain: "ml",
     title: "News Bias Classifier",
     languages: ["Python", "Jupyter Notebook"],
     stat: "94% accuracy, BART-large-MNLI",
@@ -167,7 +236,7 @@ const EXPERIENCE = [
     role: "Research Intern",
     org: "Amrita School of Artificial Intelligence",
     period: "May 2026 — Jun. 2026",
-    domain: "ai",
+    domain: "ml",
     points: [
       "Investigated and mitigated linguistic gender bias in AI systems under Dr. Premjith B.",
       "Built an NLP pipeline using Sentence-BERT embeddings and a custom 5-layer feed-forward PyTorch architecture optimizing dual cross-entropy / contrastive loss functions.",
@@ -178,7 +247,7 @@ const EXPERIENCE = [
     role: "Open Source Contributor",
     org: "Chrultrabook Project",
     period: "May 2023 — Present",
-    domain: "systems",
+    domain: "chromebook",
     points: [
       "Maintain primary systems tooling and resolve upstream documentation gaps.",
       "Manage centralized hardware compatibility schemas across supported devices.",
@@ -212,10 +281,12 @@ const LANGUAGE_COLORS = {
 };
 const LANGUAGE_FALLBACK_COLOR = "#8b949e";
 
-const SYSTEMS_LANGS = new Set([
+// Language-based fallback only kicks in when a repo has zero keyword signal
+// (see inferDomain below) — these are broad, not authoritative.
+const LOW_LEVEL_LANGS = new Set([
   "C", "C++", "Rust", "Zig", "Assembly", "Makefile", "Shell", "Dockerfile", "Nix",
 ]);
-const AI_LANGS = new Set(["Python", "Jupyter Notebook", "R", "MATLAB"]);
+const ML_LANGS = new Set(["Python", "Jupyter Notebook", "R", "MATLAB"]);
 
 // Manually classified domain for every known repo (keys are lowercase repo
 // names). This is checked first and wins outright. Any repo NOT in this table
@@ -223,58 +294,72 @@ const AI_LANGS = new Set(["Python", "Jupyter Notebook", "R", "MATLAB"]);
 // inferDomain() algorithm below, so new projects auto-categorize without
 // needing this list touched.
 const STATIC_REPO_DOMAINS = {
-  "chrultrabook-tools": "systems",
-  "chromebook-driver-installer": "systems",
-  "chromebookdatabase": "systems",
+  "chrultrabook-tools": "chromebook",
+  "chromebook-driver-installer": "chromebook",
+  "chromebookdatabase": "chromebook",
+  "antipop-for-chromebooks": "chromebook",
+  "driver-installer-links": "chromebook",
+  "croskb4-config-generator": "chromebook",
+  "chromium-tools": "chromebook",
   "rumbleguard": "web",
-  "ml-algorithms": "ai",
-  "null32": "systems",
+  "ml-algorithms": "ml",
+  "null32": "os",
   "death7654.github.io": "web",
-  "nes-emulator-rust": "systems",
+  "nes-emulator-rust": "emu",
   "death7654": "web",
-  "stock-market-predictor-ml-model": "ai",
-  "chip8-emulator-rust": "systems",
-  "chip8-emulator-cpp": "systems",
-  "xo-chip-emulator-zig": "systems",
-  "intel-8080-emulator": "systems",
-  "gameboy-emulator-rust": "systems",
-  "news-bias-classifier": "ai",
-  "fat32-reader-windows": "systems",
-  "binancetradingbot": "ai",
+  "stock-market-predictor-ml-model": "ml",
+  "chip8-emulator-rust": "emu",
+  "chip8-emulator-cpp": "emu",
+  "chip8-jit-rust": "compilers",
+  "brainfork-jit": "compilers",
+  "xo-chip-emulator-zig": "emu",
+  "intel-8080-emulator": "emu",
+  "gameboy-emulator-rust": "emu",
+  "news-bias-classifier": "ml",
+  "fat32-reader-windows": "os",
+  "binancetradingbot": "finance",
+  "sentineldefi": "finance",
   "cherry-labs": "web",
-  "chromium-tools": "systems",
-  "croskb4-config-generator": "systems",
   "movie-ticket-booking-system": "web",
-  "openvoice-openbee": "ai",
-  "tools_list_rust": "systems",
-  "stock-market-predictor-frontend": "web",
-  "driver-installer-links": "systems",
-  "antipop-for-chromebooks": "systems",
+  "openvoice-openbox": "misc",
+  "todo_list_rust": "os",
+  "stock-market-predictor-frontend": "finance",
 };
 
 // Fallback only: infers domain from what an unclassified project actually IS
 // (its name, description, and GitHub topics), not its primary language — a
 // systems tool with a TypeScript/Angular frontend is still a systems project.
 const DOMAIN_KEYWORDS = {
-  systems: [
-    "emulator", "kernel", "os", "bootloader", "firmware", "driver", "esp32",
-    "embedded", "chip8", "chip-8", "gameboy", "game-boy", "nes", "cpu",
-    "bare-metal", "baremetal", "xtensa", "assembly", "chromebook", "mapper",
-    "bios", "hardware", "interrupt", "fat32", "filesystem", "8080", "xo-chip",
+  emu: [
+    "emulator", "chip8", "chip-8", "gameboy", "game-boy", "nes", "console",
+    "mapper", "8080", "xo-chip", "cartridge", "rom",
+  ],
+  compilers: [
+    "compiler", "jit", "interpreter", "bytecode", "recompiler",
+    "transpiler", "assembler", "vm", "virtual-machine",
+  ],
+  os: [
+    "kernel", "os", "bootloader", "firmware", "bare-metal", "baremetal",
+    "xtensa", "esp32", "embedded", "interrupt", "fat32", "filesystem",
     "rtos", "microcontroller", "spi", "uart", "gpio",
   ],
-  ai: [
+  chromebook: ["chromebook", "chrome-os", "chromeos", "coolstar", "driver"],
+  ml: [
     "ml", "ai", "model", "classifier", "classification", "predictor",
     "prediction", "neural", "nlp", "bias", "lstm", "dataset", "bert",
     "machine-learning", "sentiment", "transformer", "embedding", "pytorch",
     "tensorflow", "forecast", "llm",
   ],
+  finance: [
+    "stock", "trading", "defi", "crypto", "binance", "finance", "market",
+    "blockchain", "streaming-pipeline", "kafka",
+  ],
   web: [
     "web", "webapp", "frontend", "front-end", "react", "angular", "website",
-    "portfolio", "api", "tool", "cli", "installer", "database", "bot",
-    "ticket", "booking", "voice", "config", "generator", "fullstack",
-    "full-stack", "ui",
+    "portfolio", "api", "ui", "fullstack", "full-stack", "database",
+    "booking", "ticket",
   ],
+  misc: ["hackathon", "fosshack", "hack", "demo", "prototype", "experiment"],
 };
 
 function scoreDomain(text, keywords) {
@@ -286,17 +371,15 @@ function inferDomain({ name, description, topics, language }) {
   if (known) return known;
 
   const text = [name, description, ...(topics || [])].filter(Boolean).join(" ").toLowerCase();
-  const scores = {
-    systems: scoreDomain(text, DOMAIN_KEYWORDS.systems),
-    ai: scoreDomain(text, DOMAIN_KEYWORDS.ai),
-    web: scoreDomain(text, DOMAIN_KEYWORDS.web),
-  };
+  const scores = Object.fromEntries(
+    Object.keys(DOMAIN_KEYWORDS).map((key) => [key, scoreDomain(text, DOMAIN_KEYWORDS[key])])
+  );
   const [topDomain, topScore] = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
   if (topScore > 0) return topDomain;
 
   // No keyword signal at all (e.g. an undescribed repo) — fall back to language.
-  if (SYSTEMS_LANGS.has(language)) return "systems";
-  if (AI_LANGS.has(language)) return "ai";
+  if (LOW_LEVEL_LANGS.has(language)) return "os";
+  if (ML_LANGS.has(language)) return "ml";
   return "web";
 }
 
@@ -309,7 +392,7 @@ const RESUME_VARIANTS = [
   {
     key: "systems",
     label: "Systems & Embedded",
-    domain: "systems",
+    domain: "os",
     description:
       "Bare-metal kernels, register-level drivers, and cycle-accurate emulators — for embedded, firmware, and low-level systems roles.",
     fileName: "Robinson-Arysseril-Resume-Systems.pdf",
@@ -318,7 +401,7 @@ const RESUME_VARIANTS = [
   {
     key: "swe",
     label: "Software Engineering",
-    domain: "systems",
+    domain: "os",
     description:
       "Cycle-accurate emulators and cross-platform tooling shipped to 47,000+ users, plus a bare-metal kernel built from the reference manual up — for general SWE and backend roles.",
     fileName: "Robinson-Arysseril-Resume-SWE.pdf",
@@ -327,7 +410,7 @@ const RESUME_VARIANTS = [
   {
     key: "ml",
     label: "Machine Learning & AI",
-    domain: "ai",
+    domain: "ml",
     description:
       "NLP bias-classification research, contrastive representation learning, and applied ML — for AI/ML research and engineering roles.",
     fileName: "Robinson-Arysseril-Resume-ML.pdf",
@@ -336,7 +419,7 @@ const RESUME_VARIANTS = [
   {
     key: "data-science",
     label: "Data Science",
-    domain: "ai",
+    domain: "ml",
     description:
       "Forecasting pipelines, statistical modeling, and data engineering — for data science and analytics roles.",
     fileName: "Robinson-Arysseril-Resume-DataScience.pdf",
@@ -723,7 +806,7 @@ function ParallaxBackdrop() {
    ========================================================================= */
 
 const NAV_LINKS = [
-  { label: "Skills", href: "#skills" },
+  { label: "Categories", href: "#skills" },
   { label: "Stats", href: "#stats" },
   { label: "Work", href: "#work" },
   { label: "Experience", href: "#experience" },
@@ -835,7 +918,7 @@ function Header({ onOpenResume }) {
               transition={{ duration: 0.25 }}
               className="flex flex-col pt-24 px-8 gap-1"
             >
-              {NAV_LINKS.map((l, i) => (
+              {NAV_LINKS.map((l) => (
                 <button
                   key={l.href}
                   onClick={() => go(l.href)}
@@ -872,7 +955,7 @@ function Header({ onOpenResume }) {
 }
 
 /* =========================================================================
-   HERO + SKILLS GRID
+   HERO + CATEGORY FILTER
    ========================================================================= */
 
 function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
@@ -1049,10 +1132,12 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
           </div>
         </motion.div>
 
+        {/* Category filter — a flat chip bar scales far better than a card
+            grid once there are eight categories instead of three. */}
         <div id="skills" className="mt-20 scroll-mt-24">
           <div className="flex items-end justify-between mb-5 flex-wrap gap-3">
             <h2 className="text-sm font-mono tracking-widest text-slate-400 uppercase">
-              Select a domain
+              Filter by category
             </h2>
             {activeDomain && (
               <button
@@ -1064,56 +1149,31 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex flex-wrap gap-2.5">
             {Object.values(DOMAINS).map((d, di) => {
               const isActive = activeDomain === d.key;
               const isDimmed = activeDomain && !isActive;
-              const Icon = d.key === "systems" ? Cpu : d.key === "ai" ? Brain : Code2;
+              const Icon = d.Icon;
               return (
                 <motion.button
-                  layout
                   key={d.key}
-                  initial={{ opacity: 0, y: 18 }}
+                  initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: isDimmed ? 0.45 : 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.5, delay: di * 0.08, ease: "easeOut" }}
+                  transition={{ duration: 0.45, delay: di * 0.05, ease: "easeOut" }}
                   onClick={() => setActiveDomain(isActive ? null : d.key)}
-                  whileHover={{ y: -5, scale: 1.015 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ y: -3, scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   aria-pressed={isActive}
                   aria-label={`Filter by ${d.label}${isActive ? " (active, click to clear)" : ""}`}
                   style={{ boxShadow: isActive ? d.glowShadow : "none" }}
-                  className={`text-left rounded-2xl border ${
+                  className={`inline-flex items-center gap-2 rounded-full border ${
                     isActive ? d.borderStrong : "border-white/10"
-                  } ${isActive ? d.bg : "bg-white/5"} p-5 sm:p-6 transition-colors`}
+                  } ${isActive ? d.bg : "bg-white/5"} px-4 py-2.5 transition-colors`}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <motion.span whileHover={{ rotate: -8, scale: 1.1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
-                      <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.6} />
-                    </motion.span>
-                    <span className={`h-2 w-2 rounded-full ${d.dot} ${isActive ? "pulse-dot" : ""}`} />
-                  </div>
-                  <div className="font-medium text-slate-100">{d.label}</div>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    <AnimatePresence initial={false}>
-                      {SKILLS[d.key].slice(0, isActive ? SKILLS[d.key].length : 5).map((s, si) => (
-                        <motion.span
-                          key={s}
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.25, delay: isActive ? si * 0.025 : 0 }}
-                          className="rounded-full border border-white/10 px-2 py-0.5 text-xs font-mono text-slate-300"
-                        >
-                          {s}
-                        </motion.span>
-                      ))}
-                    </AnimatePresence>
-                    {!isActive && SKILLS[d.key].length > 5 && (
-                      <span className="rounded-full px-2 py-0.5 text-xs font-mono text-slate-500">
-                        +{SKILLS[d.key].length - 5} more
-                      </span>
-                    )}
-                  </div>
+                  <Icon className={`h-3.5 w-3.5 ${d.text}`} strokeWidth={1.7} />
+                  <span className="text-sm text-slate-100 whitespace-nowrap">{d.short}</span>
+                  <span className={`h-1.5 w-1.5 rounded-full ${d.dot} ${isActive ? "pulse-dot" : ""}`} />
                 </motion.button>
               );
             })}
@@ -1129,12 +1189,8 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
    ========================================================================= */
 
 function SkillsMarquee() {
-  const items = useMemo(
-    () => [...SKILLS.systems, ...SKILLS.ai, ...SKILLS.web],
-    []
-  );
   // Duplicate the list once so the -50% translateX loop is seamless.
-  const track = [...items, ...items];
+  const track = useMemo(() => [...ALL_SKILLS, ...ALL_SKILLS], []);
 
   return (
     <div
@@ -1202,8 +1258,8 @@ function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix })
 function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
   const ready = repoStatus === "ready" && profileStatus === "ready";
   const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
-  const totalForks = repos.reduce((sum, r) => sum + r.forks, 0);
   const followers = profile ? profile.followers : 0;
+  const publicRepos = profile ? profile.publicRepos : 0;
 
   return (
     <section id="stats" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
@@ -1215,8 +1271,8 @@ function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
           quirk="curl -X GET /v3/users/death7654/stats"
         />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-          <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="systems" ready={ready} delay={0} />
-          <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ai" ready={ready} delay={0.1} />
+          <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="emu" ready={ready} delay={0} />
+          <StatCard icon={Code2} label="Public Repos" value={publicRepos} domainKey="ml" ready={ready} delay={0.1} />
           <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
         </div>
       </div>
@@ -1270,6 +1326,10 @@ function FeaturedProjects({ activeDomain }) {
                         <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
                           {p.title}
                         </h3>
+                        <span className={`inline-flex items-center gap-1.5 rounded-full border ${d.border} ${d.bg} px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider ${d.text}`}>
+                          <d.Icon className="h-3 w-3" strokeWidth={1.75} />
+                          {d.short}
+                        </span>
                         <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
                       </div>
                       <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
@@ -1409,6 +1469,8 @@ function useGithubRepos(username) {
           page += 1;
         }
 
+        // forks/last-updated aren't shown on the site anymore, so they're
+        // intentionally left out of the mapped shape below.
         const mapped = all
           .filter((r) => !r.fork)
           .map((r) => ({
@@ -1423,14 +1485,10 @@ function useGithubRepos(username) {
               language: r.language,
             }),
             stars: r.stargazers_count || 0,
-            forks: r.forks_count || 0,
             openIssues: r.open_issues_count || 0,
-            updatedAt: r.updated_at,
             url: r.html_url,
           }))
-          .sort(
-            (a, b) => b.stars - a.stars || new Date(b.updatedAt) - new Date(a.updatedAt)
-          );
+          .sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
 
         if (!cancelled) {
           setState({ status: "ready", repos: mapped, error: null });
@@ -1495,16 +1553,6 @@ function useGithubProfile(username) {
   }, [username]);
 
   return state;
-}
-
-function timeAgo(dateStr) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const days = Math.floor(diff / 86400000);
-  if (days < 1) return "today";
-  if (days < 30) return `${days}d ago`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo ago`;
-  return `${Math.floor(months / 12)}y ago`;
 }
 
 function useCountUp(target, active, duration = 1400) {
@@ -1586,7 +1634,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                 github.com/{GH_USERNAME}
                 <NewTabHint />
               </a>{" "}
-              on page load, sorted into a directory tree by domain &mdash; search, filter by
+              on page load, sorted into a directory tree by category &mdash; search, filter by
               language, or collapse a branch and the tree updates live.
             </>
           }
@@ -1708,7 +1756,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
             {domainGroups.map(({ domain: d, repos: domainRepos }, di) => {
               const isLastDomain = di === domainGroups.length - 1;
               const isOpen = expanded[d.key];
-              const Icon = d.key === "systems" ? Cpu : d.key === "ai" ? Brain : Code2;
+              const Icon = d.Icon;
               return (
                 <div key={d.key} className="min-w-max">
                   <motion.button
@@ -1726,7 +1774,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                       <ChevronRight className="h-3 w-3" />
                     </motion.span>
                     <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
-                    <span className="font-medium">{d.key}/</span>
+                    <span className="font-medium">{d.short}/</span>
                     <span className="text-slate-600 text-xs">
                       {domainRepos.length} {domainRepos.length === 1 ? "repo" : "repos"}
                     </span>
@@ -1759,7 +1807,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                                 initial={{ opacity: 0, x: -6 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.2, delay: Math.min(ri, 10) * 0.02 }}
-                                className="group grid grid-cols-[1.1rem_0.65rem_minmax(0,1fr)_3rem_3rem_4.75rem_0.9rem] items-center gap-x-2 py-1 pr-2 rounded hover:bg-white/5 transition-colors"
+                                className="group grid grid-cols-[1.1rem_0.65rem_minmax(0,1fr)_3rem_3rem_0.9rem] items-center gap-x-2 py-1 pr-2 rounded hover:bg-white/5 transition-colors"
                               >
                                 <span className="text-slate-700 shrink-0">
                                   {isLastRepo ? "└──" : "├──"}
@@ -1788,9 +1836,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                                   className="inline-flex items-center justify-end gap-1 text-xs text-slate-500 tabular-nums"
                                 >
                                   <GitPullRequest className="h-3 w-3 shrink-0" /> {r.openIssues}
-                                </span>
-                                <span className="hidden sm:inline text-right text-xs text-slate-500 tabular-nums">
-                                  {timeAgo(r.updatedAt)}
                                 </span>
                                 <ExternalLink className="h-3 w-3 justify-self-end opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <NewTabHint />
