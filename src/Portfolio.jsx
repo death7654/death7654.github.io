@@ -30,7 +30,7 @@ import {
   GraduationCap,
   ArrowUpRight,
   Star,
-  GitPullRequest,
+  GitFork,
   Users,
   Download,
   ArrowUp,
@@ -1196,10 +1196,9 @@ function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix })
   );
 }
 
-function StatsStrip({ repoStatus, totalStars, profileStatus, profile }) {
+function StatsStrip({ repoStatus, totalStars, totalForks, profileStatus, profile }) {
   const ready = repoStatus === "ready" && profileStatus === "ready";
   const followers = profile ? profile.followers : 0;
-  const publicRepos = profile ? profile.publicRepos : 0;
 
   return (
     <section id="stats" className="relative py-20 sm:py-28 px-5 sm:px-8 scroll-mt-16">
@@ -1212,7 +1211,7 @@ function StatsStrip({ repoStatus, totalStars, profileStatus, profile }) {
         />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
           <StatCard icon={Star} label="GitHub Stars" value={totalStars} domainKey="emu" ready={ready} delay={0} />
-          <StatCard icon={Code2} label="Public Repos" value={publicRepos} domainKey="ml" ready={ready} delay={0.1} />
+          <StatCard icon={GitFork} label="Forks" value={totalForks} domainKey="ml" ready={ready} delay={0.1} />
           <StatCard icon={Users} label="Followers" value={followers} domainKey="web" ready={ready} delay={0.2} />
         </div>
       </div>
@@ -1391,8 +1390,8 @@ function useGithubRepos(username) {
   const cached = useMemo(() => readCache(cacheKey), [cacheKey]);
   const [state, setState] = useState(() =>
     cached
-      ? { status: "ready", repos: cached.data.repos, totalStars: cached.data.totalStars, error: null }
-      : { status: "loading", repos: [], totalStars: 0, error: null }
+      ? { status: "ready", repos: cached.data.repos, totalStars: cached.data.totalStars, totalForks: cached.data.totalForks, error: null }
+      : { status: "loading", repos: [], totalStars: 0, totalForks: 0, error: null }
   );
 
   useEffect(() => {
@@ -1416,9 +1415,20 @@ function useGithubRepos(username) {
           page += 1;
         }
 
-        // Stars total counts across every owned repo, forks included — that's
-        // a general GitHub stat, not a project listing.
+        // Dedupe by id — paginating with sort=updated over sequential requests
+        // can shift a repo onto two pages if its updated_at changes mid-fetch,
+        // which would otherwise double-count its stars/forks below.
+        const seen = new Set();
+        all = all.filter((r) => {
+          if (seen.has(r.id)) return false;
+          seen.add(r.id);
+          return true;
+        });
+
+        // Stars and forks totals count across every owned repo, forks
+        // included — these are general GitHub stats, not a project listing.
         const totalStars = all.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
+        const totalForks = all.reduce((sum, r) => sum + (r.forks_count || 0), 0);
 
         // Forks are excluded here only — this feeds the project archive/tree,
         // which should show original work, not copies of other people's repos.
@@ -1436,22 +1446,21 @@ function useGithubRepos(username) {
               language: r.language,
             }),
             stars: r.stargazers_count || 0,
-            openIssues: r.open_issues_count || 0,
             url: r.html_url,
           }))
           .sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
 
         if (!cancelled) {
-          setState({ status: "ready", repos: mapped, totalStars, error: null });
-          writeCache(cacheKey, { repos: mapped, totalStars });
+          setState({ status: "ready", repos: mapped, totalStars, totalForks, error: null });
+          writeCache(cacheKey, { repos: mapped, totalStars, totalForks });
         }
       } catch (err) {
         if (cancelled) return;
         // Rate-limited or offline: serve the cached copy (even if stale) rather than an empty error state.
         if (cached) {
-          setState({ status: "ready", repos: cached.data.repos, totalStars: cached.data.totalStars, error: null });
+          setState({ status: "ready", repos: cached.data.repos, totalStars: cached.data.totalStars, totalForks: cached.data.totalForks, error: null });
         } else {
-          setState({ status: "error", repos: [], totalStars: 0, error: err.message });
+          setState({ status: "error", repos: [], totalStars: 0, totalForks: 0, error: err.message });
         }
       }
     }
@@ -1759,7 +1768,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                                 initial={{ opacity: 0, x: -6 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.2, delay: Math.min(ri, 10) * 0.02 }}
-                                className="group grid grid-cols-[1.1rem_0.65rem_minmax(0,1fr)_3rem_3rem_0.9rem] items-center gap-x-2 py-1 pr-2 rounded hover:bg-white/5 transition-colors"
+                                className="group grid grid-cols-[1.1rem_0.65rem_minmax(0,1fr)_3rem_0.9rem] items-center gap-x-2 py-1 pr-2 rounded hover:bg-white/5 transition-colors"
                               >
                                 <span className="text-slate-700 shrink-0">
                                   {isLastRepo ? "└──" : "├──"}
@@ -1773,7 +1782,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                                   <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-slate-600" />
                                 )}
                                 <span className="min-w-0 flex items-baseline gap-2.5 overflow-hidden">
-                                  <span className="text-slate-200 group-hover-text-brand-cyan transition-colors shrink-0">
+                                  <span className="text-slate-200 group-hover-brand-cyan transition-colors shrink-0">
                                     {r.name}
                                   </span>
                                   <span className="hidden md:inline text-slate-500 text-xs truncate">
@@ -1782,12 +1791,6 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                                 </span>
                                 <span className="inline-flex items-center justify-end gap-1 text-xs text-slate-500 tabular-nums">
                                   <Star className="h-3 w-3 shrink-0" /> {r.stars}
-                                </span>
-                                <span
-                                  title="Open pull requests + issues"
-                                  className="inline-flex items-center justify-end gap-1 text-xs text-slate-500 tabular-nums"
-                                >
-                                  <GitPullRequest className="h-3 w-3 shrink-0" /> {r.openIssues}
                                 </span>
                                 <ExternalLink className="h-3 w-3 justify-self-end opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <NewTabHint />
@@ -2079,7 +2082,7 @@ export default function Portfolio() {
 
   useDocumentMeta(route);
 
-  const { status: repoStatus, repos, totalStars, error: repoError } = useGithubRepos(GH_USERNAME);
+  const { status: repoStatus, repos, totalStars, totalForks, error: repoError } = useGithubRepos(GH_USERNAME);
   const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
 
   const handleKernelDone = () => {
@@ -2140,6 +2143,7 @@ export default function Portfolio() {
         .hover-bg-brand-cyan-20:hover { background-color: rgba(var(--c-cyan), 0.20); }
         .hover-border-brand-cyan-40:hover { border-color: rgba(var(--c-cyan), 0.40); }
         .hover-text-brand-cyan:hover { color: rgb(var(--c-cyan)); }
+        .group:hover .group-hover-brand-cyan { color: rgb(var(--c-cyan)); }
 
         .focus-brand-cyan:focus { border-color: rgba(var(--c-cyan), 0.50); box-shadow: 0 0 0 3px rgba(var(--c-cyan), 0.20); }
 
@@ -2211,6 +2215,7 @@ export default function Portfolio() {
               <StatsStrip
                 repoStatus={repoStatus}
                 totalStars={totalStars}
+                totalForks={totalForks}
                 profileStatus={profileStatus}
                 profile={profile}
               />
