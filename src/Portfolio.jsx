@@ -45,111 +45,41 @@ import {
 // Eight project categories, each carrying its own icon + color tokens so
 // every consumer (hero filter, featured cards, archive tree, resume cards)
 // can pull from one source instead of re-deriving an icon/color per usage.
+// Converts a "#RRGGBB" hex string to an "rgba(r, g, b, alpha)" string. Domain
+// colors are applied via inline style (not Tailwind arbitrary-value classes)
+// so they render correctly regardless of the build's Tailwind/JIT config.
+function rgba(hex, alpha) {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function makeDomain(key, label, short, hex, Icon) {
+  return {
+    key,
+    label,
+    short,
+    hex,
+    Icon,
+    textColor: hex,
+    borderColor: rgba(hex, 0.25),
+    borderStrongColor: rgba(hex, 0.7),
+    bgColor: rgba(hex, 0.15),
+    glowShadow: `0 0 40px -8px ${rgba(hex, 0.35)}`,
+  };
+}
+
 const DOMAINS = {
-  emu: {
-    key: "emu",
-    label: "Emulators & Virtual Machines",
-    short: "Emulation",
-    hex: "#22D3EE",
-    Icon: Cpu,
-    text: "text-cyan-300",
-    borderStrong: "border-cyan-400/70",
-    border: "border-cyan-400/25",
-    bg: "bg-cyan-400/15",
-    dot: "bg-cyan-400",
-    glowShadow: "0 0 40px -8px rgba(34,211,238,0.35)",
-  },
-  compilers: {
-    key: "compilers",
-    label: "Compilers & JIT Engines",
-    short: "Compilers & JIT Engines",
-    hex: "#A78BFA",
-    Icon: Cog,
-    text: "text-violet-300",
-    borderStrong: "border-violet-400/70",
-    border: "border-violet-400/25",
-    bg: "bg-violet-400/15",
-    dot: "bg-violet-400",
-    glowShadow: "0 0 40px -8px rgba(167,139,250,0.35)",
-  },
-  os: {
-    key: "os",
-    label: "Operating Systems & Low-Level",
-    short: "OS/Kernel",
-    hex: "#38BDF8",
-    Icon: HardDrive,
-    text: "text-sky-300",
-    borderStrong: "border-sky-400/70",
-    border: "border-sky-400/25",
-    bg: "bg-sky-400/15",
-    dot: "bg-sky-400",
-    glowShadow: "0 0 40px -8px rgba(56,189,248,0.35)",
-  },
-  chromebook: {
-    key: "chromebook",
-    label: "Chromebook Ecosystem Tools",
-    short: "Chromebook",
-    hex: "#FBBF24",
-    Icon: Laptop,
-    text: "text-amber-300",
-    borderStrong: "border-amber-400/70",
-    border: "border-amber-400/25",
-    bg: "bg-amber-400/15",
-    dot: "bg-amber-400",
-    glowShadow: "0 0 40px -8px rgba(251,191,36,0.35)",
-  },
-  ml: {
-    key: "ml",
-    label: "Machine Learning & AI",
-    short: "ML/AI",
-    hex: "#34D399",
-    Icon: Brain,
-    text: "text-emerald-300",
-    borderStrong: "border-emerald-400/70",
-    border: "border-emerald-400/25",
-    bg: "bg-emerald-400/15",
-    dot: "bg-emerald-400",
-    glowShadow: "0 0 40px -8px rgba(52,211,153,0.35)",
-  },
-  finance: {
-    key: "finance",
-    label: "Finance & Trading",
-    short: "Finance",
-    hex: "#A3E635",
-    Icon: TrendingUp,
-    text: "text-lime-300",
-    borderStrong: "border-lime-400/70",
-    border: "border-lime-400/25",
-    bg: "bg-lime-400/15",
-    dot: "bg-lime-400",
-    glowShadow: "0 0 40px -8px rgba(163,230,53,0.35)",
-  },
-  web: {
-    key: "web",
-    label: "Web Applications & Frontends",
-    short: "Web",
-    hex: "#E879F9",
-    Icon: Globe,
-    text: "text-fuchsia-300",
-    borderStrong: "border-fuchsia-400/70",
-    border: "border-fuchsia-400/25",
-    bg: "bg-fuchsia-400/15",
-    dot: "bg-fuchsia-400",
-    glowShadow: "0 0 40px -8px rgba(232,121,249,0.35)",
-  },
-  misc: {
-    key: "misc",
-    label: "Hackathon & Misc",
-    short: "Misc",
-    hex: "#FB923C",
-    Icon: Rocket,
-    text: "text-orange-300",
-    borderStrong: "border-orange-400/70",
-    border: "border-orange-400/25",
-    bg: "bg-orange-400/15",
-    dot: "bg-orange-400",
-    glowShadow: "0 0 40px -8px rgba(251,146,60,0.35)",
-  },
+  emu: makeDomain("emu", "Emulators & Virtual Machines", "Emulation", "#4C8DFF", Cpu),
+  compilers: makeDomain("compilers", "Compilers & JIT Engines", "Compilers", "#9D7BFF", Cog),
+  os: makeDomain("os", "Operating Systems & Low-Level", "OS / Kernel", "#2EE6D6", HardDrive),
+  chromebook: makeDomain("chromebook", "Chromebook Ecosystem Tools", "Chromebook", "#FFB454", Laptop),
+  ml: makeDomain("ml", "Machine Learning & AI", "ML / AI", "#2EE6A0", Brain),
+  finance: makeDomain("finance", "Finance & Trading", "Finance", "#C6E86B", TrendingUp),
+  web: makeDomain("web", "Web Applications & Frontends", "Web", "#FF6FB5", Globe),
+  misc: makeDomain("misc", "Hackathon & Misc", "Misc", "#FF6B5B", Rocket),
 };
 
 // Flat ambient skill list for the ticker strip — not tied to a single
@@ -159,7 +89,7 @@ const ALL_SKILLS = [
   "MBR", "Interrupt Handling", "DMA", "LLVM", "PyTorch", "TensorFlow",
   "Transformers", "Scikit-Learn", "Pandas", "NumPy", "LSTM",
   "Prompt Engineering", "Python", "Java", "JavaScript", "TypeScript",
-  "MySQL", "REST APIs", "Tauri", "Angular", "Kafka", "PySpark", "Just In Time Compilers",
+  "MySQL", "REST APIs", "Tauri", "Angular", "Kafka", "PySpark",
 ];
 
 const FEATURED = [
@@ -559,11 +489,11 @@ const BOOT_LINES = [
 
 const LINE_TAG_STYLES = {
   art: "text-slate-600",
-  info: "text-cyan-300/80",
+  info: "text-brand-cyan-80",
   ok: "text-slate-400",
   muted: "text-slate-500",
-  prompt: "text-cyan-300 font-semibold",
-  final: "text-emerald-300 font-semibold mt-2",
+  prompt: "text-brand-cyan font-semibold",
+  final: "text-brand-emerald font-semibold mt-2",
   blank: "h-3",
 };
 
@@ -571,10 +501,10 @@ function BootProgress({ active }) {
   const pct = useCountUp(100, active, 750);
   const blocks = Math.min(20, Math.round((pct / 100) * 20));
   return (
-    <div className="text-cyan-300/90">
+    <div className="text-brand-cyan-90">
       {"  rustc  pytorch  tensorflow  xtensa-gcc  scikit-learn  "}
       <span className="text-slate-500">[</span>
-      <span className="text-emerald-400">{"\u2588".repeat(blocks)}</span>
+      <span className="text-brand-emerald">{"\u2588".repeat(blocks)}</span>
       <span className="text-slate-700">{"\u2591".repeat(20 - blocks)}</span>
       <span className="text-slate-500">{`] ${pct}%`}</span>
     </div>
@@ -621,11 +551,11 @@ function BootSequence({ onDone }) {
         style={{
           opacity: 0.06,
           backgroundImage:
-            "repeating-linear-gradient(0deg, #22D3EE 0px, transparent 1px, transparent 3px)",
+            "repeating-linear-gradient(0deg, #2EE6D6 0px, transparent 1px, transparent 3px)",
         }}
       />
       <motion.div
-        className="pointer-events-none absolute inset-x-0 h-24 bg-cyan-400/10 blur-2xl"
+        className="pointer-events-none absolute inset-x-0 h-24 bg-brand-cyan-10 blur-2xl"
         animate={{ y: ["-10%", "110%"] }}
         transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }}
       />
@@ -640,7 +570,7 @@ function BootSequence({ onDone }) {
             </div>
           );
         })}
-        <span className="inline-block w-2 h-3.5 align-middle bg-cyan-300 animate-pulse ml-0.5" />
+        <span className="inline-block w-2 h-3.5 align-middle bg-brand-cyan animate-pulse ml-0.5" />
         <div className="mt-8 text-xs tracking-widest text-slate-500 uppercase">
           tap anywhere to skip
         </div>
@@ -658,11 +588,12 @@ function LangBadge({ label, domain, hex, size = "sm" }) {
   const pad = size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border ${d.border} ${d.bg} ${pad} font-mono text-slate-300`}
+      className={`inline-flex items-center gap-1.5 rounded-full border ${pad} font-mono text-slate-300`}
+      style={{ borderColor: d.borderColor, backgroundColor: d.bgColor }}
     >
       <span
-        className={hex ? "h-1.5 w-1.5 rounded-full" : `h-1.5 w-1.5 rounded-full ${d.dot}`}
-        style={hex ? { backgroundColor: hex } : undefined}
+        className="h-1.5 w-1.5 rounded-full"
+        style={{ backgroundColor: hex || d.hex }}
       />
       {label}
     </span>
@@ -680,7 +611,7 @@ function SectionHeading({ eyebrow, title, subtitle, quirk }) {
           {quirk}
         </div>
       )}
-      <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-3">
+      <div className="font-mono text-xs tracking-widest text-brand-cyan-70 uppercase mb-3">
         {eyebrow}
       </div>
       <h2 className="relative inline-block text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-100">
@@ -692,7 +623,7 @@ function SectionHeading({ eyebrow, title, subtitle, quirk }) {
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           style={{ originX: 0 }}
-          className="absolute -bottom-2 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-cyan-400 via-slate-200 to-emerald-400"
+          className="absolute -bottom-2 left-0 h-[3px] w-full rounded-full grad-underline"
         />
       </h2>
       {subtitle && (
@@ -751,7 +682,7 @@ function ScrollProgress() {
   return (
     <motion.div
       style={{ scaleX, zIndex: 60 }}
-      className="fixed top-0 inset-x-0 h-0.5 origin-left bg-gradient-to-r from-cyan-400 via-slate-200 to-emerald-400"
+      className="fixed top-0 inset-x-0 h-0.5 origin-left grad-underline"
     />
   );
 }
@@ -769,7 +700,7 @@ function ParallaxBackdrop() {
     <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
       <motion.div
         style={{ y: yA }}
-        className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/25 blur-3xl"
+        className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-brand-cyan-20 blur-3xl"
       >
         <motion.div
           className="h-full w-full rounded-full"
@@ -779,7 +710,7 @@ function ParallaxBackdrop() {
       </motion.div>
       <motion.div
         style={{ y: yB }}
-        className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-emerald-500/25 blur-3xl"
+        className="absolute top-1/3 -right-40 h-96 w-96 rounded-full bg-brand-emerald-20 blur-3xl"
       >
         <motion.div
           className="h-full w-full rounded-full"
@@ -789,7 +720,7 @@ function ParallaxBackdrop() {
       </motion.div>
       <motion.div
         style={{ y: yC }}
-        className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-violet-400/15 blur-3xl"
+        className="absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-brand-violet-15 blur-3xl"
       >
         <motion.div
           className="h-full w-full rounded-full"
@@ -854,8 +785,8 @@ function Header({ onOpenResume }) {
             onClick={() => go("#top")}
             className="flex items-center gap-2 font-mono text-sm text-slate-200"
           >
-            <Terminal className="h-4 w-4 text-cyan-400" strokeWidth={1.75} />
-            <span className="tracking-tight">rga<span className="text-cyan-400">.</span>dev</span>
+            <Terminal className="h-4 w-4 text-brand-cyan" strokeWidth={1.75} />
+            <span className="tracking-tight">rga<span className="text-brand-cyan">.</span>dev</span>
           </button>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -872,7 +803,7 @@ function Header({ onOpenResume }) {
               href={GITHUB_URL}
               target="_blank"
               rel="noreferrer"
-              className="ml-2 flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2 text-xs text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+              className="ml-2 flex items-center gap-1.5 rounded-full border border-brand-cyan-30 bg-brand-cyan-10 px-3.5 py-2 text-xs text-brand-cyan hover-bg-brand-cyan-20 transition-colors"
             >
               <Github className="h-3.5 w-3.5" /> GitHub
               <NewTabHint />
@@ -887,7 +818,7 @@ function Header({ onOpenResume }) {
 
           <div className="hidden md:flex items-center gap-2.5 ml-3 pl-3 border-l border-white/10 font-mono text-xs text-slate-400">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 pulse-dot" />
+              <span className="absolute inline-flex h-full w-full rounded-full bg-brand-emerald pulse-dot" />
             </span>
             <span className="tabular-nums">{clock}</span>
           </div>
@@ -932,7 +863,7 @@ function Header({ onOpenResume }) {
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-6 flex items-center justify-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 py-3.5 text-cyan-300"
+                className="mt-6 flex items-center justify-center gap-2 rounded-full border border-brand-cyan-30 bg-brand-cyan-10 py-3.5 text-brand-cyan"
               >
                 <Github className="h-4 w-4" /> github.com/death7654
                 <NewTabHint />
@@ -962,7 +893,7 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
   const reducedMotion = usePrefersReducedMotion();
   const spotX = useMotionValue(-9999);
   const spotY = useMotionValue(-9999);
-  const spotBackground = useMotionTemplate`radial-gradient(480px circle at ${spotX}px ${spotY}px, rgba(34,211,238,0.10), transparent 65%)`;
+  const spotBackground = useMotionTemplate`radial-gradient(480px circle at ${spotX}px ${spotY}px, rgba(46,230,214,0.10), transparent 65%)`;
 
   const onPointerMove = (e) => {
     if (reducedMotion) return;
@@ -1001,7 +932,7 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
           >
             <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-brand-emerald-80" />
             <span className="ml-2 font-mono text-xs text-slate-400 truncate">
               robinson@systems: ~/portfolio
             </span>
@@ -1010,7 +941,7 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
           <motion.div
             variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="font-mono text-xs tracking-widest text-emerald-400/70 uppercase mb-5"
+            className="font-mono text-xs tracking-widest text-brand-emerald-70 uppercase mb-5"
           >
             systems &amp; intelligence
           </motion.div>
@@ -1023,25 +954,25 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
               aria-hidden="true"
             >
               <motion.div
-                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-cyan-400/50 blur-3xl mix-blend-screen"
+                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-brand-cyan-50 blur-3xl mix-blend-screen"
                 style={{ left: "2%", top: "8%" }}
                 animate={reducedMotion ? undefined : { x: [0, 60, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.15, 0.95, 1] }}
                 transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-emerald-400/45 blur-3xl mix-blend-screen"
+                className="absolute h-56 w-56 sm:h-80 sm:w-80 rounded-full bg-brand-emerald-45 blur-3xl mix-blend-screen"
                 style={{ right: "6%", top: "0%" }}
                 animate={reducedMotion ? undefined : { x: [0, -50, 30, 0], y: [0, 40, -20, 0], scale: [1, 0.9, 1.1, 1] }}
                 transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute h-48 w-48 sm:h-64 sm:w-64 rounded-full bg-violet-400/40 blur-3xl mix-blend-screen"
+                className="absolute h-48 w-48 sm:h-64 sm:w-64 rounded-full bg-brand-violet-40 blur-3xl mix-blend-screen"
                 style={{ left: "32%", bottom: "-15%" }}
                 animate={reducedMotion ? undefined : { x: [0, 30, -40, 0], y: [0, -20, 30, 0], scale: [1, 1.1, 0.9, 1] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute h-40 w-40 sm:h-56 sm:w-56 rounded-full bg-pink-400/35 blur-3xl mix-blend-screen"
+                className="absolute h-40 w-40 sm:h-56 sm:w-56 rounded-full bg-brand-magenta-35 blur-3xl mix-blend-screen"
                 style={{ right: "22%", bottom: "-20%" }}
                 animate={reducedMotion ? undefined : { x: [0, -25, 15, 0], y: [0, 25, -15, 0], scale: [1, 0.95, 1.1, 1] }}
                 transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
@@ -1052,7 +983,7 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
             </h1>
             <h1 className="relative z-10 text-5xl sm:text-7xl md:text-8xl font-semibold tracking-tight leading-tight">
               <motion.span
-                className="name-shimmer inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-emerald-300"
+                className="name-shimmer inline-block text-transparent bg-clip-text grad-name-shimmer"
                 variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0 } }}
                 transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               >
@@ -1125,7 +1056,7 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
             <span className="text-slate-500">:~$</span> whoami --all
             <div className="mt-1 text-slate-300">
               B.Tech, Artificial Intelligence &amp; Data Science
-              <span className="text-emerald-400/80"> &middot; CGPA 9.46/10</span>
+              <span className="text-brand-emerald-80"> &middot; CGPA 9.46/10</span>
               <br className="hidden sm:block" />
               Vimal Jyothi Engineering College &middot; Sep. 2024 &ndash; May 2028
             </div>
@@ -1166,14 +1097,21 @@ function Hero({ activeDomain, setActiveDomain, onOpenResume }) {
                   whileTap={{ scale: 0.97 }}
                   aria-pressed={isActive}
                   aria-label={`Filter by ${d.label}${isActive ? " (active, click to clear)" : ""}`}
-                  style={{ boxShadow: isActive ? d.glowShadow : "none" }}
+                  style={{
+                    boxShadow: isActive ? d.glowShadow : "none",
+                    borderColor: isActive ? d.borderStrongColor : undefined,
+                    backgroundColor: isActive ? d.bgColor : undefined,
+                  }}
                   className={`inline-flex items-center gap-2 rounded-full border ${
-                    isActive ? d.borderStrong : "border-white/10"
-                  } ${isActive ? d.bg : "bg-white/5"} px-4 py-2.5 transition-colors`}
+                    isActive ? "" : "border-white/10 bg-white/5"
+                  } px-4 py-2.5 transition-colors`}
                 >
-                  <Icon className={`h-3.5 w-3.5 ${d.text}`} strokeWidth={1.7} />
+                  <Icon className="h-3.5 w-3.5" style={{ color: d.textColor }} strokeWidth={1.7} />
                   <span className="text-sm text-slate-100 whitespace-nowrap">{d.short}</span>
-                  <span className={`h-1.5 w-1.5 rounded-full ${d.dot} ${isActive ? "pulse-dot" : ""}`} />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${isActive ? "pulse-dot" : ""}`}
+                    style={{ backgroundColor: d.hex }}
+                  />
                 </motion.button>
               );
             })}
@@ -1197,8 +1135,8 @@ function SkillsMarquee() {
       className="marquee-row relative py-6 border-y border-white/5 overflow-hidden"
       aria-hidden="true"
     >
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-[#0B0F19] to-transparent z-10" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-[#0B0F19] to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 fade-edge-l z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 fade-edge-r z-10" />
       <div className="marquee-track flex w-max items-center gap-3">
         {track.map((s, i) => (
           <span
@@ -1231,17 +1169,20 @@ function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix })
         onViewportEnter={() => setInView(true)}
         whileHover={{ y: -5 }}
         transition={{ duration: 0.55, delay, ease: "easeOut" }}
-        style={{ boxShadow: "none" }}
-        className={`relative overflow-hidden rounded-2xl border ${d.border} ${d.bg} p-7 sm:p-9 text-center`}
+        style={{ boxShadow: "none", borderColor: d.borderColor, backgroundColor: d.bgColor }}
+        className="relative overflow-hidden rounded-2xl border p-7 sm:p-9 text-center"
       >
-        <div className={`mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
-          <Icon className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
+        <div
+          className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full border"
+          style={{ borderColor: d.borderStrongColor, backgroundColor: d.bgColor }}
+        >
+          <Icon className="h-5 w-5" style={{ color: d.textColor }} strokeWidth={1.75} />
         </div>
         <div className="font-mono text-4xl sm:text-5xl font-semibold text-slate-100 tabular-nums">
           {ready ? (
             <>
               {count.toLocaleString()}
-              {suffix ? <span className={`ml-0.5 ${d.text}`}>{suffix}</span> : null}
+              {suffix ? <span className="ml-0.5" style={{ color: d.textColor }}>{suffix}</span> : null}
             </>
           ) : (
             <span className="inline-block h-10 w-20 rounded bg-white/10 animate-pulse align-middle" />
@@ -1255,9 +1196,8 @@ function StatCard({ icon: Icon, label, value, domainKey, ready, delay, suffix })
   );
 }
 
-function StatsStrip({ repoStatus, repos, profileStatus, profile }) {
+function StatsStrip({ repoStatus, totalStars, profileStatus, profile }) {
   const ready = repoStatus === "ready" && profileStatus === "ready";
-  const totalStars = repos.reduce((sum, r) => sum + r.stars, 0);
   const followers = profile ? profile.followers : 0;
   const publicRepos = profile ? profile.publicRepos : 0;
 
@@ -1308,7 +1248,8 @@ function FeaturedProjects({ activeDomain }) {
                   viewport={{ once: true, margin: "-80px" }}
                   whileHover={{ y: -4, boxShadow: d.glowShadow }}
                   transition={{ duration: 0.5, delay: i * 0.06, ease: "easeOut" }}
-                  className={`group relative overflow-hidden rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8`}
+                  style={{ borderColor: d.borderColor }}
+                  className="group relative overflow-hidden rounded-2xl border bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-8"
                 >
                   <div className="flex flex-col md:flex-row md:items-start gap-5 md:gap-8">
                     <motion.div
@@ -1317,7 +1258,8 @@ function FeaturedProjects({ activeDomain }) {
                       whileInView={{ opacity: 0.4, scale: 1 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: i * 0.06 + 0.15, ease: "backOut" }}
-                      className={`font-mono text-4xl sm:text-5xl font-light ${d.text} shrink-0`}
+                      className="font-mono text-4xl sm:text-5xl font-light shrink-0"
+                      style={{ color: d.textColor }}
                     >
                       {p.index}
                     </motion.div>
@@ -1326,11 +1268,14 @@ function FeaturedProjects({ activeDomain }) {
                         <h3 className="text-xl sm:text-2xl font-semibold text-slate-100 tracking-tight">
                           {p.title}
                         </h3>
-                        <span className={`inline-flex items-center gap-1.5 rounded-full border ${d.border} ${d.bg} px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider ${d.text}`}>
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider"
+                          style={{ borderColor: d.borderColor, backgroundColor: d.bgColor, color: d.textColor }}
+                        >
                           <d.Icon className="h-3 w-3" strokeWidth={1.75} />
                           {d.short}
                         </span>
-                        <span className={`text-xs font-mono ${d.text}`}>{p.stat}</span>
+                        <span className="text-xs font-mono" style={{ color: d.textColor }}>{p.stat}</span>
                       </div>
                       <p className="mt-3 text-slate-300 text-sm sm:text-sm leading-relaxed max-w-3xl">
                         {p.description}
@@ -1384,7 +1329,7 @@ function Experience() {
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 1, ease: "easeOut" }}
             style={{ originY: 0 }}
-            className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-400/50 via-white/10 to-emerald-400/40"
+            className="absolute left-0 top-0 bottom-0 w-px grad-timeline"
           />
           {EXPERIENCE.map((e, i) => {
             const d = DOMAINS[e.domain];
@@ -1404,15 +1349,15 @@ function Experience() {
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true, margin: "-80px" }}
                   transition={{ duration: 0.4, delay: i * 0.15 + 0.2, ease: "backOut" }}
-                  style={{ boxShadow: "0 0 0 4px #0B0F19" }}
-                  className={`absolute -left-8 sm:-left-11 top-1.5 h-3 w-3 rounded-full ${d.dot}`}
+                  style={{ boxShadow: "0 0 0 4px #0B0F19", backgroundColor: d.hex }}
+                  className="absolute -left-8 sm:-left-11 top-1.5 h-3 w-3 rounded-full"
                 />
                 <div className="font-mono text-xs text-slate-500 mb-1 flex items-center gap-2">
                   <span aria-hidden="true" className="text-slate-600">{hexAddress}</span>
                   <span>{e.period}</span>
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-slate-100">{e.role}</h3>
-                <div className={`text-sm ${d.text} mb-3`}>{e.org}</div>
+                <div className="text-sm mb-3" style={{ color: d.textColor }}>{e.org}</div>
                 <ul className="space-y-1.5">
                   {e.points.map((pt, pi) => (
                     <motion.li
@@ -1445,7 +1390,9 @@ function useGithubRepos(username) {
   const cacheKey = `rga:repos:${username}`;
   const cached = useMemo(() => readCache(cacheKey), [cacheKey]);
   const [state, setState] = useState(() =>
-    cached ? { status: "ready", repos: cached.data, error: null } : { status: "loading", repos: [], error: null }
+    cached
+      ? { status: "ready", repos: cached.data.repos, totalStars: cached.data.totalStars, error: null }
+      : { status: "loading", repos: [], totalStars: 0, error: null }
   );
 
   useEffect(() => {
@@ -1469,8 +1416,12 @@ function useGithubRepos(username) {
           page += 1;
         }
 
-        // forks/last-updated aren't shown on the site anymore, so they're
-        // intentionally left out of the mapped shape below.
+        // Stars total counts across every owned repo, forks included — that's
+        // a general GitHub stat, not a project listing.
+        const totalStars = all.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
+
+        // Forks are excluded here only — this feeds the project archive/tree,
+        // which should show original work, not copies of other people's repos.
         const mapped = all
           .filter((r) => !r.fork)
           .map((r) => ({
@@ -1491,16 +1442,16 @@ function useGithubRepos(username) {
           .sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
 
         if (!cancelled) {
-          setState({ status: "ready", repos: mapped, error: null });
-          writeCache(cacheKey, mapped);
+          setState({ status: "ready", repos: mapped, totalStars, error: null });
+          writeCache(cacheKey, { repos: mapped, totalStars });
         }
       } catch (err) {
         if (cancelled) return;
         // Rate-limited or offline: serve the cached copy (even if stale) rather than an empty error state.
         if (cached) {
-          setState({ status: "ready", repos: cached.data, error: null });
+          setState({ status: "ready", repos: cached.data.repos, totalStars: cached.data.totalStars, error: null });
         } else {
-          setState({ status: "error", repos: [], error: err.message });
+          setState({ status: "error", repos: [], totalStars: 0, error: err.message });
         }
       }
     }
@@ -1629,7 +1580,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="text-cyan-300 hover:underline underline-offset-4"
+                className="text-brand-cyan hover:underline underline-offset-4"
               >
                 github.com/{GH_USERNAME}
                 <NewTabHint />
@@ -1650,7 +1601,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
               placeholder="Search repositories\u2026"
               aria-label="Search repositories"
               disabled={status !== "ready"}
-              className="w-full rounded-full border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 transition disabled:opacity-50"
+              className="w-full rounded-full border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus-brand-cyan transition disabled:opacity-50"
             />
           </div>
         </div>
@@ -1672,7 +1623,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                   aria-label={`Filter by ${l}`}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-mono transition-colors ${
                     active
-                      ? "border-cyan-400/50 bg-cyan-400/10 text-cyan-300"
+                      ? "border-brand-cyan-50 bg-brand-cyan-10 text-brand-cyan"
                       : "border-white/10 text-slate-300 hover:border-white/25 hover:text-slate-200"
                   }`}
                 >
@@ -1696,8 +1647,8 @@ function RepoArchive({ activeDomain, status, repos, error }) {
         )}
 
         {status === "loading" && (
-          <div className="flex items-center gap-2.5 mb-6 font-mono text-xs text-cyan-300/80">
-            <span className="h-3 w-3 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" />
+          <div className="flex items-center gap-2.5 mb-6 font-mono text-xs text-brand-cyan-80">
+            <span className="h-3 w-3 rounded-full border-2 border-brand-cyan-30 border-t-brand-cyan animate-spin" />
             fetching public repositories from github&hellip;
           </div>
         )}
@@ -1737,7 +1688,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
               href={`${GITHUB_URL}?tab=repositories`}
               target="_blank"
               rel="noreferrer"
-              className="mt-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-xs text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+              className="mt-5 inline-flex items-center gap-2 rounded-full border border-brand-cyan-30 bg-brand-cyan-10 px-4 py-2.5 text-xs text-brand-cyan hover-bg-brand-cyan-20 transition-colors"
             >
               <Github className="h-3.5 w-3.5" /> View repositories on GitHub
               <NewTabHint />
@@ -1748,7 +1699,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
         {status === "ready" && domainGroups.length > 0 && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-8 font-mono text-sm overflow-x-auto">
             <div className="text-slate-600 mb-4 whitespace-nowrap">
-              <span className="text-emerald-400/70">student@vjec</span>
+              <span className="text-brand-emerald-70">student@vjec</span>
               <span className="text-slate-600">:~$</span> tree ./{GH_USERNAME} -L 2
             </div>
             <div className="text-slate-300 mb-1 whitespace-nowrap">{GH_USERNAME}/</div>
@@ -1763,7 +1714,8 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                     onClick={() => toggleExpanded(d.key)}
                     whileHover={{ x: 2 }}
                     aria-expanded={isOpen}
-                    className={`flex items-center gap-2 py-1 pr-3 rounded transition-colors hover:bg-white/5 ${d.text}`}
+                    style={{ color: d.textColor }}
+                    className="flex items-center gap-2 py-1 pr-3 rounded transition-colors hover:bg-white/5"
                   >
                     <span className="text-slate-600">{isLastDomain ? "└──" : "├──"}</span>
                     <motion.span
@@ -1821,7 +1773,7 @@ function RepoArchive({ activeDomain, status, repos, error }) {
                                   <span className="h-1.5 w-1.5 rounded-full shrink-0 bg-slate-600" />
                                 )}
                                 <span className="min-w-0 flex items-baseline gap-2.5 overflow-hidden">
-                                  <span className="text-slate-200 group-hover:text-cyan-300 transition-colors shrink-0">
+                                  <span className="text-slate-200 group-hover-text-brand-cyan transition-colors shrink-0">
                                     {r.name}
                                   </span>
                                   <span className="hidden md:inline text-slate-500 text-xs truncate">
@@ -1880,7 +1832,7 @@ function Contact({ onOpenResume }) {
             64 bytes from localhost: icmp_seq=1 ttl=64 time=0.031 ms
           </div>
           
-          <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-4">
+          <div className="font-mono text-xs tracking-widest text-brand-cyan-70 uppercase mb-4">
             uplink established
           </div>
           <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-slate-50">
@@ -1957,10 +1909,14 @@ function ResumeCard({ variant, index }) {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
         whileHover={{ y: -4, boxShadow: d.glowShadow }}
-        className={`group relative flex flex-col h-full rounded-2xl border ${d.border} bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-7`}
+        style={{ borderColor: d.borderColor }}
+        className="group relative flex flex-col h-full rounded-2xl border bg-white/5 hover:bg-white/10 transition-colors p-6 sm:p-7"
       >
-        <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full border ${d.borderStrong} ${d.bg}`}>
-          <FileText className={`h-5 w-5 ${d.text}`} strokeWidth={1.75} />
+        <div
+          className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border"
+          style={{ borderColor: d.borderStrongColor, backgroundColor: d.bgColor }}
+        >
+          <FileText className="h-5 w-5" style={{ color: d.textColor }} strokeWidth={1.75} />
         </div>
         <h3 className="text-lg font-semibold text-slate-100 tracking-tight">{variant.label}</h3>
         <p className="mt-2.5 text-sm text-slate-300 leading-relaxed flex-1">{variant.description}</p>
@@ -1971,7 +1927,8 @@ function ResumeCard({ variant, index }) {
             download={variant.fileName}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border ${d.borderStrong} ${d.bg} px-3.5 py-2 text-xs ${d.text} hover:brightness-110 transition-all`}
+            style={{ borderColor: d.borderStrongColor, backgroundColor: d.bgColor, color: d.textColor }}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs hover:brightness-110 transition-all"
           >
             <Download className="h-3.5 w-3.5" /> Download
           </motion.a>
@@ -2002,15 +1959,15 @@ function ResumePage({ onBack }) {
             onClick={onBack}
             className="flex items-center gap-2 font-mono text-sm text-slate-200"
           >
-            <Terminal className="h-4 w-4 text-cyan-400" strokeWidth={1.75} />
-            <span className="tracking-tight">rga<span className="text-cyan-400">.</span>dev</span>
+            <Terminal className="h-4 w-4 text-brand-cyan" strokeWidth={1.75} />
+            <span className="tracking-tight">rga<span className="text-brand-cyan">.</span>dev</span>
           </button>
         </div>
       </header>
 
       <section className="relative pt-32 sm:pt-40 pb-24 px-5 sm:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="font-mono text-xs tracking-widest text-cyan-400/70 uppercase mb-5">
+          <div className="font-mono text-xs tracking-widest text-brand-cyan-70 uppercase mb-5">
             select a build target
           </div>
           <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-slate-50 max-w-3xl">
@@ -2029,7 +1986,7 @@ function ResumePage({ onBack }) {
 
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-mono text-xs text-slate-400 leading-relaxed">
             Not sure which one? Reach out at{" "}
-            <a href={`mailto:${EMAIL}`} className="text-cyan-300 hover:underline underline-offset-4">
+            <a href={`mailto:${EMAIL}`} className="text-brand-cyan hover:underline underline-offset-4">
               {EMAIL}
             </a>{" "}
             and I&rsquo;ll send the right one directly.
@@ -2066,7 +2023,7 @@ function BackToTop() {
           onClick={() => document.querySelector("#top")?.scrollIntoView({ behavior: "smooth" })}
           aria-label="Back to top"
           style={{ zIndex: 55 }}
-          className="fixed bottom-6 right-5 sm:right-8 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-[#0B0F19]/90 backdrop-blur text-slate-300 shadow-lg hover:text-cyan-300 hover:border-cyan-400/40 transition-colors"
+          className="fixed bottom-6 right-5 sm:right-8 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-void-90 backdrop-blur text-slate-300 shadow-lg hover-text-brand-cyan hover-border-brand-cyan-40 transition-colors"
         >
           <ArrowUp className="h-4 w-4" />
         </motion.button>
@@ -2122,7 +2079,7 @@ export default function Portfolio() {
 
   useDocumentMeta(route);
 
-  const { status: repoStatus, repos, error: repoError } = useGithubRepos(GH_USERNAME);
+  const { status: repoStatus, repos, totalStars, error: repoError } = useGithubRepos(GH_USERNAME);
   const { status: profileStatus, profile } = useGithubProfile(GH_USERNAME);
 
   const handleKernelDone = () => {
@@ -2134,7 +2091,7 @@ export default function Portfolio() {
   return (
     <div
       style={{ backgroundColor: "#0B0F19" }}
-      className="min-h-screen w-full text-slate-200 antialiased selection:bg-cyan-400/30 selection:text-white"
+      className="min-h-screen w-full text-slate-200 antialiased"
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
@@ -2145,6 +2102,55 @@ export default function Portfolio() {
         html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
         *::-webkit-scrollbar { width: 0; height: 0; }
         * { scrollbar-width: none; }
+
+        /* Brand colors as plain CSS (not Tailwind arbitrary-value classes) so
+           they always render regardless of the build's Tailwind/JIT config. */
+        :root {
+          --c-cyan: 46, 230, 214;
+          --c-emerald: 46, 230, 160;
+          --c-violet: 157, 123, 255;
+          --c-magenta: 255, 111, 181;
+          --c-void: 11, 15, 25;
+        }
+        .text-brand-cyan { color: rgb(var(--c-cyan)); }
+        .text-brand-cyan-70 { color: rgba(var(--c-cyan), 0.7); }
+        .text-brand-cyan-80 { color: rgba(var(--c-cyan), 0.8); }
+        .text-brand-cyan-90 { color: rgba(var(--c-cyan), 0.9); }
+        .text-brand-emerald { color: rgb(var(--c-emerald)); }
+        .text-brand-emerald-70 { color: rgba(var(--c-emerald), 0.7); }
+        .text-brand-emerald-80 { color: rgba(var(--c-emerald), 0.8); }
+
+        .bg-brand-cyan { background-color: rgb(var(--c-cyan)); }
+        .bg-brand-cyan-10 { background-color: rgba(var(--c-cyan), 0.10); }
+        .bg-brand-cyan-20 { background-color: rgba(var(--c-cyan), 0.20); }
+        .bg-brand-cyan-50 { background-color: rgba(var(--c-cyan), 0.50); }
+        .bg-brand-emerald { background-color: rgb(var(--c-emerald)); }
+        .bg-brand-emerald-20 { background-color: rgba(var(--c-emerald), 0.20); }
+        .bg-brand-emerald-45 { background-color: rgba(var(--c-emerald), 0.45); }
+        .bg-brand-emerald-80 { background-color: rgba(var(--c-emerald), 0.80); }
+        .bg-brand-violet-15 { background-color: rgba(var(--c-violet), 0.15); }
+        .bg-brand-violet-40 { background-color: rgba(var(--c-violet), 0.40); }
+        .bg-brand-magenta-35 { background-color: rgba(var(--c-magenta), 0.35); }
+        .bg-void-90 { background-color: rgba(var(--c-void), 0.90); }
+
+        .border-brand-cyan-30 { border-color: rgba(var(--c-cyan), 0.30); }
+        .border-brand-cyan-50 { border-color: rgba(var(--c-cyan), 0.50); }
+        .border-t-brand-cyan { border-top-color: rgb(var(--c-cyan)); }
+
+        .hover-bg-brand-cyan-20:hover { background-color: rgba(var(--c-cyan), 0.20); }
+        .hover-border-brand-cyan-40:hover { border-color: rgba(var(--c-cyan), 0.40); }
+        .hover-text-brand-cyan:hover { color: rgb(var(--c-cyan)); }
+
+        .focus-brand-cyan:focus { border-color: rgba(var(--c-cyan), 0.50); box-shadow: 0 0 0 3px rgba(var(--c-cyan), 0.20); }
+
+        ::selection { background-color: rgba(var(--c-cyan), 0.30); color: white; }
+
+        .grad-underline { background-image: linear-gradient(to right, rgb(var(--c-cyan)), #e2e8f0, rgb(var(--c-emerald))); }
+        .grad-name-shimmer { background-image: linear-gradient(to right, rgb(var(--c-cyan)), rgb(var(--c-violet)), rgb(var(--c-emerald))); }
+        .grad-timeline { background-image: linear-gradient(to bottom, rgba(var(--c-cyan),0.5), rgba(255,255,255,0.10), rgba(var(--c-emerald),0.4)); }
+        .fade-edge-l { background-image: linear-gradient(to right, rgb(var(--c-void)), transparent); }
+        .fade-edge-r { background-image: linear-gradient(to left, rgb(var(--c-void)), transparent); }
+
         .name-shimmer {
           background-size: 200% auto;
           animation: shimmer 7s ease-in-out infinite;
@@ -2160,7 +2166,7 @@ export default function Portfolio() {
         }
         .pulse-dot { animation: softPulse 2.2s ease-in-out infinite; }
         :focus-visible {
-          outline: 2px solid #22D3EE;
+          outline: 2px solid #2EE6D6;
           outline-offset: 2px;
           border-radius: 4px;
         }
@@ -2204,7 +2210,7 @@ export default function Portfolio() {
               <Hero activeDomain={activeDomain} setActiveDomain={setActiveDomain} onOpenResume={goToResume} />
               <StatsStrip
                 repoStatus={repoStatus}
-                repos={repos}
+                totalStars={totalStars}
                 profileStatus={profileStatus}
                 profile={profile}
               />
