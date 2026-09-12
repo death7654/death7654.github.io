@@ -1,14 +1,559 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Robinson George Arysseril</title>
-    <link rel="icon" type="image/x-icon" href="/icon.ico">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<title>Scream Pong — Poster</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#050506;
+  --panel:#0b0c0e;
+  --line:#232629;
+  --line-soft:#191b1e;
+  --fg:#f2f2f0;
+  --fg-dim:#8b8f96;
+  --green:#3ee97a;
+  --blue:#3fa9ff;
+  --white-paddle:#f2f2f0;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0;
+  padding:0;
+  background:#000;
+  color:var(--fg);
+  font-family:'Space Grotesk', sans-serif;
+}
+
+.poster{
+  width:1400px;
+  margin:0 auto;
+  background:var(--bg);
+  position:relative;
+  overflow:hidden;
+  border-left:1px solid var(--line);
+  border-right:1px solid var(--line);
+}
+
+/* ---------- shared bits ---------- */
+
+.mono{
+  font-family:'JetBrains Mono', monospace;
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  letter-spacing:.02em;
+  color:var(--green);
+}
+.dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px 1px rgba(62,233,122,.6);
+}
+
+.seam{
+  position:absolute;
+  top:0; bottom:0; left:50%;
+  width:1px;
+  background-image:linear-gradient(var(--line) 60%, transparent 0%);
+  background-size:1px 14px;
+  transform:translateX(-0.5px);
+}
+
+/* ---------- hero ---------- */
+
+.hero{
+  position:relative;
+  height:640px;
+  border-bottom:1px solid var(--line);
+}
+
+.hero-bar{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  padding:28px 44px 0;
+  z-index:3;
+}
+
+.hero-title{
+  position:absolute;
+  top:50%; left:0; right:0;
+  transform:translateY(-52%);
+  display:flex;
+  justify-content:center;
+  align-items:baseline;
+  gap:26px;
+  font-weight:700;
+  font-size:172px;
+  line-height:1;
+  letter-spacing:-.02em;
+  color:#161719;
+  z-index:1;
+  user-select:none;
+}
+
+.hero-title .word.right{ color:#141517; }
+
+.hero-sub{
+  position:absolute;
+  bottom:120px; left:0; right:0;
+  text-align:center;
+  z-index:3;
+}
+.hero-sub .tagline{
+  font-size:22px;
+  color:var(--fg);
+  font-weight:500;
+}
+.hero-sub .tagline-sub{
+  margin-top:10px;
+  font-size:14px;
+  color:var(--fg-dim);
+}
+
+.court{
+  position:absolute;
+  left:44px; right:44px; bottom:44px;
+  height:2px;
+  z-index:3;
+}
+.paddle{
+  position:absolute;
+  bottom:0;
+  width:120px; height:8px;
+  background:var(--white-paddle);
+}
+.paddle.left{ left:26%; }
+.paddle.right{ right:26%; }
+
+.score-row{
+  display:flex;
+  gap:22px;
+  align-items:baseline;
+  font-weight:700;
+  font-size:44px;
+}
+.score-row .sep{ color:var(--fg-dim); font-weight:500; }
+
+.player-label{
+  font-size:12px;
+  letter-spacing:.14em;
+  color:var(--fg-dim);
+  margin-top:4px;
+}
+
+/* ---------- section shell ---------- */
+
+.section{
+  position:relative;
+  padding:80px 44px;
+  border-bottom:1px solid var(--line);
+}
+.section-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:52px;
+}
+.section-head h2{
+  font-size:34px;
+  margin:0;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.section-head .tag{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  color:var(--fg-dim);
+  letter-spacing:.06em;
+}
+
+/* ---------- court diagram ---------- */
+
+.court-diagram{
+  position:relative;
+  height:360px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.court-diagram .seam{ background-image:linear-gradient(var(--line-soft) 60%, transparent 0%); }
+.cd-half{
+  position:absolute; top:0; bottom:0; width:50%;
+  padding:20px 28px;
+}
+.cd-half.left{ left:0; }
+.cd-half.right{ right:0; text-align:right; }
+.cd-status{ font-size:12px; }
+.cd-score{
+  font-weight:700;
+  font-size:30px;
+  margin-top:6px;
+}
+.cd-ball{
+  position:absolute;
+  top:50%; left:50%;
+  width:10px; height:10px;
+  border-radius:50%;
+  background:var(--fg);
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 14px 2px rgba(242,242,240,.5);
+}
+.cd-paddle{
+  position:absolute;
+  bottom:26px;
+  width:90px; height:7px;
+  background:var(--white-paddle);
+}
+.cd-paddle.pl{ left:18%; }
+.cd-paddle.pr{ right:18%; }
+.cd-caption{
+  position:absolute;
+  bottom:14px; left:0; right:0;
+  text-align:center;
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  color:var(--fg-dim);
+  letter-spacing:.08em;
+}
+
+.court-note{
+  margin-top:28px;
+  max-width:640px;
+  color:var(--fg-dim);
+  font-size:15px;
+  line-height:1.6;
+}
+
+/* ---------- controllers ---------- */
+
+.controllers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+}
+.ctrl-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:28px 26px 32px;
+}
+.ctrl-card h3{
+  font-size:19px;
+  margin:0 0 6px;
+  font-weight:700;
+}
+.ctrl-card .who{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  color:var(--green);
+  margin-bottom:22px;
+}
+.ctrl-visual{
+  height:190px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:22px;
+  gap:18px;
+}
+
+/* motion visual: vertical track */
+.track{
+  width:46px; height:170px;
+  border-radius:30px;
+  border:1.5px solid #3a3d42;
+  position:relative;
+}
+.track .knob{
+  position:absolute;
+  left:4px; bottom:14px;
+  width:38px; height:38px;
+  border-radius:50%;
+  background:var(--blue);
+}
+.track-label{
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  color:var(--fg-dim);
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+}
+
+/* button visual */
+.btn-stack{
+  display:flex; flex-direction:column; gap:14px;
+  width:100%;
+}
+.btn{
+  background:#1d1f22;
+  border:1px solid #2c2f33;
+  border-radius:8px;
+  text-align:center;
+  padding:18px 0;
+  font-size:15px;
+  color:var(--fg);
+}
+
+.ctrl-desc{
+  color:var(--fg-dim);
+  font-size:14px;
+  line-height:1.6;
+}
+.ctrl-desc .mic{ color:var(--blue); }
+
+/* ---------- scream mechanic ---------- */
+
+.scream-wrap{
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  gap:48px;
+  align-items:center;
+}
+.scream-visual{
+  position:relative;
+  height:280px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:34px;
+}
+.scream-bars{
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+  height:170px;
+}
+.scream-bars .bar{
+  width:10px;
+  background:var(--green);
+  opacity:.85;
+}
+.scream-caption{
+  position:absolute;
+  top:22px; left:0; right:0;
+  text-align:center;
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  color:var(--fg-dim);
+  letter-spacing:.08em;
+}
+.scream-copy p{
+  color:var(--fg-dim);
+  font-size:15px;
+  line-height:1.7;
+  max-width:520px;
+}
+.scream-copy strong{ color:var(--fg); font-weight:700; }
+
+/* ---------- flow ---------- */
+
+.flow{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:26px;
+}
+.flow-step{
+  border:1px solid var(--line);
+  padding:26px 22px;
+  background:var(--panel);
+}
+.flow-step .num{
+  font-family:'JetBrains Mono', monospace;
+  color:var(--fg-dim);
+  font-size:13px;
+  margin-bottom:14px;
+}
+.flow-step h4{
+  margin:0 0 10px;
+  font-size:17px;
+  font-weight:700;
+}
+.flow-step p{
+  margin:0;
+  font-size:14px;
+  color:var(--fg-dim);
+  line-height:1.6;
+}
+
+/* ---------- footer / transport ---------- */
+
+.footer{
+  padding:44px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  color:var(--fg-dim);
+}
+.footer .transport{
+  display:flex;
+  gap:34px;
+}
+.transport .item{ color:var(--fg); }
+.transport .item span{ color:var(--fg-dim); }
+
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- HERO : two-laptop shared court -->
+  <div class="hero">
+    <div class="seam"></div>
+    <div class="hero-bar">
+      <div>
+        <div class="status"><span class="dot"></span><span class="mono">ONLINE · PLAYER 1</span></div>
+        <div class="score-row"><span>6</span><span class="sep">:</span></div>
+        <div class="player-label">PLAYER 1 · TOP</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="status" style="justify-content:flex-end;"><span class="mono">PLAYER 2 · ONLINE</span><span class="dot"></span></div>
+        <div class="score-row"><span class="sep">:</span><span>356</span></div>
+        <div class="player-label">PLAYER 2 · BOTTOM</div>
+      </div>
+    </div>
+
+    <div class="hero-title">
+      <span class="word left">SCREAM</span><span class="word right">PONG</span>
+    </div>
+
+    <div class="hero-sub">
+      <div class="tagline">One court, two laptops, screens touching.</div>
+      <div class="tagline-sub">The ball crosses the seam like the court was never split at all.</div>
+    </div>
+
+    <div class="court">
+      <div class="paddle left"></div>
+      <div class="paddle right"></div>
+    </div>
+  </div>
+
+  <!-- SHARED COURT -->
+  <div class="section">
+    <div class="section-head">
+      <h2>A court split across two screens</h2>
+      <div class="tag">01 · SHARED STATE</div>
+    </div>
+    <div class="court-diagram">
+      <div class="seam"></div>
+      <div class="cd-half left">
+        <div class="cd-status status"><span class="dot"></span><span class="mono">ONLINE</span></div>
+        <div class="cd-score">124</div>
+      </div>
+      <div class="cd-half right">
+        <div class="cd-status status" style="justify-content:flex-end;"><span class="mono">ONLINE</span><span class="dot"></span></div>
+        <div class="cd-score">356</div>
+      </div>
+      <div class="cd-ball"></div>
+      <div class="cd-paddle pl"></div>
+      <div class="cd-paddle pr"></div>
+      <div class="cd-caption">ONE GAME_STATE · ONE PHYSICS LOOP · ONE WEBSOCKET ENDPOINT</div>
+    </div>
+    <p class="court-note">Every device — both laptop displays, both phone controllers — connects to the same process over a single WebSocket. There's exactly one ball, one pair of paddles, one score. Nothing is duplicated per device, so the two halves never drift out of sync.</p>
+  </div>
+
+  <!-- CONTROLLERS -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Two ways to hold the paddle</h2>
+      <div class="tag">02 · CONTROLLERS</div>
+    </div>
+    <div class="controllers">
+      <div class="ctrl-card">
+        <h3>Motion controls</h3>
+        <div class="who">CONNECTED · CONTROLLER (PLAYER 1)</div>
+        <div class="ctrl-visual">
+          <div class="track"><div class="knob"></div></div>
+          <div class="track-label">SWING POWER</div>
+        </div>
+        <div class="ctrl-desc">Tilt the phone up or down to move the paddle. Swing it sharply and the hit lands with real power behind it — the same motion sensor doing both jobs.</div>
+      </div>
+      <div class="ctrl-card">
+        <h3>Button controls</h3>
+        <div class="who">CONNECTED · CONTROLLER (PLAYER 2)</div>
+        <div class="ctrl-visual">
+          <div class="btn-stack">
+            <div class="btn">UP</div>
+            <div class="btn">DOWN</div>
+          </div>
+        </div>
+        <div class="ctrl-desc">No sensors required — tap UP or DOWN to move the paddle. Either player can flip modes at any time from <span class="mic">Change control mode</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREAM MECHANIC -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Scream to grow your paddle</h2>
+      <div class="tag">03 · MIC INPUT</div>
+    </div>
+    <div class="scream-wrap">
+      <div class="scream-visual">
+        <div class="scream-caption">SCREAM POWER · GROWS YOUR PADDLE</div>
+        <div class="scream-bars">
+          <div class="bar" style="height:30%"></div>
+          <div class="bar" style="height:55%"></div>
+          <div class="bar" style="height:40%"></div>
+          <div class="bar" style="height:80%"></div>
+          <div class="bar" style="height:65%"></div>
+          <div class="bar" style="height:95%"></div>
+          <div class="bar" style="height:70%"></div>
+          <div class="bar" style="height:50%"></div>
+        </div>
+      </div>
+      <div class="scream-copy">
+        <p>Either controller can enable the mic. Volume feeds straight into the game loop as a live input — the louder you scream, the bigger your paddle gets on the shared court, right up until you stop and it settles back down.</p>
+        <p><strong>Enable Scream Power</strong> is opt-in per player, so a quiet room and a loud one can still play each other fairly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOW -->
+  <div class="section" style="border-bottom:none;">
+    <div class="section-head">
+      <h2>Getting from laptop to phone to court</h2>
+      <div class="tag">04 · CONNECT FLOW</div>
+    </div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="num">01</div>
+        <h4>Start the server</h4>
+        <p>One laptop runs the game and renders the left half of the court; a second laptop opens the same address for the right half.</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">02</div>
+        <h4>Scan to connect</h4>
+        <p>Each player scans a QR code shown on their laptop, opening a mobile controller page over a secure connection.</p>
+      </div>
+      <div class="flow-step">
+        <div class="num">03</div>
+        <h4>Pick a mode and play</h4>
+        <p>Choose motion or buttons, optionally enable the mic, and the paddle is live on the shared court.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="mono">SCREAM PONG</div>
+    <div class="transport">
+      <div class="item">HTTP :8000 <span>· laptops</span></div>
+      <div class="item">HTTPS :8443 <span>· phones</span></div>
+      <div class="item">WS /ws/{client_id} <span>· realtime</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
 </html>
