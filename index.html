@@ -1,185 +1,72 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Robinson</title>
-    <!--Bootstrap Icons-->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    />
-    <link href="src/style.css" rel="stylesheet" type="text/css" />
-  </head>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Robinson George Arysseril</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<nav><div class="wrap"><b>~/robinson</b>
+  <a href="#about">About</a><a href="#featured">Featured</a><a href="#repos">Repos</a><a href="#links">Links</a><button id="tbtn" class="chip" type="button" aria-label="Open terminal">&gt;_ terminal</button></div></nav>
+<main>
+<div class="wrap">
+  <header class="hero"><canvas id="px" aria-hidden="true"></canvas>
+    <h1>Robinson<br>George <i>Arysseril</i></h1>
+    <p class="tw" id="tw" aria-label="Systems programmer. Emulators, operating systems, embedded and ML."></p>
+    <p class="lede">I'm a student who loves everything computers. I write low-level code, build emulators and operating systems, and maintain tools used by tens of thousands of Chromebook owners.</p>
+    <div class="cta"><a class="btn main" href="#featured">See my projects</a><a class="btn" href="#links">Find me online</a></div>
+  </header>
+</div>
 
-  <body id="body">
-    <section id="home" class="home white_text">
-      <div class="grid display_grid">
-        <div class="about_me">
-          <h1 class="header"><span class="hi">Hi,</span> I'm Robinson</h1>
-          <p class="header_text">
-            I'm a student that loves everything computers. I love to learn, and
-            try new things. My life goal is to do as many unique things as
-            possible, and to be happy.
-          </p>
-        </div>
-        <ul class="menu p_relative text_align_left border_radius_20" id="menu">
-          <li class="first white_text text_align_left border_radius_20" id="projects_scroll">
-            <i class="bi bi-file-earmark-binary-fill">&nbsp;&nbsp;&nbsp;</i
-            >Projects
-          </li>
-          <li class="white_text text_align_left border_radius_20" id="link_scroll"><i class="bi bi-github">&nbsp;&nbsp;&nbsp;</i>Links</li>
-        </ul>
-      </div>
-    </section>
-    <section id="projects" class="projects project_background">
-      <div class="header_container p_relative" id="header_container">
-        <div class="p_relative width_100" id="typewriter_animation"></div>
-        <div
-          class="typewriter_style display_none p_relative" 
-          id="project_header"
-        >
-          <h1 class="header typewriter_title width_100" id="project_title">Projects</h1>
-        </div>
-      </div>
-      <div class="slide_show_grid display_grid">
-        <div class="description">
-          <h1 class="project_title">
-            <a
-              href="https://github.com/death7654/Chrultrabook-Tools"
-              target="_blank"
-              >Chrultrabook Tools
-              <svg
-                class="octicon octicon-link v-align-middle"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                role="img"
-                aria-hidden="true"
-              >
-                <path
-                  d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
-                ></path></svg><br/></a>
-          </h1>
-          <p class="project_paragraph">
-            A tool that adds back lost functionality and new features to all
-            chromebooks on Windows, Linux and macOS
-          </p>
-        </div>
-        <div class="video">
-          <video autoplay muted loop class="video_class width_100 margin_0 border_radius_20">
-            <source src="assets/chrultrabook_tools.mp4" />
-          </video>
-        </div>
-      </div>
-      <div class="slide_show_grid display_grid project_gap_top p_relative">
-        <div class="description">
-          <video
-            autoplay
-            muted
-            loop
-            class="video_class width_100 driver_installer p_relative margin_0 border_radius_20"
-          >
-            <source src="assets/driver.mp4" />
-          </video>
-        </div>
-        <div class="video">
-          <h1 class="project_title">
-            <a
-              href="https://github.com/death7654/Chromebook-Driver-Installer"
-              target="_blank"
-              >Chromebook Driver Installer
-              <svg
-                class="octicon octicon-link v-align-middle"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                role="img"
-                aria-hidden="true"
-              >
-                <path
-                  d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
-                ></path></svg><br /></a
-            ><br />
-          </h1>
-          <p class="project_paragraph">
-            A tool that automatically detects and installs missing drivers for
-            chromebooks running Windows
-          </p>
-        </div>
-      </div>
-      <div class="slide_show_grid  display_grid project_gap_top_2 p_relative">
-        <div class="description">
-          <h1 class="project_title">
-            <a
-              href="https://github.com/death7654/CHIP8-Emulator-CPP"
-              target="_blank"
-              >Chip8 Emulator
-              <svg
-                class="octicon octicon-link v-align-middle"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                role="img"
-                aria-hidden="true"
-              >
-                <path
-                  d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"
-                ></path></svg><br /></a
-            ><br />
-          </h1>
-          <p class="project_paragraph">
-            A program that replicates the Chip8 interpreter
-          </p>
-        </div>
-        <div class="video">
-          <video autoplay muted loop class="video_class width_100 chip_8 margin_0 border_radius_20">
-            <source src="assets/chip8.mp4" />
-          </video>
-        </div>
-      </div>
-    </section>
-    <section id="links" class="links border_radius_20">
-      <div class="links_title p_relative">
-        <h1 id="links_title">Links</h1>
-      </div>
-      <div class="link_container display_grid p_relative">
-        <div
-          class="link github_icon border_radius_20"
-          onmouseover="github()"
-          onmouseleave="remove_github()"
-        >
-          <a href="https://github.com/death7654" target="_blank"><i class="bi bi-github p_relative"></i></a>
-        </div>
-        <div
-          class="link instagram_icon border_radius_20"
-          onmouseover="instagram()"
-          onmouseleave="remove_instagram()"
-        >
-         <a href="https://www.instagram.com/robinsongeorge301/" target="_blank"> <i class="bi bi-instagram p_relative"></i></a>
-        </div>
-        <div
-          class="link facebook_icon border_radius_20"
-          onmouseover="facebook()"
-          onmouseleave="remove_facebook()"
-        >
-          <i class="bi bi-meta p_relative"></i>
-        </div>
-        <div
-          class="link linkedin_icon border_radius_20"
-          onmouseover="linkedin()"
-          onmouseleave="remove_linkedin()"
-        >
-          <a href="https://www.linkedin.com/in/robinsonarysseril/" target="_blank"> <i class="bi bi-linkedin p_relative"></i></a>
-        </div>
-      </div>
-    </section>
+<section id="about"><div class="wrap">
+  <h2 data-type>About</h2>
+  <p class="sub">My life goal is to do as many unique things as possible, and to be happy.</p>
+  <dl class="facts">
+    <div><dt>studying</dt><dd>B.Tech in Artificial Intelligence and Data Science (Honors), Vimal Jyothi Engineering College, Chemperi. Third year, CGPA 9.46, graduating May 2028.</dd></div>
+    <div><dt>open source</dt><dd>Long-term contributor to the Chrultrabook project, with more than 45,000 downloads.</dd></div>
+    <div><dt>research</dt><dd>Remote AI research internship at Amrita School of Artificial Intelligence, under Dr. Premjith B.</dd></div>
+    <div><dt>building now</dt><dd>null32 (an OS for the ESP32), a Rust quantization engine, BusMitra (bus crowd prediction), and AXIOM (crash alert system for a mountain bike).</dd></div>
+    <div><dt>outside code</dt><dd>I trained in eskrima, the Filipino stick-fighting art. The sprite carries two sticks for a reason.</dd></div>
+  </dl>
+</div></section>
 
-    <script src="src/script.js"></script>
-    <script> </script>
-    <!--bug on chrome where transition fires everytime a form element is loaded-->
-  </body>
+<section id="featured"><div class="wrap">
+  <h2 data-type>Featured</h2>
+  <p class="sub">The three projects that started this site, plus the one most people find first.</p>
+  <article class="feat"><div class="txt"><h3><a href="https://github.com/death7654/Chrultrabook-Tools" target="_blank" rel="noopener">Chrultrabook Tools</a></h3>
+    <p>A tool that adds back lost functionality and new features to Chromebooks running Windows, Linux and macOS.</p><div class="meta">TypeScript + Rust · 117 stars</div></div>
+    <div class="media"><video autoplay muted loop playsinline><source src="assets/chrultrabook_tools.mp4"></video><span>assets/chrultrabook_tools.mp4</span></div></article>
+  <article class="feat"><div class="txt"><h3><a href="https://github.com/death7654/Chromebook-Driver-Installer" target="_blank" rel="noopener">Chromebook Driver Installer</a></h3>
+    <p>A one-click tool that detects and installs missing drivers on Chromebooks running Windows.</p><div class="meta">Rust · 29 stars</div></div>
+    <div class="media"><video autoplay muted loop playsinline><source src="assets/driver.mp4"></video><span>assets/driver.mp4</span></div></article>
+  <article class="feat"><div class="txt"><h3><a href="https://github.com/death7654/CHIP8-Emulator-CPP" target="_blank" rel="noopener">Chip8 Emulator</a></h3>
+    <p>A program that replicates the Chip8 interpreter. I've since rebuilt it in Rust, Zig, and with an x86-64 JIT.</p><div class="meta">C++</div></div>
+    <div class="media"><video autoplay muted loop playsinline><source src="assets/chip8.mp4"></video><span>assets/chip8.mp4</span></div></article>
+</div></section>
+
+<section id="repos"><div class="wrap">
+  <h2 data-type>Repositories</h2>
+  <p class="sub">Everything on GitHub, grouped by what it does. Open a group, or search across all of them.</p>
+  <div class="tools"><input id="q" type="search" placeholder="Search repos or descriptions" aria-label="Search repositories"><span id="chips" style="display:contents"></span></div>
+  <div id="segs"></div>
+</div></section>
+
+<section id="links"><div class="wrap">
+  <h2 data-type>Links</h2>
+  <p class="sub">Hover one and the whole page takes its color.</p>
+  <div class="links">
+    <a class="lk" data-c="#e6edf3" href="https://github.com/death7654" target="_blank" rel="noopener"><strong>GitHub</strong><span>death7654</span></a>
+    <a class="lk" data-c="#4da3d9" href="https://www.linkedin.com/in/robinsonarysseril/" target="_blank" rel="noopener"><strong>LinkedIn</strong><span>robinsonarysseril</span></a>
+    <a class="lk" data-c="#e1306c" href="https://www.instagram.com/robinsongeorge301/" target="_blank" rel="noopener"><strong>Instagram</strong><span>robinsongeorge301</span></a>
+  </div>
+</div></section>
+</main>
+<footer><div class="wrap">Robinson George Arysseril · death7654.github.io · press / for the terminal</div></footer>
+<div id="term" hidden role="dialog" aria-label="Terminal"><div class="tbox"><div id="tout" aria-live="polite"></div><div class="trow"><span>$</span><input id="tin" autocomplete="off" spellcheck="false" aria-label="Command"></div></div></div>
+
+<script src="src/script.js">
+</script>
+</body>
 </html>
