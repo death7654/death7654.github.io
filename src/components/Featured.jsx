@@ -1,11 +1,32 @@
 import { useState } from "react";
 import { FEATURED, asset } from "../data";
 import { calmNow } from "../lib/hooks";
+import { forgetRepoImage, useRepoImage } from "../lib/repoImage";
 import TypeTitle from "./TypeTitle";
 
-/** Screen recording that tilts toward the cursor. Falls back to text if the clip is missing. */
-function Media({ video, fallback }) {
-  const [state, setState] = useState(video ? "loading" : "none");
+/**
+ * Project media, shown whole (never cropped). Order of preference:
+ *   1. the local screen recording (.mp4) or animated image (.gif/.webp), if there is one and it loads
+ *   2. an image pulled from the project's GitHub repo (README screenshot, else social card)
+ *   3. a text placeholder
+ * The frame takes the media's own aspect ratio once it is known.
+ */
+function Media({ video, repoUrl, title, fallback }) {
+  // A .gif/.webp can't go in a <video>; play it straight from /assets with an <img>.
+  const isAnimatedImage = !!video && /\.(gif|webp|apng)$/i.test(video);
+  const [vState, setVState] = useState(video && !isAnimatedImage ? "loading" : "none"); // loading | ok | error | none
+  const [localBad, setLocalBad] = useState(false);
+  const [imgBad, setImgBad] = useState(false);
+  const [ratio, setRatio] = useState(null);
+
+  const showLocalImage = isAnimatedImage && !localBad;
+  const needImage = !showLocalImage && (vState === "none" || vState === "error");
+  const gh = useRepoImage(repoUrl, needImage);
+  const showImage = needImage && gh.status === "ready" && !imgBad;
+  const showVideo = video && !isAnimatedImage && vState !== "error";
+  const placeholder = !(vState === "ok" || ((showImage || showLocalImage) && ratio));
+
+  const setFrom = (w, h) => w && h && setRatio(w / h);
 
   const tilt = (e) => {
     if (calmNow()) return;
@@ -18,21 +39,53 @@ function Media({ video, fallback }) {
   const reset = (e) => (e.currentTarget.style.transform = "");
 
   return (
-    <div className="media" onPointerMove={tilt} onPointerLeave={reset}>
-      {video && state !== "error" && (
+    <div
+      className="media"
+      style={ratio ? { aspectRatio: String(ratio) } : undefined}
+      onPointerMove={tilt}
+      onPointerLeave={reset}
+    >
+      {showVideo && (
         <video
           src={asset(video)}
           autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
           aria-hidden="true"
-          onLoadedData={() => setState("ok")}
-          onError={() => setState("error")}
+          onLoadedMetadata={(e) => {
+            setFrom(e.currentTarget.videoWidth, e.currentTarget.videoHeight);
+            setVState("ok");
+          }}
+          onLoadedData={() => setVState("ok")}
+          onCanPlay={() => setVState("ok")}
+          onError={() => setVState("error")}
         />
       )}
-      {state !== "ok" && <span>{fallback}</span>}
+      {showLocalImage && (
+        <img
+          src={asset(video)}
+          alt={`${title} demo`}
+          decoding="async"
+          onLoad={(e) => setFrom(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)}
+          onError={() => setLocalBad(true)}
+        />
+      )}
+      {showImage && (
+        <img
+          src={gh.src}
+          alt={`${title} screenshot from GitHub`}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onLoad={(e) => setFrom(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)}
+          onError={() => {
+            forgetRepoImage(repoUrl);
+            setImgBad(true);
+          }}
+        />
+      )}
+      {placeholder && <span>{fallback}</span>}
     </div>
   );
 }
@@ -58,7 +111,7 @@ export default function Featured() {
               <p>{p.description}</p>
               <div className="meta">{p.meta}</div>
             </div>
-            <Media video={p.video} fallback={p.video ?? p.url.replace(/^https?:\/\//, "")} />
+            <Media video={p.video} repoUrl={p.url} title={p.title} fallback={p.url.replace(/^https?:\/\//, "")} />
           </article>
         ))}
       </div>

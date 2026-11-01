@@ -105,6 +105,7 @@ export const FEATURED = [
     id: "null32",
     title: "Bare Metal ESP32 Kernel",
     url: "https://github.com/death7654/null32",
+    video: "assets/esp32.gif",
     meta: "C · Xtensa assembly · built from the TRM up",
     description:
       "A two-stage bootloader and kernel for the ESP32, built entirely from the Technical Reference Manual. It has a custom Xtensa assembly trampoline that moves the kernel from DRAM to IRAM, a register-level SPI/SD driver, a FAT32 driver that walks cluster chains, and an interactive kernel shell with its own script interpreter.",
