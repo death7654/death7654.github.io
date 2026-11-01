@@ -1,22 +1,20 @@
-# React + Vite
+# Robinson George Arysseril — portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + Vite, styled with the pink/mint theme from the original `index.html`.
 
-Currently, two official plugins are available:
+    npm install
+    npm run dev       # local
+    npm run build     # static site in dist/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+No other dependencies: Tailwind, framer-motion and lucide-react are no longer used.
 
-## React Compiler
+## Add your files
+- `public/assets/` — `chrultrabook_tools.mp4`, `driver.mp4`, `chip8.mp4` (optional; text fallback if missing)
+- `public/resumes/` — the four PDFs, named as in `public/resumes/README.txt`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-
-
-# to build
-```
-  npm run deploy
-```
+## Where things live
+- `src/data.js` — all content (facts, featured projects, experience, resumes, static repo list)
+- `src/Portfolio.jsx` — page composition, hash routing (`#/resume`), `/` terminal shortcut
+- `src/components/` — one file per section
+- `src/lib/critters.js` — the bug + eskrima fighter (ported from the old script.js)
+- `src/index.css` — original `style.css` followed by the additions
